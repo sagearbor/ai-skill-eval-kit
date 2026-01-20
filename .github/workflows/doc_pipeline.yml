@@ -36,25 +36,58 @@ jobs:
           cat > generate_reference.py << 'EOF'
           import docx
           from docx.shared import Pt, RGBColor
+          from docx.oxml import OxmlElement
+          from docx.oxml.ns import qn
+
+          def set_table_borders(table):
+              """
+              Manually sets the XML for table borders to ensure they are visible.
+              """
+              tbl = table._tbl
+              tblPr = tbl.tblPr
+              
+              # Create tblBorders element
+              tblBorders = OxmlElement('w:tblBorders')
+              
+              # Define border types
+              for border_name in ['top', 'left', 'bottom', 'right', 'insideH', 'insideV']:
+                  border = OxmlElement(f'w:{border_name}')
+                  border.set(qn('w:val'), 'single')
+                  border.set(qn('w:sz'), '4') # Border size
+                  border.set(qn('w:space'), '0')
+                  border.set(qn('w:color'), '000000') # Black color
+                  tblBorders.append(border)
+              
+              tblPr.append(tblBorders)
 
           doc = docx.Document()
-          styles = doc.styles
+          
+          # 1. Create a dummy table to initialize the "Table Grid" style
+          table = doc.add_table(rows=1, cols=1)
+          table.style = 'Table Grid'
+          
+          # 2. Force border XML on this table style so Pandoc picks it up
+          # (Pandoc uses the underlying styles of the reference doc)
+          # Note: Since python-docx styles are sometimes tricky, we just ensure 
+          # the default table we create has the style, then we save.
+          set_table_borders(table)
 
-          # Tweak "Normal" paragraph font if it exists
+          # 3. Tweak "Normal" paragraph font
+          styles = doc.styles
           if "Normal" in styles:
               style = styles["Normal"]
               font = style.font
               font.name = "Calibri"
               font.size = Pt(11)
 
-          # Tweak "Heading 1" if it exists
+          # 4. Tweak "Heading 1"
           if "Heading 1" in styles:
               h1 = styles["Heading 1"]
               h1.font.color.rgb = RGBColor(0x2E, 0x74, 0xB5) # Blue title
               h1.font.size = Pt(16)
 
           doc.save("reference.docx")
-          print("Generated reference.docx with custom styles")
+          print("Generated reference.docx with forced table borders")
           EOF
 
           python3 generate_reference.py
