@@ -31,46 +31,50 @@ jobs:
         run: pip install python-docx
 
       - name: Generate Styled Reference Doc
-        # We write the script to a file first to avoid YAML/Shell newline issues
+        # This script patches the 'Normal Table' style directly in the XML to force borders
         run: |
           cat > generate_reference.py << 'EOF'
           import docx
           from docx.shared import Pt, RGBColor
-          from docx.oxml import OxmlElement
-          from docx.oxml.ns import qn
+          from docx.oxml import OxmlElement, ns
 
-          def set_table_borders(table):
-              """
-              Manually sets the XML for table borders to ensure they are visible.
-              """
-              tbl = table._tbl
-              tblPr = tbl.tblPr
+          def create_element(name):
+              return OxmlElement(name)
+
+          def create_attribute(element, name, value):
+              element.set(ns.qn(name), value)
+
+          def add_borders(style):
+              # Find or create the table properties (tblPr) element
+              tblPr = style._element.get_or_add_tblPr()
               
-              # Create tblBorders element
-              tblBorders = OxmlElement('w:tblBorders')
+              # Create the borders element
+              tblBorders = create_element('w:tblBorders')
               
-              # Define border types
-              for border_name in ['top', 'left', 'bottom', 'right', 'insideH', 'insideV']:
-                  border = OxmlElement(f'w:{border_name}')
-                  border.set(qn('w:val'), 'single')
-                  border.set(qn('w:sz'), '4') # Border size
-                  border.set(qn('w:space'), '0')
-                  border.set(qn('w:color'), '000000') # Black color
-                  tblBorders.append(border)
+              # Add specific borders (top, left, bottom, right, inside horizontal, inside vertical)
+              for border in ['top', 'left', 'bottom', 'right', 'insideH', 'insideV']:
+                  bd = create_element(f'w:{border}')
+                  create_attribute(bd, 'w:val', 'single')
+                  create_attribute(bd, 'w:sz', '4')      # Border width (1/8 pt units, so 4 = 0.5pt)
+                  create_attribute(bd, 'w:space', '0')
+                  create_attribute(bd, 'w:color', 'auto') # Automatic color (usually black)
+                  tblBorders.append(bd)
               
+              # Append borders to table properties
               tblPr.append(tblBorders)
 
           doc = docx.Document()
-          
-          # 1. Create a dummy table to initialize the "Table Grid" style
-          table = doc.add_table(rows=1, cols=1)
-          table.style = 'Table Grid'
-          
-          # 2. Force border XML on this table style so Pandoc picks it up
-          set_table_borders(table)
+          styles = doc.styles
+
+          # 1. Force borders onto 'Normal Table' (Pandoc's default)
+          if 'Normal Table' in styles:
+              add_borders(styles['Normal Table'])
+
+          # 2. Force borders onto 'Table Grid' (Standard Word style)
+          # Note: python-docx doesn't always expose this easily if not used, 
+          # but we modify Normal Table as the primary fallback.
 
           # 3. Tweak "Normal" paragraph font
-          styles = doc.styles
           if "Normal" in styles:
               style = styles["Normal"]
               font = style.font
@@ -84,7 +88,7 @@ jobs:
               h1.font.size = Pt(16)
 
           doc.save("reference.docx")
-          print("Generated reference.docx with forced table borders")
+          print("Generated reference.docx with XML-patched table borders")
           EOF
 
           python3 generate_reference.py
@@ -95,8 +99,6 @@ jobs:
           touch build/.gitkeep
 
       - name: Convert Markdown to DOCX
-        # Source MD is now fixed, so we don't need sed hacks.
-        # Just run Pandoc using the reference doc for styling.
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/data \
@@ -117,5 +119,5 @@ jobs:
             exit 0
           fi
           
-          git commit -m "chore: update build artifacts with fixed tables [skip ci]"
+          git commit -m "chore: update build artifacts with fixed borders [skip ci]"
           git push
