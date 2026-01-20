@@ -1,0 +1,52 @@
+name: Build DOCX from Markdown
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    paths:
+      - "docs/*.md"
+      - ".github/workflows/doc_pipeline.yml"
+  # Run nightly at 2 AM UTC to ensure everything is fresh
+  schedule:
+    - cron: "0 2 * * *"
+  # Allow manual trigger from GitHub Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-docx:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Ensure build directory exists
+        run: mkdir -p build
+
+      - name: Convert Markdown to DOCX
+        # Uses Dockerized Pandoc to ensure consistency without installing dependencies
+        run: |
+          docker run --rm \
+            -v "$PWD:/data" \
+            -w /data \
+            pandoc/core:latest \
+            pandoc -s docs/ai_mastery_eval.md -o build/ai_mastery_eval.docx
+
+      - name: Commit updated DOCX
+        # Only commits if there are actual changes to the file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Check if the file changed
+          if git diff --quiet -- build/ai_mastery_eval.docx; then
+            echo "No changes detected in DOCX. Skipping commit."
+            exit 0
+          fi
+          
+          git add build/ai_mastery_eval.docx
+          git commit -m "chore: auto-generate DOCX from Markdown [skip ci]"
+          git push
