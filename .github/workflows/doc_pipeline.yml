@@ -67,9 +67,6 @@ jobs:
           table.style = 'Table Grid'
           
           # 2. Force border XML on this table style so Pandoc picks it up
-          # (Pandoc uses the underlying styles of the reference doc)
-          # Note: Since python-docx styles are sometimes tricky, we just ensure 
-          # the default table we create has the style, then we save.
           set_table_borders(table)
 
           # 3. Tweak "Normal" paragraph font
@@ -98,14 +95,18 @@ jobs:
           touch build/.gitkeep
 
       - name: Convert Markdown to DOCX
-        # Note: We are now using the Python-generated "reference.docx"
+        # 1. Pre-process MD to ensure tables have blank lines around them
+        # 2. Run Pandoc using the generated reference doc
         run: |
+          # Add blank lines before and after tables to ensure Pandoc detects them
+          sed 's/^|/\n|/g' docs/ai_mastery_eval.md > docs/temp_processed.md
+          
           docker run --rm \
             -v ${{ github.workspace }}:/data \
             -w /data \
             --user root \
             pandoc/core:latest \
-            docs/ai_mastery_eval.md --reference-doc reference.docx -o build/ai_mastery_eval.docx
+            docs/temp_processed.md --reference-doc reference.docx -o build/ai_mastery_eval.docx
 
       - name: Commit artifacts
         run: |
@@ -119,5 +120,5 @@ jobs:
             exit 0
           fi
           
-          git commit -m "chore: update build artifacts with new styles [skip ci]"
+          git commit -m "chore: update build artifacts with fixed tables [skip ci]"
           git push
