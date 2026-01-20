@@ -6,7 +6,6 @@ on:
     paths:
       - "docs/*.md"
       - ".github/workflows/doc_pipeline.yml"
-      - "scripts/generate_reference.py"
   schedule:
     - cron: "0 2 * * *"
   workflow_dispatch:
@@ -31,64 +30,64 @@ jobs:
         run: pip install python-docx
 
       - name: Generate Styled Reference Doc
-        # This script patches the 'Normal Table' style directly in the XML to force borders
+        # This script manually injects the tblBorders into the style XML
         run: |
           cat > generate_reference.py << 'EOF'
           import docx
           from docx.shared import Pt, RGBColor
-          from docx.oxml import OxmlElement, ns
+          from docx.oxml import OxmlElement
+          from docx.oxml.ns import qn
 
-          def create_element(name):
-              return OxmlElement(name)
-
-          def create_attribute(element, name, value):
-              element.set(ns.qn(name), value)
-
-          def add_borders(style):
-              # Find or create the table properties (tblPr) element
-              tblPr = style._element.get_or_add_tblPr()
+          def add_borders_to_style(style):
+              """
+              Manually injects tblBorders XML into a style element.
+              """
+              # Access the underlying XML element: <w:style>
+              style_el = style._element
               
-              # Create the borders element
-              tblBorders = create_element('w:tblBorders')
+              # Find or create <w:tblPr>
+              tblPr = style_el.find(qn('w:tblPr'))
+              if tblPr is None:
+                  tblPr = OxmlElement('w:tblPr')
+                  # tblPr must be inserted in the correct order in <w:style>
+                  style_el.append(tblPr)
               
-              # Add specific borders (top, left, bottom, right, inside horizontal, inside vertical)
-              for border in ['top', 'left', 'bottom', 'right', 'insideH', 'insideV']:
-                  bd = create_element(f'w:{border}')
-                  create_attribute(bd, 'w:val', 'single')
-                  create_attribute(bd, 'w:sz', '4')      # Border width (1/8 pt units, so 4 = 0.5pt)
-                  create_attribute(bd, 'w:space', '0')
-                  create_attribute(bd, 'w:color', 'auto') # Automatic color (usually black)
-                  tblBorders.append(bd)
+              # Find or create <w:tblBorders>
+              tblBorders = tblPr.find(qn('w:tblBorders'))
+              if tblBorders is None:
+                  tblBorders = OxmlElement('w:tblBorders')
+                  tblPr.append(tblBorders)
               
-              # Append borders to table properties
-              tblPr.append(tblBorders)
+              # Add specific borders
+              for border_name in ['top', 'left', 'bottom', 'right', 'insideH', 'insideV']:
+                  # Check if border already exists to avoid duplicates
+                  if tblBorders.find(qn(f'w:{border_name}')) is None:
+                      border = OxmlElement(f'w:{border_name}')
+                      border.set(qn('w:val'), 'single')
+                      border.set(qn('w:sz'), '4')  # 0.5 pt
+                      border.set(qn('w:space'), '0')
+                      border.set(qn('w:color'), 'auto')
+                      tblBorders.append(border)
 
           doc = docx.Document()
           styles = doc.styles
 
-          # 1. Force borders onto 'Normal Table' (Pandoc's default)
+          # Force borders onto the default 'Normal Table'
           if 'Normal Table' in styles:
-              add_borders(styles['Normal Table'])
+              add_borders_to_style(styles['Normal Table'])
 
-          # 2. Force borders onto 'Table Grid' (Standard Word style)
-          # Note: python-docx doesn't always expose this easily if not used, 
-          # but we modify Normal Table as the primary fallback.
-
-          # 3. Tweak "Normal" paragraph font
+          # Standard font and header styling
           if "Normal" in styles:
-              style = styles["Normal"]
-              font = style.font
-              font.name = "Calibri"
-              font.size = Pt(11)
+              styles["Normal"].font.name = "Calibri"
+              styles["Normal"].font.size = Pt(11)
 
-          # 4. Tweak "Heading 1"
           if "Heading 1" in styles:
               h1 = styles["Heading 1"]
-              h1.font.color.rgb = RGBColor(0x2E, 0x74, 0xB5) # Blue title
+              h1.font.color.rgb = RGBColor(0x2E, 0x74, 0xB5)
               h1.font.size = Pt(16)
 
           doc.save("reference.docx")
-          print("Generated reference.docx with XML-patched table borders")
+          print("Reference doc generated with fixed XML borders.")
           EOF
 
           python3 generate_reference.py
@@ -112,12 +111,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          git add build/
+          git add build/ reference.docx
           
           if git diff --cached --quiet; then
             echo "No changes detected. Skipping commit."
             exit 0
           fi
           
-          git commit -m "chore: update build artifacts with fixed borders [skip ci]"
+          git commit -m "chore: fix table borders in reference doc [skip ci]"
           git push
