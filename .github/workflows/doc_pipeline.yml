@@ -31,34 +31,33 @@ jobs:
         run: pip install python-docx
 
       - name: Generate Styled Reference Doc
-        # This creates a reference.docx with a "Grid Table" style that Pandoc likes
+        # We write the script to a file first to avoid YAML/Shell newline issues
         run: |
-          python3 -c '
-import docx
-from docx.enum.style import WD_STYLE_TYPE
-from docx.shared import Pt, RGBColor
+          cat > generate_reference.py << 'EOF'
+          import docx
+          from docx.shared import Pt, RGBColor
 
-doc = docx.Document()
+          doc = docx.Document()
+          styles = doc.styles
 
-# Access the default table style or create one
-# Pandoc often maps to "Table" or "Table Normal"
-styles = doc.styles
+          # Tweak "Normal" paragraph font if it exists
+          if "Normal" in styles:
+              style = styles["Normal"]
+              font = style.font
+              font.name = "Calibri"
+              font.size = Pt(11)
 
-# Tweak "Normal" paragraph font
-style = styles["Normal"]
-font = style.font
-font.name = "Calibri"
-font.size = Pt(11)
+          # Tweak "Heading 1" if it exists
+          if "Heading 1" in styles:
+              h1 = styles["Heading 1"]
+              h1.font.color.rgb = RGBColor(0x2E, 0x74, 0xB5) # Blue title
+              h1.font.size = Pt(16)
 
-# Tweak "Heading 1"
-h1 = styles["Heading 1"]
-h1.font.color.rgb = RGBColor(0x2E, 0x74, 0xB5) # Blue title
-h1.font.size = Pt(16)
+          doc.save("reference.docx")
+          print("Generated reference.docx with custom styles")
+          EOF
 
-# Save the reference doc
-doc.save("reference.docx")
-print("Generated reference.docx with custom styles")
-'
+          python3 generate_reference.py
 
       - name: Ensure build directory exists
         run: |
