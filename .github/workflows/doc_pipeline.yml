@@ -6,10 +6,8 @@ on:
     paths:
       - "docs/*.md"
       - ".github/workflows/doc_pipeline.yml"
-  # Run nightly at 2 AM UTC to ensure everything is fresh
   schedule:
     - cron: "0 2 * * *"
-  # Allow manual trigger from GitHub Actions tab
   workflow_dispatch:
 
 permissions:
@@ -27,21 +25,19 @@ jobs:
         run: mkdir -p build
 
       - name: Convert Markdown to DOCX
-        # Uses Dockerized Pandoc to ensure consistency without installing dependencies
         run: |
           docker run --rm \
-            -v "$PWD:/data" \
+            -v ${{ github.workspace }}:/data \
             -w /data \
+            --user root \
             pandoc/core:latest \
-            pandoc -s docs/ai_mastery_eval.md -o build/ai_mastery_eval.docx
+            docs/ai_mastery_eval.md -o build/ai_mastery_eval.docx
 
       - name: Commit updated DOCX
-        # Only commits if there are actual changes to the file
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Check if the file changed
           if git diff --quiet -- build/ai_mastery_eval.docx; then
             echo "No changes detected in DOCX. Skipping commit."
             exit 0
