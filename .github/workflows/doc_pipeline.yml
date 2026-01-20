@@ -6,6 +6,7 @@ on:
     paths:
       - "docs/*.md"
       - ".github/workflows/doc_pipeline.yml"
+      - "reference.docx" # Trigger build if reference doc changes
   schedule:
     - cron: "0 2 * * *"
   workflow_dispatch:
@@ -27,27 +28,30 @@ jobs:
           touch build/.gitkeep
 
       - name: Convert Markdown to DOCX
-        # Fixed the volume mapping and added --user root to solve mapping errors
+        # We override entrypoint to /bin/sh to run logic:
+        # 1. Generate reference.docx if missing
+        # 2. Run conversion using that reference for styling
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/data \
             -w /data \
             --user root \
+            --entrypoint /bin/sh \
             pandoc/core:latest \
-            docs/ai_mastery_eval.md -o build/ai_mastery_eval.docx
+            -c "if [ ! -f reference.docx ]; then pandoc -o reference.docx --print-default-data-file reference.docx; fi && pandoc -f markdown -s docs/ai_mastery_eval.md --reference-doc reference.docx -o build/ai_mastery_eval.docx"
 
-      - name: Commit updated DOCX
+      - name: Commit artifacts
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Add the .gitkeep and the docx
-          git add build/
+          # Add build folder AND the reference doc (if newly generated)
+          git add build/ reference.docx
           
           if git diff --cached --quiet; then
-            echo "No changes detected in build artifacts. Skipping commit."
+            echo "No changes detected. Skipping commit."
             exit 0
           fi
           
-          git commit -m "chore: auto-generate DOCX and maintain build directory [skip ci]"
+          git commit -m "chore: update build artifacts and styles [skip ci]"
           git push
