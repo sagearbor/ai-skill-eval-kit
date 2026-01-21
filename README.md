@@ -2,7 +2,9 @@
 
 A standardized, evidence-based system for measuring individual AI competency.
 
-**Live Site:** [sagearbor.github.io/ai-skill-eval-kit](https://sagearbor.github.io/ai-skill-eval-kit/)
+[![Try the Assessment](https://img.shields.io/badge/Try_the_Assessment-Live_Site-blue?style=for-the-badge)](https://sagearbor.github.io/ai-skill-eval-kit/)
+
+> **Take the AIQ Assessment now:** https://sagearbor.github.io/ai-skill-eval-kit/
 
 ## What is AIQ?
 
