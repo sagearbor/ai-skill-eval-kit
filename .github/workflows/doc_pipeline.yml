@@ -5,7 +5,9 @@ on:
     branches: [ "main", "master" ]
     paths:
       - "docs/*.md"
+      - "docs/templates/**"
       - ".github/workflows/doc_pipeline.yml"
+      - ".markdownlint.json"
   schedule:
     - cron: "0 2 * * *"
   workflow_dispatch:
@@ -14,9 +16,22 @@ permissions:
   contents: write
 
 jobs:
+  lint-markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Lint Markdown files
+        uses: DavidAnson/markdownlint-cli2-action@v19
+        with:
+          globs: "docs/*.md"
+          config: ".markdownlint.json"
+
   build-docx:
     runs-on: ubuntu-latest
-    
+    needs: lint-markdown
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,52 +44,99 @@ jobs:
       - name: Install python-docx
         run: pip install python-docx
 
+      - name: Ensure directories exist
+        run: |
+          mkdir -p docs/templates
+          mkdir -p build
+          touch build/.gitkeep
+
       - name: Generate Styled Reference Doc
-        # This script manually injects the tblBorders into the style XML
+        # Creates a reference.docx with a custom "Table" style that Pandoc uses
+        # Key insight: Pandoc looks for a style named exactly "Table" (not "Normal Table")
+        # See: https://johnathandos.com/posts/2025-11-24-custom-tables-with-pandoc/
         run: |
           cat > generate_reference.py << 'EOF'
           import docx
-          from docx.shared import Pt, RGBColor
+          from docx.shared import Pt, RGBColor, Twips
           from docx.oxml import OxmlElement
-          from docx.oxml.ns import qn
+          from docx.oxml.ns import qn, nsmap
+          from docx.enum.style import WD_STYLE_TYPE
 
-          def add_borders_to_style(style):
+          def create_table_style_with_borders(doc):
               """
-              Manually injects tblBorders XML into a style element.
+              Creates a custom table style named 'Table' that Pandoc will use.
+              Pandoc specifically looks for a style with this exact name.
               """
-              # Access the underlying XML element: <w:style>
-              style_el = style._element
-              
+              styles = doc.styles
+
+              # Create a new table style named "Table"
+              # This is the key - Pandoc looks for exactly this name
+              table_style = styles.add_style('Table', WD_STYLE_TYPE.TABLE)
+              table_style.base_style = styles['Table Grid']  # Inherit from Table Grid
+
+              # Access the underlying XML element
+              style_el = table_style._element
+
               # Find or create <w:tblPr>
               tblPr = style_el.find(qn('w:tblPr'))
               if tblPr is None:
                   tblPr = OxmlElement('w:tblPr')
-                  # tblPr must be inserted in the correct order in <w:style>
                   style_el.append(tblPr)
-              
-              # Find or create <w:tblBorders>
-              tblBorders = tblPr.find(qn('w:tblBorders'))
-              if tblBorders is None:
-                  tblBorders = OxmlElement('w:tblBorders')
-                  tblPr.append(tblBorders)
-              
-              # Add specific borders
+
+              # Create <w:tblBorders> with all border types
+              tblBorders = OxmlElement('w:tblBorders')
+
               for border_name in ['top', 'left', 'bottom', 'right', 'insideH', 'insideV']:
-                  # Check if border already exists to avoid duplicates
-                  if tblBorders.find(qn(f'w:{border_name}')) is None:
+                  border = OxmlElement(f'w:{border_name}')
+                  border.set(qn('w:val'), 'single')
+                  border.set(qn('w:sz'), '4')  # 0.5 pt (4 eighths of a point)
+                  border.set(qn('w:space'), '0')
+                  border.set(qn('w:color'), '000000')  # Black borders
+                  tblBorders.append(border)
+
+              tblPr.append(tblBorders)
+
+              return table_style
+
+          def add_borders_to_table_grid(doc):
+              """
+              Also ensure Table Grid style has proper borders as a fallback.
+              """
+              styles = doc.styles
+              if 'Table Grid' in styles:
+                  style = styles['Table Grid']
+                  style_el = style._element
+
+                  tblPr = style_el.find(qn('w:tblPr'))
+                  if tblPr is None:
+                      tblPr = OxmlElement('w:tblPr')
+                      style_el.append(tblPr)
+
+                  # Remove existing borders if any
+                  existing_borders = tblPr.find(qn('w:tblBorders'))
+                  if existing_borders is not None:
+                      tblPr.remove(existing_borders)
+
+                  tblBorders = OxmlElement('w:tblBorders')
+                  for border_name in ['top', 'left', 'bottom', 'right', 'insideH', 'insideV']:
                       border = OxmlElement(f'w:{border_name}')
                       border.set(qn('w:val'), 'single')
-                      border.set(qn('w:sz'), '4')  # 0.5 pt
+                      border.set(qn('w:sz'), '4')
                       border.set(qn('w:space'), '0')
-                      border.set(qn('w:color'), 'auto')
+                      border.set(qn('w:color'), '000000')
                       tblBorders.append(border)
 
+                  tblPr.append(tblBorders)
+
+          # Create document
           doc = docx.Document()
           styles = doc.styles
 
-          # Force borders onto the default 'Normal Table'
-          if 'Normal Table' in styles:
-              add_borders_to_style(styles['Normal Table'])
+          # Create the custom "Table" style that Pandoc uses
+          create_table_style_with_borders(doc)
+
+          # Also fix Table Grid as fallback
+          add_borders_to_table_grid(doc)
 
           # Standard font and header styling
           if "Normal" in styles:
@@ -86,16 +148,25 @@ jobs:
               h1.font.color.rgb = RGBColor(0x2E, 0x74, 0xB5)
               h1.font.size = Pt(16)
 
-          doc.save("reference.docx")
-          print("Reference doc generated with fixed XML borders.")
+          if "Heading 2" in styles:
+              h2 = styles["Heading 2"]
+              h2.font.color.rgb = RGBColor(0x2E, 0x74, 0xB5)
+              h2.font.size = Pt(14)
+
+          # Create a sample table to ensure the style is "used" in the document
+          # This is required for python-docx to properly save the style
+          table = doc.add_table(rows=1, cols=1)
+          table.style = 'Table'
+
+          # Remove the sample table's paragraph (cleanup)
+          # The style will remain in the document
+          doc._body._element.remove(table._tbl)
+
+          doc.save("docs/templates/reference.docx")
+          print("Reference doc generated with 'Table' style for Pandoc.")
           EOF
 
           python3 generate_reference.py
-
-      - name: Ensure build directory exists
-        run: |
-          mkdir -p build
-          touch build/.gitkeep
 
       - name: Convert Markdown to DOCX
         run: |
@@ -104,19 +175,99 @@ jobs:
             -w /data \
             --user root \
             pandoc/core:latest \
-            docs/ai_mastery_eval.md --reference-doc reference.docx -o build/ai_mastery_eval.docx
+            docs/ai_mastery_eval.md \
+            --reference-doc docs/templates/reference.docx \
+            -o build/ai_mastery_eval.docx
+
+      - name: Post-process DOCX to ensure table borders
+        # Fallback: Apply borders directly to all tables in the generated document
+        # This handles cases where Pandoc doesn't pick up the style
+        run: |
+          cat > fix_table_borders.py << 'EOF'
+          import docx
+          from docx.oxml import OxmlElement
+          from docx.oxml.ns import qn
+
+          def set_table_borders(table):
+              """
+              Apply borders directly to a table element.
+              This ensures borders appear regardless of style inheritance issues.
+              """
+              tbl = table._tbl
+              tblPr = tbl.tblPr
+              if tblPr is None:
+                  tblPr = OxmlElement('w:tblPr')
+                  tbl.insert(0, tblPr)
+
+              # Remove existing borders
+              existing = tblPr.find(qn('w:tblBorders'))
+              if existing is not None:
+                  tblPr.remove(existing)
+
+              # Add new borders
+              tblBorders = OxmlElement('w:tblBorders')
+              for border_name in ['top', 'left', 'bottom', 'right', 'insideH', 'insideV']:
+                  border = OxmlElement(f'w:{border_name}')
+                  border.set(qn('w:val'), 'single')
+                  border.set(qn('w:sz'), '4')
+                  border.set(qn('w:space'), '0')
+                  border.set(qn('w:color'), '000000')
+                  tblBorders.append(border)
+
+              tblPr.append(tblBorders)
+
+          def set_cell_borders(cell):
+              """
+              Apply borders directly to each cell for maximum compatibility.
+              """
+              tc = cell._tc
+              tcPr = tc.get_or_add_tcPr()
+
+              # Remove existing cell borders
+              existing = tcPr.find(qn('w:tcBorders'))
+              if existing is not None:
+                  tcPr.remove(existing)
+
+              # Add cell borders
+              tcBorders = OxmlElement('w:tcBorders')
+              for border_name in ['top', 'left', 'bottom', 'right']:
+                  border = OxmlElement(f'w:{border_name}')
+                  border.set(qn('w:val'), 'single')
+                  border.set(qn('w:sz'), '4')
+                  border.set(qn('w:space'), '0')
+                  border.set(qn('w:color'), '000000')
+                  tcBorders.append(border)
+
+              tcPr.append(tcBorders)
+
+          # Process the generated document
+          doc = docx.Document('build/ai_mastery_eval.docx')
+
+          table_count = 0
+          for table in doc.tables:
+              set_table_borders(table)
+              for row in table.rows:
+                  for cell in row.cells:
+                      set_cell_borders(cell)
+              table_count += 1
+
+          doc.save('build/ai_mastery_eval.docx')
+          print(f"Post-processed {table_count} tables with borders.")
+          EOF
+
+          python3 fix_table_borders.py
 
       - name: Commit artifacts
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          git add build/ reference.docx
-          
+
+          git add build/ docs/templates/
+
           if git diff --cached --quiet; then
             echo "No changes detected. Skipping commit."
             exit 0
           fi
-          
-          git commit -m "chore: fix table borders in reference doc [skip ci]"
+
+          git commit -m "chore: update generated documents [skip ci]"
           git push
