@@ -7,6 +7,8 @@
 let currentResults = null;
 let currentRole = 'General';
 let currentLevels = null;
+let currentName = '';
+let currentEmail = '';
 
 // =============================================================================
 // INITIALIZATION
@@ -197,6 +199,15 @@ function validateForm() {
  * Main calculation function - validates, calculates, and shows results
  */
 function calculateAndShowResults() {
+  // Validate name field
+  const nameInput = document.getElementById('assessee-name');
+  if (!nameInput || !nameInput.value.trim()) {
+    nameInput?.classList.add('is-invalid');
+    nameInput?.focus();
+    return;
+  }
+  nameInput.classList.remove('is-invalid');
+
   // Validate form
   if (!validateForm()) {
     // Scroll to error message
@@ -204,7 +215,10 @@ function calculateAndShowResults() {
     return;
   }
 
-  // Get role and answers
+  // Get name, email, role and answers
+  currentName = nameInput.value.trim();
+  const emailInput = document.getElementById('assessee-email');
+  currentEmail = emailInput ? emailInput.value.trim() : '';
   const roleSelect = document.getElementById('role-select');
   currentRole = roleSelect ? roleSelect.value : 'General';
   currentLevels = collectAnswers();
@@ -331,8 +345,8 @@ function downloadJSON() {
 
   // Create report object using shared utility
   const report = createReportObject({
-    assesseeName: '',
-    assesseeEmail: '',
+    assesseeName: currentName,
+    assesseeEmail: currentEmail,
     role: currentRole,
     levels: currentLevels,
     assessmentLevel: 1
@@ -370,6 +384,10 @@ function downloadPDF() {
       <p style="text-align: center; color: #64748b; margin-top: 0;">Level 1: Self-Assessment</p>
 
       <table style="width: 100%; margin: 30px 0; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;"><strong>Name:</strong></td>
+          <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">${currentName}</td>
+        </tr>
         <tr>
           <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;"><strong>Report ID:</strong></td>
           <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">${reportId}</td>
@@ -467,6 +485,8 @@ function goToPeerReview() {
 
   // Encode current state for L2
   const stateData = {
+    name: currentName,
+    email: currentEmail,
     role: currentRole,
     levels: currentLevels,
     fromL1: true

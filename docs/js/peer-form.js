@@ -23,6 +23,39 @@ function initAssesseeForm() {
     // Create dimension score dropdowns
     createDimensionScoreInputs();
 
+    // Check for prefill data from L1
+    const prefillEncoded = getUrlParam('prefill');
+    if (prefillEncoded) {
+        const prefillData = decodeState(prefillEncoded);
+        if (prefillData && prefillData.fromL1) {
+            // Prefill name
+            if (prefillData.name) {
+                const nameInput = document.getElementById('assesseeName');
+                if (nameInput) nameInput.value = prefillData.name;
+            }
+            // Prefill email
+            if (prefillData.email) {
+                const emailInput = document.getElementById('assesseeEmail');
+                if (emailInput) emailInput.value = prefillData.email;
+            }
+            // Prefill role
+            if (prefillData.role && roleSelect) {
+                roleSelect.value = prefillData.role;
+            }
+            // Prefill dimension scores
+            if (prefillData.levels) {
+                for (const [dimKey, level] of Object.entries(prefillData.levels)) {
+                    const select = document.getElementById(`score_${dimKey}`);
+                    if (select) {
+                        select.value = level;
+                        // Trigger change event to update hint
+                        select.dispatchEvent(new Event('change'));
+                    }
+                }
+            }
+        }
+    }
+
     // Set up form submit handler
     const form = document.getElementById('assesseeForm');
     if (form) {
