@@ -196,21 +196,21 @@ hr {
    Hero Section
    ---------------------------------------- */
 .hero {
-  padding: var(--space-16) 0;
+  padding: var(--space-6) 0 var(--space-4);
   text-align: center;
   background: linear-gradient(180deg, var(--color-bg-alt) 0%, var(--color-bg) 100%);
 }
 
 .hero h1 {
-  font-size: clamp(2rem, 5vw, 3rem);
-  margin-bottom: var(--space-4);
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  margin-bottom: var(--space-2);
 }
 
 .hero-subtitle {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-base);
   color: var(--color-secondary);
-  max-width: 700px;
-  margin: 0 auto var(--space-8);
+  max-width: 600px;
+  margin: 0 auto var(--space-4);
 }
 
 .hero-buttons {
@@ -218,28 +218,29 @@ hr {
   flex-wrap: wrap;
   gap: var(--space-4);
   justify-content: center;
-  margin-top: var(--space-8);
+  margin-top: var(--space-4);
 }
 
 .quick-start {
   display: flex;
-  gap: var(--space-4);
+  gap: var(--space-3);
   justify-content: center;
   flex-wrap: wrap;
-  margin-top: var(--space-8);
+  margin-top: var(--space-4);
 }
 
 .quick-start-btn {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  padding: var(--space-6);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   text-decoration: none;
   color: var(--color-text);
-  min-width: 180px;
+  min-width: auto;
   transition: all var(--transition-normal);
 }
 
@@ -251,19 +252,20 @@ hr {
 }
 
 .quick-start-btn .icon {
-  font-size: var(--font-size-3xl);
-  margin-bottom: var(--space-3);
+  font-size: var(--font-size-xl);
+  margin-bottom: 0;
 }
 
 .quick-start-btn .label {
   font-weight: 600;
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-base);
 }
 
 .quick-start-btn .desc {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
-  margin-top: var(--space-1);
+  margin-top: 0;
+  margin-left: var(--space-1);
 }
 
 /* ----------------------------------------
@@ -1360,16 +1362,18 @@ hr {
   }
 
   .hero {
-    padding: var(--space-10) 0;
+    padding: var(--space-4) 0 var(--space-3);
   }
 
   .quick-start {
     flex-direction: column;
     align-items: stretch;
+    gap: var(--space-2);
   }
 
   .quick-start-btn {
     min-width: auto;
+    justify-content: center;
   }
 
   .hero-buttons {
