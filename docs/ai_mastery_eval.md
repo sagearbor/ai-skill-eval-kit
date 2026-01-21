@@ -26,19 +26,25 @@ $$AIQ \= \\sum (\\text{Dimension Score} \\times \\text{Role Weight}) \\times \\t
 | **81-95** | Architect | Advances practices. Mentors others. Trusted for critical work. |
 | **96-100** | Pioneer | Industry-recognized contribution. Shapes how AI is used. |
 
-## **Part I: The Five Dimensions**
+## **Part I: The Five SCOREs Dimensions**
 
-Every individual is scored on the same five dimensions. Only the weights change based on role.
+Every individual is scored on the same five dimensions that form the **SCOREs** framework. Only the weights change based on role.
+
+- **S** = Study (learn about the field)
+- **C** = Copy (try/mimic something, validate)
+- **O** = Output (ship actual products)
+- **R** = Research (contribute to field, add something novel)
+- **Es** = Ethical security (security/alignment)
 
 | Dimension | What It Measures | Core Question |
 | --- | --- | --- |
-| **1\. KNOW** | Information diet, conceptual fluency, trend awareness | Where do you learn? |
-| **2\. TEST** | Evaluation skill, scientific rigor, quality judgment | How do you validate? |
-| **3\. SHIP** | Deployment capability, workflow integration, reliability | What have you built? |
-| **4\. CREATE** | Innovation, novel methods, advancing the field | What's new because of you? |
-| **5\. GUARD** | Safety practices, ethics, failure awareness, compliance | Are you trustworthy? |
+| **S = Study** | Information diet, conceptual fluency, trend awareness | Where do you learn? |
+| **C = Copy** | Evaluation skill, scientific rigor, quality judgment | How do you validate? |
+| **O = Output** | Deployment capability, workflow integration, reliability | What have you built? |
+| **R = Research** | Innovation, novel methods, advancing the field | What's new because of you? |
+| **E = Ethical security** | Safety practices, ethics, failure awareness, compliance | Are you trustworthy? |
 
-### **Dimension 1: KNOW (Information & Fluency)**
+### **Dimension 1: Study (Information & Fluency)**
 
 *Where do you learn about AI? Can you explain why things work or fail?*
 
@@ -51,7 +57,7 @@ Every individual is scored on the same five dimensions. Only the weights change 
 | **4** | 13-16 | Technical reports, GitHub repos. Can explain why models fail. |
 | **5** | 17-20 | ArXiv papers, model weights, source code. Predicts capability shifts. |
 
-### **Dimension 2: TEST (Evaluation & Rigor)**
+### **Dimension 2: Copy (Evaluation & Rigor)**
 
 *How do you know if AI output is good? Can you prove it?*
 
@@ -64,7 +70,7 @@ Every individual is scored on the same five dimensions. Only the weights change 
 | **4** | 13-16 | Automated evals. LLM-as-Judge. Quantified metrics (precision, recall). |
 | **5** | 17-20 | Statistical confidence intervals. CI/CD for prompts. Regression testing. |
 
-### **Dimension 3: SHIP (Deployment & Impact)**
+### **Dimension 3: Output (Deployment & Impact)**
 
 *What have you built that others actually use? What value did it create?*
 
@@ -77,7 +83,7 @@ Every individual is scored on the same five dimensions. Only the weights change 
 | **4** | 16-20 | Production agentic systems. Revenue-generating. External users. |
 | **5** | 21-25 | Vertical AI platform. Fine-tuned models. $100k+ verified value. |
 
-### **Dimension 4: CREATE (Innovation & Contribution)**
+### **Dimension 4: Research (Innovation & Contribution)**
 
 *Do you advance the field or just consume it?*
 
@@ -90,7 +96,7 @@ Every individual is scored on the same five dimensions. Only the weights change 
 | **4** | 13-16 | Researches: novel architectures, publishes at conferences. |
 | **5** | 17-20 | Invents: paradigm-shifting discoveries. Industry-recognized impact. |
 
-### **Dimension 5: GUARD (Safety & Responsibility)**
+### **Dimension 5: Ethical security (Safety & Responsibility)**
 
 *Can you be trusted with AI? Do you use it safely?*
 
@@ -105,9 +111,9 @@ Every individual is scored on the same five dimensions. Only the weights change 
 
 ## **Part II: Role-Based Weighting**
 
-Different roles require different skill mixes. A researcher needs CREATE; an engineer needs SHIP; an executive needs KNOW and GUARD. Weights normalize scores so roles can be compared.
+Different roles require different skill mixes. A researcher needs Research; an engineer needs Output; an executive needs Study and Ethical security. Weights normalize scores so roles can be compared.
 
-| Role | KNOW | TEST | SHIP | CREATE | GUARD |
+| Role | Study | Copy | Output | Research | Ethical |
 | --- | --- | --- | --- | --- | --- |
 | **General (default)** | 20% | 20% | 30% | 15% | 15% |
 | **Software Engineer** | 10% | 25% | 40% | 15% | 10% |
@@ -125,9 +131,10 @@ Claims without proof are discounted. Evidence modulates confidence, not capabili
 | Evidence Level | Multiplier | Description |
 | --- | --- | --- |
 | **Self-report only** | 0.6x | No artifacts. No validation. "Trust me." |
-| **Artifact provided** | 0.75x | Work samples exist (GitHub, doc, demo) but unreviewed. |
-| **Peer/manager validated** | 0.9x | Someone else confirmed the work and quality. |
-| **Validated \+ measured** | 1.0x | Confirmed by others AND quantified impact (users, revenue, time). |
+| **Peer/manager validated** | 0.8x | Someone else confirmed the work and quality. |
+| **Auto/Audit verified** | 1.0x | Automated verification OR full manual audit with quantified impact. |
+
+*Note: Automated verification and manual audit are equivalent—both achieve 1.0x. The choice depends on what's practical for the skill being assessed, not a hierarchy of rigor.*
 
 ### **Confidence Rating**
 
@@ -136,8 +143,8 @@ Every AIQ score is reported with a confidence level based on average evidence qu
 | Avg Multiplier | Confidence | Interpretation |
 | --- | --- | --- |
 | **\< 0.7** | LOW | Mostly self-reported. Treat score as aspirational. |
-| **0.7 \- 0.85** | MEDIUM | Mixed evidence. Reasonable working estimate. |
-| **\> 0.85** | HIGH | Well-documented. Score is trustworthy. |
+| **0.7 \- 0.9** | MEDIUM | Peer-validated. Reasonable working estimate. |
+| **\> 0.9** | HIGH | Auto/audit verified. Score is trustworthy. |
 
 ## **Part IV: Time Decay**
 
@@ -178,12 +185,12 @@ AIQ explicitly rejects "more usage \= better." The framework includes safeguards
 
 | Red Flag | Consequence |
 | --- | --- |
-| **Garbage output** | AI work rejected by users or requires heavy rework → **zero SHIP credit** |
+| **Garbage output** | AI work rejected by users or requires heavy rework → **zero Output credit** |
 | **Unverifiable claims** | "Saved $100k" without documentation → **automatic audit, 0.6x multiplier** |
 | **Credit theft** | Two people claim 80%+ of same project → **both audited, split enforced** |
-| **Deployed but unused** | System with zero real users or adoption → **minimal SHIP credit** |
-| **Credit burning** | High API costs without corresponding value → **SHIP score capped** |
-| **Safety violations** | PII exposure, policy breach, bias incident → **GUARD score to zero** |
+| **Deployed but unused** | System with zero real users or adoption → **minimal Output credit** |
+| **Credit burning** | High API costs without corresponding value → **Output score capped** |
+| **Safety violations** | PII exposure, policy breach, bias incident → **Ethical security score to zero** |
 
 ### **Team Project Attribution**
 
@@ -198,13 +205,15 @@ When multiple people work on a project, impact is split by contribution:
 
 ## **Part VII: Implementation**
 
-### **Three Levels of Rigor**
+### **Three Levels of Verification**
 
-| Level | Time | Method | Use For |
+| Level | Time | Method | Multiplier |
 | --- | --- | --- | --- |
-| **1\. Quick** | 5 min | Self-assessment only | Personal development |
-| **2\. Standard** | 30 min | \+ Manager calibration | Performance reviews |
-| **3\. Verified** | 2 hrs | \+ Portfolio \+ audit | Critical hires, promotions |
+| **1\. Self** | 5 min | Self-assessment only | 0.6x |
+| **2\. Peer** | 30 min | Peer/manager validation | 0.8x |
+| **3\. Auto/Audit** | 1+ hr | Automated verification OR full audit | 1.0x |
+
+*Note: Both automated verification and manual audit achieve the same 1.0x multiplier. Good automation is not inferior to manual audit—both provide equivalent confidence when properly implemented.*
 
 ### **Recommended Rollout**
 
@@ -239,7 +248,7 @@ A high AIQ score should mean one thing:
 
 ### **Quick Reference: The Complete Formula**
 
-1. **Step 1:** Score each dimension (KNOW, TEST, SHIP, CREATE, GUARD) using rubrics.
+1. **Step 1:** Score each dimension (Study, Copy, Output, Research, Ethical security) using the SCOREs rubrics.
 2. **Step 2:** Apply time decay based on when skills were learned.
 3. **Step 3:** Apply production bonus (1.5x) for live project learning.
 4. **Step 4:** Multiply by role weights.
