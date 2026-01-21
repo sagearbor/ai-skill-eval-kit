@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validate AI Skills Assessment - AIQ Assessment</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="page-header">
+        <div class="container container-narrow">
+            <p><a href="index.html">&larr; Back to Assessment Levels</a></p>
+            <h1>Validate AI Skills Assessment</h1>
+            <p>Review and validate the claimed AI skill levels below.</p>
+        </div>
+    </div>
+
+    <main class="section">
+        <div class="container container-narrow">
+            <!-- Error State (shown if invalid data) -->
+            <div id="errorState" class="card hidden">
+                <div class="card-body text-center">
+                    <div class="alert alert-error">
+                        <div class="alert-content">
+                            <div class="alert-title">Invalid or Missing Data</div>
+                            <p class="mb-0">The validation link appears to be invalid or corrupted. Please ask the assessee to generate a new link.</p>
+                        </div>
+                    </div>
+                    <a href="index.html" class="btn btn-primary mt-4">Return to Home</a>
+                </div>
+            </div>
+
+            <!-- Main Validation Form (hidden until data loads) -->
+            <div id="validationContent" class="hidden">
+                <!-- Assessee Information Card -->
+                <div class="card mb-6">
+                    <div class="card-header">
+                        <h3 class="card-title">Assessee Information</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
+                            <div>
+                                <p class="text-muted mb-0">Name</p>
+                                <p class="font-semibold" id="displayAssesseeName">-</p>
+                            </div>
+                            <div>
+                                <p class="text-muted mb-0">Role</p>
+                                <p class="font-semibold" id="displayAssesseeRole">-</p>
+                            </div>
+                            <div>
+                                <p class="text-muted mb-0">Submitted</p>
+                                <p class="font-semibold" id="displaySubmittedDate">-</p>
+                            </div>
+                        </div>
+                        <div id="assesseeNotesSection" class="hidden mt-4">
+                            <p class="text-muted mb-0">Notes from Assessee</p>
+                            <p id="displayAssesseeNotes" class="font-semibold" style="white-space: pre-wrap;">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Validation Form -->
+                <form id="validatorForm">
+                    <div class="card mb-6">
+                        <div class="card-header">
+                            <h3 class="card-title">Review Claimed Scores</h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-6">For each dimension, review the claimed level and either confirm it or adjust with a reason.</p>
+
+                            <div id="dimensionValidations">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Validator Information -->
+                    <div class="card mb-6">
+                        <div class="card-header">
+                            <h3 class="card-title">Your Information (Validator)</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="validatorName" class="form-label form-label-required">Your Name</label>
+                                <input type="text" id="validatorName" name="validatorName" class="form-input" required placeholder="Enter your full name">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="validatorRelationship" class="form-label form-label-required">Your Relationship to Assessee</label>
+                                <select id="validatorRelationship" name="validatorRelationship" class="form-select" required>
+                                    <option value="">Select relationship...</option>
+                                    <option value="Manager">Manager</option>
+                                    <option value="Peer">Peer</option>
+                                    <option value="Direct Report">Direct Report</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary btn-large btn-block">
+                        Complete Validation
+                    </button>
+                </form>
+            </div>
+
+            <!-- Results Section (hidden until validation complete) -->
+            <div id="resultsSection" class="card mt-8 hidden">
+                <div class="card-header">
+                    <h3 class="card-title">Validation Complete</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Score Display -->
+                    <div class="score-display">
+                        <div class="score-value" id="finalScoreValue">--</div>
+                        <div class="score-label">AIQ Score (Level 2: Peer Validated)</div>
+                        <div id="scoreBandBadge" class="score-band">--</div>
+                        <p class="text-muted mt-4">
+                            <span class="badge badge-medium">0.8x Evidence Multiplier</span>
+                        </p>
+                    </div>
+
+                    <!-- Breakdown Table -->
+                    <h4 class="mt-6 mb-4">Score Breakdown</h4>
+                    <table class="breakdown-table" id="breakdownTable">
+                        <thead>
+                            <tr>
+                                <th>Dimension</th>
+                                <th>Claimed</th>
+                                <th>Validated</th>
+                                <th>Status</th>
+                                <th class="score-cell">Points</th>
+                            </tr>
+                        </thead>
+                        <tbody id="breakdownTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+
+                    <!-- Adjustments Summary -->
+                    <div id="adjustmentsSummary" class="alert alert-info mt-6 hidden">
+                        <div class="alert-content">
+                            <div class="alert-title">Adjustments Made</div>
+                            <ul id="adjustmentsList" class="mb-0">
+                                <!-- Populated by JavaScript -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Download Options -->
+                    <div class="download-options mt-8">
+                        <div class="download-card" onclick="downloadValidatedJSON()">
+                            <div class="download-icon">{ }</div>
+                            <div class="download-label">Download JSON</div>
+                            <div class="download-desc">Machine-readable report</div>
+                        </div>
+                        <div class="download-card" onclick="downloadValidatedPDF()">
+                            <div class="download-icon">PDF</div>
+                            <div class="download-label">Download PDF</div>
+                            <div class="download-desc">Human-readable report</div>
+                        </div>
+                    </div>
+
+                    <!-- Share Back URL -->
+                    <div class="mt-8">
+                        <h4 class="mb-4">Share Results</h4>
+                        <p class="text-muted mb-4">Copy this link to share the validated results with the assessee.</p>
+                        <div style="display: flex; gap: var(--space-3);">
+                            <input type="text" id="completedUrl" class="form-input" readonly style="flex: 1;">
+                            <button type="button" class="btn btn-secondary" onclick="copyCompletedUrl()">
+                                Copy
+                            </button>
+                        </div>
+                        <p id="completedCopyFeedback" class="form-hint text-success hidden">Copied to clipboard!</p>
+                    </div>
+
+                    <!-- Start Over -->
+                    <div class="text-center mt-8">
+                        <a href="index.html" class="btn btn-ghost">Return to Assessment Levels</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden element for PDF generation -->
+            <div id="pdfContent" class="hidden" style="padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                <!-- Populated by JavaScript before PDF generation -->
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>Universal AIQ Framework - Level 2 Peer Validation</p>
+                <p><a href="https://github.com/sagearbor/ai-skill-eval-kit" target="_blank" rel="noopener noreferrer">View on GitHub</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/shared.js"></script>
+    <script src="js/peer-form.js"></script>
+    <script>
+        // Initialize the validator form when page loads
+        document.addEventListener('DOMContentLoaded', initValidatorForm);
+    </script>
+</body>
+</html>

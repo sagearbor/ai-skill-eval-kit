@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Peer Validation - AIQ Assessment</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="page-header">
+        <div class="container container-narrow">
+            <p><a href="index.html">&larr; Back to Assessment Levels</a></p>
+            <h1>Request Peer Validation</h1>
+            <p>Enter your claimed AI skill levels and generate a link for a peer or manager to validate.</p>
+        </div>
+    </div>
+
+    <main class="section">
+        <div class="container container-narrow">
+            <!-- Process Explanation -->
+            <div class="card mb-6">
+                <div class="card-header">
+                    <h3 class="card-title">How Peer Validation Works</h3>
+                </div>
+                <div class="card-body">
+                    <ol>
+                        <li><strong>You enter your claimed scores</strong> - Rate yourself honestly on each SCOREs dimension (0-5)</li>
+                        <li><strong>Generate a validation link</strong> - A unique URL is created with your claims encoded</li>
+                        <li><strong>Share with your validator</strong> - Send the link to a manager, peer, or direct report</li>
+                        <li><strong>Validator reviews and confirms</strong> - They can confirm or adjust each dimension with reasoning</li>
+                        <li><strong>Both receive the validated report</strong> - Final score uses 0.8x evidence multiplier (Level 2)</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Assessee Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Your Information</h3>
+                </div>
+                <div class="card-body">
+                    <form id="assesseeForm">
+                        <!-- Name -->
+                        <div class="form-group">
+                            <label for="assesseeName" class="form-label form-label-required">Your Name</label>
+                            <input type="text" id="assesseeName" name="assesseeName" class="form-input" required placeholder="Enter your full name">
+                        </div>
+
+                        <!-- Role -->
+                        <div class="form-group">
+                            <label for="assesseeRole" class="form-label form-label-required">Your Role</label>
+                            <select id="assesseeRole" name="assesseeRole" class="form-select" required>
+                                <!-- Populated by JavaScript -->
+                            </select>
+                            <p class="form-hint">Your role affects how dimensions are weighted in the final score.</p>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label for="assesseeEmail" class="form-label">Your Email (optional)</label>
+                            <input type="email" id="assesseeEmail" name="assesseeEmail" class="form-input" placeholder="For validator reference only">
+                            <p class="form-hint">Helps your validator identify you. Not used for anything else.</p>
+                        </div>
+
+                        <hr>
+
+                        <!-- Claimed Scores Section -->
+                        <h4 class="mb-4">Your Claimed Scores</h4>
+                        <p class="text-muted mb-6">Rate yourself honestly on each dimension. Level 0 = no skill, Level 5 = expert.</p>
+
+                        <div id="dimensionScores">
+                            <!-- Populated by JavaScript -->
+                        </div>
+
+                        <hr>
+
+                        <!-- Context/Notes -->
+                        <div class="form-group">
+                            <label for="assesseeNotes" class="form-label">Context or Notes (optional)</label>
+                            <textarea id="assesseeNotes" name="assesseeNotes" class="form-textarea" placeholder="Add any context for your validator - recent projects, training completed, areas of focus, etc."></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary btn-large btn-block">
+                            Generate Validation Link
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Generated URL Section (hidden initially) -->
+            <div id="generatedUrlSection" class="card mt-8 hidden">
+                <div class="card-header">
+                    <h3 class="card-title">Your Validation Link</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success mb-4">
+                        <div class="alert-content">
+                            <div class="alert-title">Link Generated Successfully</div>
+                            <p class="mb-0">Copy the link below and share it with your validator.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Shareable URL</label>
+                        <div style="display: flex; gap: var(--space-3);">
+                            <input type="text" id="generatedUrl" class="form-input" readonly style="flex: 1;">
+                            <button type="button" id="copyUrlBtn" class="btn btn-secondary" onclick="copyToClipboard()">
+                                Copy
+                            </button>
+                        </div>
+                        <p id="copyFeedback" class="form-hint text-success hidden">Copied to clipboard!</p>
+                    </div>
+
+                    <div class="alert alert-info mt-4">
+                        <div class="alert-content">
+                            <div class="alert-title">Next Steps</div>
+                            <ol class="mb-0">
+                                <li>Send this link to your validator (manager, peer, or direct report)</li>
+                                <li>They will review your claimed scores and either confirm or adjust each one</li>
+                                <li>After validation, you'll both receive the final assessed score with Level 2 confidence (0.8x multiplier)</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="btn-group mt-6">
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                            Start Over
+                        </button>
+                        <a id="previewValidatorLink" href="#" class="btn btn-ghost" target="_blank">
+                            Preview Validator View
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>Universal AIQ Framework - Level 2 Peer Validation</p>
+                <p><a href="https://github.com/sagearbor/ai-skill-eval-kit" target="_blank" rel="noopener noreferrer">View on GitHub</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/shared.js"></script>
+    <script src="js/peer-form.js"></script>
+    <script>
+        // Initialize the assessee form when page loads
+        document.addEventListener('DOMContentLoaded', initAssesseeForm);
+    </script>
+</body>
+</html>

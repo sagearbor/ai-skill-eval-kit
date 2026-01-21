@@ -3,76 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIQ Assessment Levels</title>
+    <title>AIQ Assessment - Measure Your AI Skills</title>
+    <link rel="stylesheet" href="css/styles.css">
     <style>
-        * {
-            box-sizing: border-box;
+        /* Page-specific styles that extend the design system */
+
+        /* Privacy badge */
+        .privacy-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 9999px;
+            font-size: var(--font-size-sm);
+            color: var(--color-success);
+            margin-bottom: var(--space-6);
         }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f5f5f5;
-            color: #333;
+
+        .privacy-badge svg {
+            width: 16px;
+            height: 16px;
         }
-        h1 {
-            color: #2E74B5;
-            border-bottom: 2px solid #2E74B5;
-            padding-bottom: 10px;
-        }
-        .controls {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-        }
-        .controls button {
-            padding: 8px 16px;
-            border: 1px solid #2E74B5;
-            background: white;
-            color: #2E74B5;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .controls button:hover {
-            background: #2E74B5;
-            color: white;
-        }
-        /* Hero Section - Intro + Visual */
+
+        /* Hero Section - Intro + Visual (existing bubble chart) */
         .hero-section {
             display: grid;
             grid-template-columns: 1fr 2fr;
             gap: 30px;
-            background: white;
-            border-radius: 12px;
-            padding: 25px 30px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-8);
+            margin-bottom: var(--space-8);
+            box-shadow: var(--shadow-md);
             align-items: center;
         }
         .hero-intro h2 {
-            color: #2E74B5;
-            margin: 0 0 12px 0;
-            font-size: 22px;
+            color: var(--color-primary);
+            margin: 0 0 var(--space-3) 0;
+            font-size: var(--font-size-xl);
             line-height: 1.3;
         }
         .hero-intro p {
-            color: #555;
-            margin: 0 0 10px 0;
-            font-size: 15px;
+            color: var(--color-secondary);
+            margin: 0 0 var(--space-3) 0;
+            font-size: var(--font-size-base);
             line-height: 1.5;
         }
         .hero-hint {
-            color: #777;
-            font-size: 13px;
+            color: var(--color-text-muted);
+            font-size: var(--font-size-sm);
             font-style: italic;
         }
         .hero-cta {
-            margin-top: 15px;
-            color: #2E74B5;
+            margin-top: var(--space-4);
+            color: var(--color-accent);
             font-weight: 500;
-            font-size: 14px;
+            font-size: var(--font-size-sm);
         }
         .cta-arrow {
             display: inline-block;
@@ -94,21 +83,21 @@
         }
         .bubble-chart-svg .axis-label {
             font-size: 10px;
-            fill: #666;
+            fill: var(--color-secondary);
             font-weight: 500;
         }
         .bubble-chart-svg .axis-tick {
             font-size: 9px;
-            fill: #888;
+            fill: var(--color-text-muted);
         }
         .bubble-chart-svg .dimension-label {
             font-size: 10px;
-            fill: #1565c0;
+            fill: var(--color-accent);
             font-weight: 600;
         }
         .bubble-chart-svg .level-label {
             font-size: 9px;
-            fill: #666;
+            fill: var(--color-secondary);
         }
         .bubble-chart-svg .persona-bubble {
             cursor: pointer;
@@ -119,18 +108,19 @@
         }
         .bubble-chart-svg .persona-text {
             font-size: 10px;
-            fill: #333;
+            fill: var(--color-primary);
             font-weight: 600;
             pointer-events: none;
         }
         .bubble-chart-svg .multiplier-text {
             font-size: 8px;
-            fill: #666;
+            fill: var(--color-secondary);
             pointer-events: none;
         }
         @media (max-width: 768px) {
             .hero-section {
                 grid-template-columns: 1fr;
+                padding: var(--space-6);
             }
             .hero-visual {
                 order: -1;
@@ -140,37 +130,50 @@
             }
         }
 
-        /* Collapsible sections */
+        /* Controls */
+        .controls {
+            margin-bottom: var(--space-6);
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        /* Collapsible sections (matrix, comparison) */
         .collapsible {
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-4);
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-sm);
         }
         .collapsible-header {
-            padding: 15px 20px;
+            padding: var(--space-4) var(--space-5);
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
             user-select: none;
-            background: #2E74B5;
+            background: var(--color-accent);
             color: white;
         }
         .collapsible-header:hover {
-            background: #245a8a;
+            background: var(--color-accent-hover);
         }
         .collapsible-header h2 {
             margin: 0;
-            font-size: 16px;
+            font-size: var(--font-size-base);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: var(--space-3);
+            color: white;
+        }
+        .collapsible-header span {
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
         }
         .collapsible-content {
             display: none;
-            padding: 15px 20px;
+            padding: var(--space-5);
         }
         .collapsible.open .collapsible-content {
             display: block;
@@ -185,14 +188,15 @@
 
         /* Level cards - blue gradient from light to dark */
         .level {
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-3);
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-sm);
         }
         .level-header {
-            padding: 15px 20px;
+            padding: var(--space-4) var(--space-5);
             cursor: pointer;
             display: flex;
             justify-content: space-between;
@@ -204,13 +208,13 @@
         }
         .level-header h3 {
             margin: 0;
-            font-size: 18px;
+            font-size: var(--font-size-lg);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: var(--space-3);
         }
         .level-header .meta {
-            font-size: 14px;
+            font-size: var(--font-size-sm);
             opacity: 0.9;
         }
         .level.open .arrow {
@@ -218,7 +222,7 @@
         }
         .level-content {
             display: none;
-            padding: 0 20px 20px 20px;
+            padding: 0 var(--space-5) var(--space-5) var(--space-5);
             border-top: 1px solid rgba(0,0,0,0.1);
         }
         .level.open .level-content {
@@ -231,126 +235,169 @@
         .level-3 .level-header { background: #42a5f5; color: #0d47a1; }
 
         .levels-group {
-            border: 2px solid #2E74B5;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            background: #f8fbff;
+            border: 2px solid var(--color-accent);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            margin-bottom: var(--space-6);
+            background: var(--color-bg-alt);
         }
         .levels-group-title {
-            font-size: 14px;
-            color: #2E74B5;
-            margin: -25px 0 15px 10px;
-            background: #f5f5f5;
+            font-size: var(--font-size-sm);
+            color: var(--color-accent);
+            margin: calc(-1 * var(--space-6)) 0 var(--space-4) var(--space-3);
+            background: var(--color-bg-alt);
             display: inline-block;
-            padding: 0 10px;
+            padding: 0 var(--space-3);
             font-weight: 600;
         }
 
         .section {
-            margin-top: 15px;
+            margin-top: var(--space-4);
         }
         .section h4 {
-            font-size: 14px;
-            color: #666;
-            margin: 0 0 8px 0;
+            font-size: var(--font-size-sm);
+            color: var(--color-secondary);
+            margin: 0 0 var(--space-2) 0;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .section ul {
             margin: 0;
-            padding-left: 20px;
+            padding-left: var(--space-5);
         }
         .section li {
-            margin: 5px 0;
+            margin: var(--space-1) 0;
         }
         .badge {
             display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 12px;
+            padding: var(--space-1) var(--space-2);
+            border-radius: 9999px;
+            font-size: var(--font-size-xs);
             font-weight: 500;
         }
-        .badge-low { background: #ffcdd2; color: #c62828; }
-        .badge-medium { background: #fff9c4; color: #f9a825; }
-        .badge-high { background: #c8e6c9; color: #2e7d32; }
+        .badge-low { background: rgba(244, 63, 94, 0.1); color: var(--color-error); }
+        .badge-medium { background: rgba(245, 158, 11, 0.1); color: var(--color-warning); }
+        .badge-high { background: rgba(16, 185, 129, 0.1); color: var(--color-success); }
 
         .best-for {
-            background: #e3f2fd;
-            padding: 10px 15px;
-            border-radius: 4px;
-            margin-top: 15px;
+            background: rgba(79, 70, 229, 0.05);
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-md);
+            margin-top: var(--space-4);
+            border-left: 3px solid var(--color-accent);
         }
         .best-for strong {
-            color: #1565c0;
+            color: var(--color-accent);
         }
 
         .scores-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-top: 15px;
+            gap: var(--space-3);
+            margin-top: var(--space-4);
+        }
+        @media (max-width: 900px) {
+            .scores-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .scores-grid {
+                grid-template-columns: 1fr;
+            }
         }
         .score-item {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 4px;
-            border-left: 3px solid #2E74B5;
+            background: var(--color-bg-alt);
+            padding: var(--space-3);
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--color-accent);
         }
         .score-item strong {
             display: block;
-            color: #2E74B5;
-            margin-bottom: 5px;
-            font-size: 13px;
+            color: var(--color-accent);
+            margin-bottom: var(--space-1);
+            font-size: var(--font-size-sm);
         }
         .score-item span {
-            font-size: 12px;
-            color: #666;
+            font-size: var(--font-size-xs);
+            color: var(--color-secondary);
         }
 
         .summary-table, .matrix-table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            font-size: 14px;
+            background: var(--color-bg);
+            font-size: var(--font-size-sm);
         }
         .summary-table th, .summary-table td,
         .matrix-table th, .matrix-table td {
-            padding: 12px 10px;
+            padding: var(--space-3);
             text-align: left;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--color-border);
         }
         .summary-table th, .matrix-table th {
-            background: #2E74B5;
+            background: var(--color-accent);
             color: white;
         }
         .summary-table tr:hover, .matrix-table tr:hover {
-            background: #f5f5f5;
+            background: var(--color-bg-alt);
         }
         .matrix-table td {
-            font-size: 12px;
+            font-size: var(--font-size-xs);
             vertical-align: top;
         }
         .matrix-table td:first-child {
             font-weight: 500;
-            background: #f8f9fa;
+            background: var(--color-bg-alt);
         }
 
-        /* Footer */
-        .footer {
-            margin-top: 40px;
-            padding: 20px;
-            text-align: center;
-            border-top: 1px solid #ddd;
-            color: #666;
-            font-size: 14px;
+        /* Start Assessment button inside level cards */
+        .start-assessment-btn {
+            margin-top: var(--space-5);
         }
-        .footer a {
-            color: #2E74B5;
-            text-decoration: none;
+
+        /* Diagram section */
+        .diagram-section {
+            margin: var(--space-8) 0;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: var(--color-bg);
+            box-shadow: var(--shadow-sm);
         }
-        .footer a:hover {
-            text-decoration: underline;
+        .diagram-section summary {
+            padding: var(--space-4) var(--space-5);
+            background: var(--color-bg-alt);
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--color-secondary);
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+        .diagram-section summary::-webkit-details-marker {
+            display: none;
+        }
+        .diagram-section summary::before {
+            content: '\25B6';
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+        .diagram-section[open] summary::before {
+            transform: rotate(90deg);
+        }
+        .diagram-section summary:hover {
+            background: var(--color-border);
+        }
+        .diagram-section .diagram-content {
+            padding: var(--space-6);
+            background: var(--color-bg);
+            display: flex;
+            justify-content: center;
+        }
+        .diagram-section .mermaid {
+            max-width: 100%;
         }
 
         /* Peek animation for matrix */
@@ -363,393 +410,388 @@
             80% { max-height: 200px; opacity: 1; }
             100% { max-height: 0; opacity: 0; }
         }
-
-        /* Diagram section */
-        .diagram-section {
-            margin: 30px 0;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            overflow: hidden;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .diagram-section summary {
-            padding: 15px 20px;
-            background: #f8fafc;
-            cursor: pointer;
-            font-weight: 500;
-            color: #475569;
-            list-style: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .diagram-section summary::-webkit-details-marker {
-            display: none;
-        }
-        .diagram-section summary::before {
-            content: '▶';
-            font-size: 12px;
-            transition: transform 0.2s;
-        }
-        .diagram-section[open] summary::before {
-            transform: rotate(90deg);
-        }
-        .diagram-section summary:hover {
-            background: #f1f5f9;
-        }
-        .diagram-section .diagram-content {
-            padding: 20px;
-            background: white;
-            display: flex;
-            justify-content: center;
-        }
-        .diagram-section .mermaid {
-            max-width: 100%;
-        }
     </style>
 </head>
 <body>
-    <h1>AIQ Assessment Levels</h1>
+    <div class="container">
+        <!-- New Hero Section with Quick Start -->
+        <section class="hero">
+            <div class="privacy-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 00-.722-.516 11.209 11.209 0 01-7.877-3.08z" clip-rule="evenodd" />
+                </svg>
+                Your data never leaves your browser. No tracking. No accounts.
+            </div>
 
-    <!-- Hero Section: Intro + Visual -->
-    <div class="hero-section">
-        <div class="hero-intro">
-            <h2>How confident is your AI skill assessment?</h2>
-            <p>Choose a verification level based on your needs. <strong>More rigor = higher confidence in your score.</strong></p>
-            <p class="hero-hint">Start with Level 1 for quick self-reflection. Add verification layers when stakes are higher.</p>
-            <div class="hero-cta">
-                <span class="cta-arrow">&#8595;</span> Explore the levels below
+            <h1>Measure Your AI Skills</h1>
+            <p class="hero-subtitle">Get a standardized AIQ score in minutes. Choose your validation level.</p>
+
+            <div class="quick-start">
+                <a href="level1.html" class="quick-start-btn">
+                    <span class="icon">&#10003;</span>
+                    <span class="label">Quick Self-Check</span>
+                    <span class="desc">5 min</span>
+                </a>
+                <a href="level2.html" class="quick-start-btn">
+                    <span class="icon">&#128101;</span>
+                    <span class="label">Peer Validation</span>
+                    <span class="desc">30 min</span>
+                </a>
+                <a href="level3.html" class="quick-start-btn">
+                    <span class="icon">&#128202;</span>
+                    <span class="label">Full Verification</span>
+                    <span class="desc">1+ hr</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Existing Bubble Chart Section -->
+        <div class="hero-section">
+            <div class="hero-intro">
+                <h2>How confident is your AI skill assessment?</h2>
+                <p>Choose a verification level based on your needs. <strong>More rigor = higher confidence in your score.</strong></p>
+                <p class="hero-hint">Start with Level 1 for quick self-reflection. Add verification layers when stakes are higher.</p>
+                <div class="hero-cta">
+                    <span class="cta-arrow">&#8595;</span> Explore the levels below
+                </div>
+            </div>
+            <div class="hero-visual">
+                <svg viewBox="0 0 400 300" class="bubble-chart-svg">
+                    <!-- Definitions -->
+                    <defs>
+                        <linearGradient id="bubbleGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#fff9c4"/>
+                            <stop offset="100%" style="stop-color:#ffeb3b"/>
+                        </linearGradient>
+                        <linearGradient id="bubbleGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ffe0b2"/>
+                            <stop offset="100%" style="stop-color:#ff9800"/>
+                        </linearGradient>
+                        <linearGradient id="bubbleGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#c8e6c9"/>
+                            <stop offset="100%" style="stop-color:#4caf50"/>
+                        </linearGradient>
+                        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
+                        </filter>
+                    </defs>
+
+                    <!-- Chart area background -->
+                    <rect x="60" y="30" width="310" height="200" fill="#fafafa" stroke="#e0e0e0" stroke-width="1" rx="4"/>
+
+                    <!-- Grid lines - horizontal (verification levels) -->
+                    <line x1="60" y1="97" x2="370" y2="97" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,4"/>
+                    <line x1="60" y1="163" x2="370" y2="163" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,4"/>
+
+                    <!-- Grid lines - vertical (SCOREs dimensions) -->
+                    <line x1="122" y1="30" x2="122" y2="230" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,4"/>
+                    <line x1="184" y1="30" x2="184" y2="230" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,4"/>
+                    <line x1="246" y1="30" x2="246" y2="230" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,4"/>
+                    <line x1="308" y1="30" x2="308" y2="230" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,4"/>
+
+                    <!-- Y-axis labels (Verification Levels) -->
+                    <text x="55" y="200" text-anchor="end" class="level-label">1: Self</text>
+                    <text x="55" y="133" text-anchor="end" class="level-label">2: Peer</text>
+                    <text x="55" y="66" text-anchor="end" class="level-label">3: Auto/Audit</text>
+
+                    <!-- Y-axis title -->
+                    <text x="15" y="115" text-anchor="middle" class="axis-label" transform="rotate(-90, 15, 115)">Verification Level</text>
+                    <text x="28" y="115" text-anchor="middle" class="axis-tick" transform="rotate(-90, 28, 115)">(less certain → more certain)</text>
+
+                    <!-- X-axis labels (SCOREs dimensions) -->
+                    <text x="91" y="248" text-anchor="middle" class="dimension-label">S</text>
+                    <text x="153" y="248" text-anchor="middle" class="dimension-label">C</text>
+                    <text x="215" y="248" text-anchor="middle" class="dimension-label">O</text>
+                    <text x="277" y="248" text-anchor="middle" class="dimension-label">R</text>
+                    <text x="339" y="248" text-anchor="middle" class="dimension-label">Es</text>
+
+                    <!-- X-axis subtitle labels -->
+                    <text x="91" y="260" text-anchor="middle" class="axis-tick">Study</text>
+                    <text x="153" y="260" text-anchor="middle" class="axis-tick">Copy</text>
+                    <text x="215" y="260" text-anchor="middle" class="axis-tick">Output</text>
+                    <text x="277" y="260" text-anchor="middle" class="axis-tick">Research</text>
+                    <text x="339" y="260" text-anchor="middle" class="axis-tick">Ethical</text>
+
+                    <!-- X-axis title -->
+                    <text x="215" y="285" text-anchor="middle" class="axis-label">Skill Progression (Basic to Advanced)</text>
+
+                    <!-- Progression arrow (diagonal from bottom-left to top-right) -->
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#4f46e5" opacity="0.4"/>
+                        </marker>
+                    </defs>
+                    <path d="M 85 195 Q 200 130, 340 55" fill="none" stroke="#4f46e5" stroke-width="2" stroke-dasharray="6,4" opacity="0.3" marker-end="url(#arrowhead)"/>
+
+                    <!-- Persona Bubbles (sizes: Beginner largest, AI User medium, AI Leader smallest) -->
+                    <!-- Beginner: bottom-left area (low SCOREs S-C, Level 1 Self) - LARGEST bubble -->
+                    <g class="persona-bubble" onclick="scrollToLevel(1)" filter="url(#shadow)">
+                        <ellipse cx="115" cy="190" rx="55" ry="35" fill="url(#bubbleGrad1)" stroke="#f9a825" stroke-width="2"/>
+                        <text x="115" y="187" text-anchor="middle" class="persona-text">Beginner</text>
+                        <text x="115" y="200" text-anchor="middle" class="multiplier-text">(0.6x)</text>
+                    </g>
+
+                    <!-- AI User: middle area (medium SCOREs C-O, Level 2 Peer) - MEDIUM bubble -->
+                    <g class="persona-bubble" onclick="scrollToLevel(2)" filter="url(#shadow)">
+                        <ellipse cx="195" cy="130" rx="45" ry="28" fill="url(#bubbleGrad2)" stroke="#ef6c00" stroke-width="2"/>
+                        <text x="195" y="127" text-anchor="middle" class="persona-text">AI User</text>
+                        <text x="195" y="140" text-anchor="middle" class="multiplier-text">(0.8x)</text>
+                    </g>
+
+                    <!-- AI Leader: top-right area (high SCOREs R-Es, Level 3 Auto/Audit) - SMALLEST bubble -->
+                    <g class="persona-bubble" onclick="scrollToLevel(3)" filter="url(#shadow)">
+                        <ellipse cx="310" cy="60" rx="35" ry="22" fill="url(#bubbleGrad3)" stroke="#2e7d32" stroke-width="2"/>
+                        <text x="310" y="57" text-anchor="middle" class="persona-text">AI Leader</text>
+                        <text x="310" y="70" text-anchor="middle" class="multiplier-text">(1.0x)</text>
+                    </g>
+                </svg>
             </div>
         </div>
-        <div class="hero-visual">
-            <svg viewBox="0 0 400 300" class="bubble-chart-svg">
-                <!-- Definitions -->
-                <defs>
-                    <linearGradient id="bubbleGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#fff9c4"/>
-                        <stop offset="100%" style="stop-color:#ffeb3b"/>
-                    </linearGradient>
-                    <linearGradient id="bubbleGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#ffe0b2"/>
-                        <stop offset="100%" style="stop-color:#ff9800"/>
-                    </linearGradient>
-                    <linearGradient id="bubbleGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#c8e6c9"/>
-                        <stop offset="100%" style="stop-color:#4caf50"/>
-                    </linearGradient>
-                    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-                        <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
-                    </filter>
-                </defs>
 
-                <!-- Chart area background -->
-                <rect x="60" y="30" width="310" height="200" fill="#fafafa" stroke="#e0e0e0" stroke-width="1" rx="4"/>
-
-                <!-- Grid lines - horizontal (verification levels) -->
-                <line x1="60" y1="97" x2="370" y2="97" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,4"/>
-                <line x1="60" y1="163" x2="370" y2="163" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,4"/>
-
-                <!-- Grid lines - vertical (SCOREs dimensions) -->
-                <line x1="122" y1="30" x2="122" y2="230" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,4"/>
-                <line x1="184" y1="30" x2="184" y2="230" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,4"/>
-                <line x1="246" y1="30" x2="246" y2="230" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,4"/>
-                <line x1="308" y1="30" x2="308" y2="230" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="4,4"/>
-
-                <!-- Y-axis labels (Verification Levels) -->
-                <text x="55" y="200" text-anchor="end" class="level-label">1: Self</text>
-                <text x="55" y="133" text-anchor="end" class="level-label">2: Peer</text>
-                <text x="55" y="66" text-anchor="end" class="level-label">3: Auto/Audit</text>
-
-                <!-- Y-axis title -->
-                <text x="15" y="115" text-anchor="middle" class="axis-label" transform="rotate(-90, 15, 115)">Verification Level</text>
-                <text x="28" y="115" text-anchor="middle" class="axis-tick" transform="rotate(-90, 28, 115)">(less certain → more certain)</text>
-
-                <!-- X-axis labels (SCOREs dimensions) -->
-                <text x="91" y="248" text-anchor="middle" class="dimension-label">S</text>
-                <text x="153" y="248" text-anchor="middle" class="dimension-label">C</text>
-                <text x="215" y="248" text-anchor="middle" class="dimension-label">O</text>
-                <text x="277" y="248" text-anchor="middle" class="dimension-label">R</text>
-                <text x="339" y="248" text-anchor="middle" class="dimension-label">Es</text>
-
-                <!-- X-axis subtitle labels -->
-                <text x="91" y="260" text-anchor="middle" class="axis-tick">Study</text>
-                <text x="153" y="260" text-anchor="middle" class="axis-tick">Copy</text>
-                <text x="215" y="260" text-anchor="middle" class="axis-tick">Output</text>
-                <text x="277" y="260" text-anchor="middle" class="axis-tick">Research</text>
-                <text x="339" y="260" text-anchor="middle" class="axis-tick">Ethical</text>
-
-                <!-- X-axis title -->
-                <text x="215" y="285" text-anchor="middle" class="axis-label">Skill Progression (Basic to Advanced)</text>
-
-                <!-- Progression arrow (diagonal from bottom-left to top-right) -->
-                <defs>
-                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                        <polygon points="0 0, 10 3.5, 0 7" fill="#1565c0" opacity="0.4"/>
-                    </marker>
-                </defs>
-                <path d="M 85 195 Q 200 130, 340 55" fill="none" stroke="#1565c0" stroke-width="2" stroke-dasharray="6,4" opacity="0.3" marker-end="url(#arrowhead)"/>
-
-                <!-- Persona Bubbles (sizes: Beginner largest, AI User medium, AI Leader smallest) -->
-                <!-- Beginner: bottom-left area (low SCOREs S-C, Level 1 Self) - LARGEST bubble -->
-                <g class="persona-bubble" onclick="scrollToLevel(1)" filter="url(#shadow)">
-                    <ellipse cx="115" cy="190" rx="55" ry="35" fill="url(#bubbleGrad1)" stroke="#f9a825" stroke-width="2"/>
-                    <text x="115" y="187" text-anchor="middle" class="persona-text">Beginner</text>
-                    <text x="115" y="200" text-anchor="middle" class="multiplier-text">(0.6x)</text>
-                </g>
-
-                <!-- AI User: middle area (medium SCOREs C-O, Level 2 Peer) - MEDIUM bubble -->
-                <g class="persona-bubble" onclick="scrollToLevel(2)" filter="url(#shadow)">
-                    <ellipse cx="195" cy="130" rx="45" ry="28" fill="url(#bubbleGrad2)" stroke="#ef6c00" stroke-width="2"/>
-                    <text x="195" y="127" text-anchor="middle" class="persona-text">AI User</text>
-                    <text x="195" y="140" text-anchor="middle" class="multiplier-text">(0.8x)</text>
-                </g>
-
-                <!-- AI Leader: top-right area (high SCOREs R-Es, Level 3 Auto/Audit) - SMALLEST bubble -->
-                <g class="persona-bubble" onclick="scrollToLevel(3)" filter="url(#shadow)">
-                    <ellipse cx="310" cy="60" rx="35" ry="22" fill="url(#bubbleGrad3)" stroke="#2e7d32" stroke-width="2"/>
-                    <text x="310" y="57" text-anchor="middle" class="persona-text">AI Leader</text>
-                    <text x="310" y="70" text-anchor="middle" class="multiplier-text">(1.0x)</text>
-                </g>
-            </svg>
+        <div class="controls">
+            <button class="btn btn-secondary btn-small" onclick="toggleAll(true)">Expand All</button>
+            <button class="btn btn-secondary btn-small" onclick="toggleAll(false)">Collapse All</button>
         </div>
-    </div>
 
-    <div class="controls">
-        <button onclick="toggleAll(true)">Expand All</button>
-        <button onclick="toggleAll(false)">Collapse All</button>
-    </div>
-
-    <!-- Validation Matrix - First, Collapsible -->
-    <div class="collapsible" id="matrix-section">
-        <div class="collapsible-header" onclick="toggleCollapsible(this)">
-            <h2><span class="arrow">&#9654;</span> Validation Matrix: Levels x SCOREs</h2>
-            <span>See what evidence validates each dimension</span>
-        </div>
-        <div class="collapsible-content" id="matrix-content">
-            <table class="matrix-table">
-                <tr>
-                    <th style="min-width:100px">Level</th>
-                    <th>S - Study</th>
-                    <th>C - Copy</th>
-                    <th>O - Output</th>
-                    <th>R - Research</th>
-                    <th>Es - Ethical</th>
-                </tr>
-                <tr>
-                    <td><strong>1. Self</strong><br>(0.6x)</td>
-                    <td>"I read ArXiv papers"</td>
-                    <td>"I followed 3 tutorials"</td>
-                    <td>"I built a chatbot"</td>
-                    <td>"I published a method"</td>
-                    <td>"I never leak PII"</td>
-                </tr>
-                <tr>
-                    <td><strong>2. Peer</strong><br>(0.8x)</td>
-                    <td>Manager confirms learning</td>
-                    <td>Peer reviews code samples</td>
-                    <td>Screenshots + demos</td>
-                    <td>Links to shared work</td>
-                    <td>Manager attests safety</td>
-                </tr>
-                <tr>
-                    <td><strong>3. Auto/Audit</strong><br>(1.0x)</td>
-                    <td>LMS logs, live interview on concepts</td>
-                    <td>Git commits, live demo + walkthrough</td>
-                    <td>CI/CD metrics, ROI proof + testimonials</td>
-                    <td>GitHub stats, papers, citations</td>
-                    <td>Audit logs, compliance records</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <!-- Quick Level Comparison - Second, Collapsible -->
-    <div class="collapsible" id="comparison-section">
-        <div class="collapsible-header" onclick="toggleCollapsible(this)">
-            <h2><span class="arrow">&#9654;</span> Quick Level Comparison</h2>
-            <span>Time, evidence, and use cases at a glance</span>
-        </div>
-        <div class="collapsible-content">
-            <table class="summary-table">
-                <tr>
-                    <th>Level</th>
-                    <th>Time</th>
-                    <th>Evidence</th>
-                    <th>Confidence</th>
-                    <th>Use Case</th>
-                </tr>
-                <tr>
-                    <td>1. Self</td>
-                    <td>5 min</td>
-                    <td>None</td>
-                    <td><span class="badge badge-low">LOW (0.6x)</span></td>
-                    <td>Personal Dev</td>
-                </tr>
-                <tr>
-                    <td>2. Peer</td>
-                    <td>30 min</td>
-                    <td>Work samples</td>
-                    <td><span class="badge badge-medium">MEDIUM (0.8x)</span></td>
-                    <td>Reviews</td>
-                </tr>
-                <tr>
-                    <td>3. Auto/Audit</td>
-                    <td>1-2+ hrs</td>
-                    <td>Logs + Portfolio</td>
-                    <td><span class="badge badge-high">HIGH (1.0x)</span></td>
-                    <td>Hiring/Promo</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <!-- Levels Group with gradient -->
-    <div class="levels-group">
-        <div class="levels-group-title">Verification Levels (click to expand)</div>
-
-        <div class="level level-1">
-            <div class="level-header" onclick="toggleLevel(this)">
-                <h3><span class="arrow">&#9654;</span> Level 1: Self</h3>
-                <span class="meta">5 min | <span class="badge badge-low">LOW</span> | 0.6x</span>
+        <!-- Validation Matrix - First, Collapsible -->
+        <div class="collapsible" id="matrix-section">
+            <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                <h2><span class="arrow">&#9654;</span> Validation Matrix: Levels x SCOREs</h2>
+                <span>See what evidence validates each dimension</span>
             </div>
-            <div class="level-content">
-                <div class="section">
-                    <h4>How Each SCOREs Dimension is Validated</h4>
-                    <div class="scores-grid">
-                        <div class="score-item">
-                            <strong>S - Study</strong>
-                            <span>Self-report: "Where do I learn about AI?"</span>
-                        </div>
-                        <div class="score-item">
-                            <strong>C - Copy</strong>
-                            <span>Self-report: "What tutorials have I followed?"</span>
-                        </div>
-                        <div class="score-item">
-                            <strong>O - Output</strong>
-                            <span>Self-report: "What have I deployed?"</span>
-                        </div>
-                        <div class="score-item">
-                            <strong>R - Research</strong>
-                            <span>Self-report: "What have I contributed?"</span>
-                        </div>
-                        <div class="score-item">
-                            <strong>Es - Ethical</strong>
-                            <span>Self-report: "How safely do I use AI?"</span>
+            <div class="collapsible-content" id="matrix-content">
+                <table class="matrix-table">
+                    <tr>
+                        <th style="min-width:100px">Level</th>
+                        <th>S - Study</th>
+                        <th>C - Copy</th>
+                        <th>O - Output</th>
+                        <th>R - Research</th>
+                        <th>Es - Ethical</th>
+                    </tr>
+                    <tr>
+                        <td><strong>1. Self</strong><br>(0.6x)</td>
+                        <td>"I read ArXiv papers"</td>
+                        <td>"I followed 3 tutorials"</td>
+                        <td>"I built a chatbot"</td>
+                        <td>"I published a method"</td>
+                        <td>"I never leak PII"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2. Peer</strong><br>(0.8x)</td>
+                        <td>Manager confirms learning</td>
+                        <td>Peer reviews code samples</td>
+                        <td>Screenshots + demos</td>
+                        <td>Links to shared work</td>
+                        <td>Manager attests safety</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3. Auto/Audit</strong><br>(1.0x)</td>
+                        <td>LMS logs, live interview on concepts</td>
+                        <td>Git commits, live demo + walkthrough</td>
+                        <td>CI/CD metrics, ROI proof + testimonials</td>
+                        <td>GitHub stats, papers, citations</td>
+                        <td>Audit logs, compliance records</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Quick Level Comparison - Second, Collapsible -->
+        <div class="collapsible" id="comparison-section">
+            <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                <h2><span class="arrow">&#9654;</span> Quick Level Comparison</h2>
+                <span>Time, evidence, and use cases at a glance</span>
+            </div>
+            <div class="collapsible-content">
+                <table class="summary-table">
+                    <tr>
+                        <th>Level</th>
+                        <th>Time</th>
+                        <th>Evidence</th>
+                        <th>Confidence</th>
+                        <th>Use Case</th>
+                    </tr>
+                    <tr>
+                        <td>1. Self</td>
+                        <td>5 min</td>
+                        <td>None</td>
+                        <td><span class="badge badge-low">LOW (0.6x)</span></td>
+                        <td>Personal Dev</td>
+                    </tr>
+                    <tr>
+                        <td>2. Peer</td>
+                        <td>30 min</td>
+                        <td>Work samples</td>
+                        <td><span class="badge badge-medium">MEDIUM (0.8x)</span></td>
+                        <td>Reviews</td>
+                    </tr>
+                    <tr>
+                        <td>3. Auto/Audit</td>
+                        <td>1-2+ hrs</td>
+                        <td>Logs + Portfolio</td>
+                        <td><span class="badge badge-high">HIGH (1.0x)</span></td>
+                        <td>Hiring/Promo</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Levels Group with gradient -->
+        <div class="levels-group">
+            <div class="levels-group-title">Verification Levels (click to expand)</div>
+
+            <div class="level level-1">
+                <div class="level-header" onclick="toggleLevel(this)">
+                    <h3><span class="arrow">&#9654;</span> Level 1: Self</h3>
+                    <span class="meta">5 min | <span class="badge badge-low">LOW</span> | 0.6x</span>
+                </div>
+                <div class="level-content">
+                    <div class="section">
+                        <h4>How Each SCOREs Dimension is Validated</h4>
+                        <div class="scores-grid">
+                            <div class="score-item">
+                                <strong>S - Study</strong>
+                                <span>Self-report: "Where do I learn about AI?"</span>
+                            </div>
+                            <div class="score-item">
+                                <strong>C - Copy</strong>
+                                <span>Self-report: "What tutorials have I followed?"</span>
+                            </div>
+                            <div class="score-item">
+                                <strong>O - Output</strong>
+                                <span>Self-report: "What have I deployed?"</span>
+                            </div>
+                            <div class="score-item">
+                                <strong>R - Research</strong>
+                                <span>Self-report: "What have I contributed?"</span>
+                            </div>
+                            <div class="score-item">
+                                <strong>Es - Ethical</strong>
+                                <span>Self-report: "How safely do I use AI?"</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="section">
-                    <h4>Evidence Required</h4>
-                    <ul>
-                        <li>None - honest self-reflection only</li>
-                        <li>Mental inventory of your AI skills and experience</li>
-                    </ul>
-                </div>
-                <div class="best-for">
-                    <strong>Best for:</strong> Personal development planning, identifying skill gaps, quick baseline check
-                </div>
-            </div>
-        </div>
-
-        <div class="level level-2">
-            <div class="level-header" onclick="toggleLevel(this)">
-                <h3><span class="arrow">&#9654;</span> Level 2: Peer</h3>
-                <span class="meta">30 min | <span class="badge badge-medium">MEDIUM</span> | 0.8x</span>
-            </div>
-            <div class="level-content">
-                <div class="section">
-                    <h4>How Each SCOREs Dimension is Validated</h4>
-                    <div class="scores-grid">
-                        <div class="score-item">
-                            <strong>S - Study</strong>
-                            <span>Manager confirms learning activities, course completions, reading habits</span>
-                        </div>
-                        <div class="score-item">
-                            <strong>C - Copy</strong>
-                            <span>Peer reviews code/work samples showing replication of techniques</span>
-                        </div>
-                        <div class="score-item">
-                            <strong>O - Output</strong>
-                            <span>Manager confirms deployed projects, screenshots, demo recordings</span>
-                        </div>
-                        <div class="score-item">
-                            <strong>R - Research</strong>
-                            <span>Links to published work, shared methods, peer acknowledgment</span>
-                        </div>
-                        <div class="score-item">
-                            <strong>Es - Ethical</strong>
-                            <span>Manager attests to safe practices, no known incidents</span>
-                        </div>
+                    <div class="section">
+                        <h4>Evidence Required</h4>
+                        <ul>
+                            <li>None - honest self-reflection only</li>
+                            <li>Mental inventory of your AI skills and experience</li>
+                        </ul>
+                    </div>
+                    <div class="best-for">
+                        <strong>Best for:</strong> Personal development planning, identifying skill gaps, quick baseline check
+                    </div>
+                    <div class="start-assessment-btn">
+                        <a href="level1.html" class="btn btn-primary">Start Level 1 Assessment</a>
                     </div>
                 </div>
-                <div class="section">
-                    <h4>Evidence Required</h4>
-                    <ul>
-                        <li>Work samples (GitHub repos, project docs)</li>
-                        <li>Demo recordings or screenshots</li>
-                        <li>Peer/colleague reviews</li>
-                        <li>Manager sign-off on each dimension</li>
-                    </ul>
-                </div>
-                <div class="best-for">
-                    <strong>Best for:</strong> Quarterly performance reviews, team calibration sessions, training allocation
-                </div>
             </div>
-        </div>
 
-        <div class="level level-3">
-            <div class="level-header" onclick="toggleLevel(this)">
-                <h3><span class="arrow">&#9654;</span> Level 3: Auto/Audit</h3>
-                <span class="meta">1-2+ hrs | <span class="badge badge-high">HIGH</span> | 1.0x</span>
-            </div>
-            <div class="level-content">
-                <div class="section">
-                    <h4>How Each SCOREs Dimension is Validated</h4>
-                    <p style="color: #666; font-size: 13px; margin-bottom: 10px;">This level combines automated verification with full audit capabilities. Use automated methods for scalable validation, or conduct a full audit for high-stakes decisions. Both achieve 1.0x confidence.</p>
-                    <div class="scores-grid">
-                        <div class="score-item">
-                            <strong>S - Study</strong>
-                            <span><em>Auto:</em> LMS logs, RSS feeds<br><em>Audit:</em> Live interview on concepts</span>
-                        </div>
-                        <div class="score-item">
-                            <strong>C - Copy</strong>
-                            <span><em>Auto:</em> Git commits, Copilot logs<br><em>Audit:</em> Live demo + code walkthrough</span>
-                        </div>
-                        <div class="score-item">
-                            <strong>O - Output</strong>
-                            <span><em>Auto:</em> CI/CD + production metrics<br><em>Audit:</em> ROI proof + testimonials</span>
-                        </div>
-                        <div class="score-item">
-                            <strong>R - Research</strong>
-                            <span><em>Auto:</em> GitHub stats, citations<br><em>Audit:</em> Papers, talks, recognition</span>
-                        </div>
-                        <div class="score-item">
-                            <strong>Es - Ethical</strong>
-                            <span><em>Auto:</em> Audit logs, PII scans<br><em>Audit:</em> Compliance records, post-mortems</span>
+            <div class="level level-2">
+                <div class="level-header" onclick="toggleLevel(this)">
+                    <h3><span class="arrow">&#9654;</span> Level 2: Peer</h3>
+                    <span class="meta">30 min | <span class="badge badge-medium">MEDIUM</span> | 0.8x</span>
+                </div>
+                <div class="level-content">
+                    <div class="section">
+                        <h4>How Each SCOREs Dimension is Validated</h4>
+                        <div class="scores-grid">
+                            <div class="score-item">
+                                <strong>S - Study</strong>
+                                <span>Manager confirms learning activities, course completions, reading habits</span>
+                            </div>
+                            <div class="score-item">
+                                <strong>C - Copy</strong>
+                                <span>Peer reviews code/work samples showing replication of techniques</span>
+                            </div>
+                            <div class="score-item">
+                                <strong>O - Output</strong>
+                                <span>Manager confirms deployed projects, screenshots, demo recordings</span>
+                            </div>
+                            <div class="score-item">
+                                <strong>R - Research</strong>
+                                <span>Links to published work, shared methods, peer acknowledgment</span>
+                            </div>
+                            <div class="score-item">
+                                <strong>Es - Ethical</strong>
+                                <span>Manager attests to safe practices, no known incidents</span>
+                            </div>
                         </div>
                     </div>
+                    <div class="section">
+                        <h4>Evidence Required</h4>
+                        <ul>
+                            <li>Work samples (GitHub repos, project docs)</li>
+                            <li>Demo recordings or screenshots</li>
+                            <li>Peer/colleague reviews</li>
+                            <li>Manager sign-off on each dimension</li>
+                        </ul>
+                    </div>
+                    <div class="best-for">
+                        <strong>Best for:</strong> Quarterly performance reviews, team calibration sessions, training allocation
+                    </div>
+                    <div class="start-assessment-btn">
+                        <a href="level2.html" class="btn btn-primary">Start Level 2 Assessment</a>
+                    </div>
                 </div>
-                <div class="section">
-                    <h4>Evidence Required</h4>
-                    <ul>
-                        <li><strong>Automated:</strong> Git history, tool logs (Copilot, API calls), code review history, time savings data</li>
-                        <li><strong>Full Audit:</strong> Comprehensive portfolio with case studies, stakeholder testimonials, ROI documentation</li>
-                        <li>Before/after comparisons, external audit reports, safety compliance records</li>
-                    </ul>
+            </div>
+
+            <div class="level level-3">
+                <div class="level-header" onclick="toggleLevel(this)">
+                    <h3><span class="arrow">&#9654;</span> Level 3: Auto/Audit</h3>
+                    <span class="meta">1-2+ hrs | <span class="badge badge-high">HIGH</span> | 1.0x</span>
                 </div>
-                <div class="best-for">
-                    <strong>Best for:</strong> Critical hiring decisions, promotion to senior AI roles, high-stakes project assignments, objective validation of claims
+                <div class="level-content">
+                    <div class="section">
+                        <h4>How Each SCOREs Dimension is Validated</h4>
+                        <p style="color: var(--color-secondary); font-size: var(--font-size-sm); margin-bottom: var(--space-3);">This level combines automated verification with full audit capabilities. Use automated methods for scalable validation, or conduct a full audit for high-stakes decisions. Both achieve 1.0x confidence.</p>
+                        <div class="scores-grid">
+                            <div class="score-item">
+                                <strong>S - Study</strong>
+                                <span><em>Auto:</em> LMS logs, RSS feeds<br><em>Audit:</em> Live interview on concepts</span>
+                            </div>
+                            <div class="score-item">
+                                <strong>C - Copy</strong>
+                                <span><em>Auto:</em> Git commits, Copilot logs<br><em>Audit:</em> Live demo + code walkthrough</span>
+                            </div>
+                            <div class="score-item">
+                                <strong>O - Output</strong>
+                                <span><em>Auto:</em> CI/CD + production metrics<br><em>Audit:</em> ROI proof + testimonials</span>
+                            </div>
+                            <div class="score-item">
+                                <strong>R - Research</strong>
+                                <span><em>Auto:</em> GitHub stats, citations<br><em>Audit:</em> Papers, talks, recognition</span>
+                            </div>
+                            <div class="score-item">
+                                <strong>Es - Ethical</strong>
+                                <span><em>Auto:</em> Audit logs, PII scans<br><em>Audit:</em> Compliance records, post-mortems</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <h4>Evidence Required</h4>
+                        <ul>
+                            <li><strong>Automated:</strong> Git history, tool logs (Copilot, API calls), code review history, time savings data</li>
+                            <li><strong>Full Audit:</strong> Comprehensive portfolio with case studies, stakeholder testimonials, ROI documentation</li>
+                            <li>Before/after comparisons, external audit reports, safety compliance records</li>
+                        </ul>
+                    </div>
+                    <div class="best-for">
+                        <strong>Best for:</strong> Critical hiring decisions, promotion to senior AI roles, high-stakes project assignments, objective validation of claims
+                    </div>
+                    <div class="start-assessment-btn">
+                        <a href="level3.html" class="btn btn-primary">Start Level 3 Assessment</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Assessment Flow Diagram -->
-    <details class="diagram-section">
-        <summary>View Assessment Flow Diagram</summary>
-        <div class="diagram-content">
-            <pre class="mermaid">
+        <!-- Assessment Flow Diagram -->
+        <details class="diagram-section">
+            <summary>View Assessment Flow Diagram</summary>
+            <div class="diagram-content">
+                <pre class="mermaid">
 flowchart TD
     subgraph START[" "]
         Q{{"What's your<br/>assessment purpose?"}}
@@ -790,15 +832,45 @@ flowchart TD
     class L2,MC level2
     class L3,VER level3
     class DONE1,DONE2,DONE3 endpoint
-            </pre>
-        </div>
-    </details>
+                </pre>
+            </div>
+        </details>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
-        <a href="https://github.com/sagearbor/ai-skill-eval-kit" target="_blank" rel="noopener noreferrer">View source and documentation on GitHub</a>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>AIQ Framework</h4>
+                    <ul class="footer-links">
+                        <li><a href="ai_mastery_eval.md">Framework Documentation</a></li>
+                        <li><a href="https://github.com/sagearbor/ai-skill-eval-kit" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Assessment Levels</h4>
+                    <ul class="footer-links">
+                        <li><a href="level1.html">Level 1: Self-Assessment</a></li>
+                        <li><a href="level2.html">Level 2: Peer Validation</a></li>
+                        <li><a href="level3.html">Level 3: Full Verification</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>For Organizations</h4>
+                    <ul class="footer-links">
+                        <li><a href="tools/dashboard.html">Analytics Dashboard</a></li>
+                        <li><a href="tools/README.md">Admin Guide</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                Universal AIQ Framework - Open source and free to use
+            </div>
+        </div>
     </footer>
 
+    <script src="js/shared.js"></script>
     <script>
         function toggleLevel(header) {
             const level = header.parentElement;
@@ -831,7 +903,7 @@ flowchart TD
                     levelElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 100);
                 // Brief highlight effect
-                levelElement.style.boxShadow = '0 0 0 3px #2E74B5';
+                levelElement.style.boxShadow = '0 0 0 3px var(--color-accent)';
                 setTimeout(() => {
                     levelElement.style.boxShadow = '';
                 }, 1500);

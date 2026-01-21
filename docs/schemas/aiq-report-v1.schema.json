@@ -1,0 +1,323 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sagearbor.github.io/ai-skill-eval-kit/schemas/aiq-report-v1.schema.json",
+  "title": "AIQ Report Schema",
+  "description": "JSON Schema for Universal AIQ Framework assessment reports. Validates output from all three assessment levels (L1 Self, L2 Peer, L3 Auto/Audit).",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "reportType",
+    "assessmentLevel",
+    "generatedAt",
+    "assessee",
+    "dimensions",
+    "calculation"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Schema version for forwards compatibility. Must be '1.0' for this schema version."
+    },
+    "reportType": {
+      "type": "string",
+      "enum": ["self-assessment", "peer-validation", "full-verification"],
+      "description": "Type of assessment: self-assessment (L1), peer-validation (L2), or full-verification (L3 with automated/audit evidence)."
+    },
+    "assessmentLevel": {
+      "type": "integer",
+      "enum": [1, 2, 3],
+      "description": "Assessment rigor level: 1=Self (0.6x), 2=Peer (0.8x), 3=Auto/Audit (1.0x)."
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the report was generated."
+    },
+    "assessee": {
+      "type": "object",
+      "description": "Information about the person being assessed.",
+      "required": ["name", "role"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Full name of the person being assessed."
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Job role used for weight selection (e.g., 'Software Engineer', 'Product Manager')."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address. Empty string if not provided (enables aggregation without nulls)."
+        }
+      }
+    },
+    "dimensions": {
+      "type": "object",
+      "description": "Scores for all five SCOREs dimensions: Study, Copy, Output, Research, Ethical security.",
+      "required": ["study", "copy", "output", "research", "ethical"],
+      "additionalProperties": false,
+      "properties": {
+        "study": {
+          "$ref": "#/definitions/dimensionScore",
+          "description": "Study dimension: Information diet, conceptual fluency, trend awareness."
+        },
+        "copy": {
+          "$ref": "#/definitions/dimensionScore",
+          "description": "Copy dimension: Evaluation skill, scientific rigor, quality judgment."
+        },
+        "output": {
+          "$ref": "#/definitions/dimensionScore",
+          "description": "Output dimension: Deployment capability, workflow integration, reliability."
+        },
+        "research": {
+          "$ref": "#/definitions/dimensionScore",
+          "description": "Research dimension: Innovation, novel methods, advancing the field."
+        },
+        "ethical": {
+          "$ref": "#/definitions/dimensionScore",
+          "description": "Ethical security dimension: Safety practices, ethics, failure awareness, compliance."
+        }
+      }
+    },
+    "calculation": {
+      "type": "object",
+      "description": "Final score calculation details.",
+      "required": [
+        "rawTotal",
+        "evidenceMultiplier",
+        "finalScore",
+        "normalizedScore",
+        "scoreBand",
+        "confidence"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "rawTotal": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Sum of all weighted dimension scores before evidence multiplier."
+        },
+        "evidenceMultiplier": {
+          "type": "number",
+          "enum": [0.6, 0.8, 1.0],
+          "description": "Evidence-based confidence modifier: 0.6=Self-report, 0.8=Peer-validated, 1.0=Auto/Audit verified."
+        },
+        "finalScore": {
+          "type": "number",
+          "minimum": 0,
+          "description": "rawTotal * evidenceMultiplier. The actual AIQ score used for reporting."
+        },
+        "normalizedScore": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Final score normalized to 0-100 scale for easy interpretation."
+        },
+        "scoreBand": {
+          "type": "string",
+          "enum": ["Unaware", "User", "Practitioner", "Builder", "Architect", "Pioneer"],
+          "description": "Human-readable proficiency band based on normalizedScore: Unaware (0-20), User (21-40), Practitioner (41-60), Builder (61-80), Architect (81-95), Pioneer (96-100)."
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["LOW", "MEDIUM", "HIGH"],
+          "description": "Confidence rating based on evidence quality: LOW (<0.7 avg multiplier), MEDIUM (0.7-0.9), HIGH (>0.9)."
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "description": "Peer/manager validation details. Required for Level 2+ assessments.",
+      "required": [
+        "validatorName",
+        "validatorRelationship",
+        "validatedAt",
+        "dimensionConfirmations"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "validatorName": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Full name of the person who validated the assessment."
+        },
+        "validatorRelationship": {
+          "type": "string",
+          "enum": ["Manager", "Peer", "Direct Report", "Other"],
+          "description": "Validator's relationship to the assessee."
+        },
+        "validatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when validation was completed."
+        },
+        "dimensionConfirmations": {
+          "type": "object",
+          "description": "Per-dimension confirmation or adjustment by validator.",
+          "required": ["study", "copy", "output", "research", "ethical"],
+          "additionalProperties": false,
+          "properties": {
+            "study": { "$ref": "#/definitions/dimensionConfirmation" },
+            "copy": { "$ref": "#/definitions/dimensionConfirmation" },
+            "output": { "$ref": "#/definitions/dimensionConfirmation" },
+            "research": { "$ref": "#/definitions/dimensionConfirmation" },
+            "ethical": { "$ref": "#/definitions/dimensionConfirmation" }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "description": "Detailed evidence collection for Level 3 auto/audit verification.",
+      "required": ["tools", "auditNotes"],
+      "additionalProperties": false,
+      "properties": {
+        "tools": {
+          "type": "object",
+          "description": "Evidence collected from specific AI tools. Keys are tool identifiers (e.g., 'claudeCode', 'chatgpt', 'githubCopilot').",
+          "additionalProperties": {
+            "$ref": "#/definitions/toolEvidence"
+          }
+        },
+        "auditNotes": {
+          "type": "string",
+          "description": "Free-form notes from auditor reviewing evidence, Git history, or other artifacts."
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "assessmentLevel": { "minimum": 2 }
+        }
+      },
+      "then": {
+        "required": ["validation"],
+        "properties": {
+          "validation": {
+            "description": "Validation object is required for Level 2+ assessments."
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "assessmentLevel": { "const": 3 }
+        }
+      },
+      "then": {
+        "required": ["evidence"],
+        "properties": {
+          "evidence": {
+            "description": "Evidence object is required for Level 3 assessments."
+          }
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "dimensionScore": {
+      "type": "object",
+      "description": "Score data for a single SCOREs dimension.",
+      "required": ["level", "points", "weight", "weightedScore"],
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "description": "Proficiency level (0-5) as defined in the SCOREs rubric."
+        },
+        "points": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Raw points earned at this level (varies by dimension)."
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Role-based weight for this dimension (0.0-1.0, all weights sum to 1.0)."
+        },
+        "weightedScore": {
+          "type": "number",
+          "minimum": 0,
+          "description": "points * weight. Contribution of this dimension to rawTotal."
+        }
+      }
+    },
+    "dimensionConfirmation": {
+      "type": "object",
+      "description": "Validator's confirmation or adjustment for a dimension score.",
+      "required": ["confirmed", "adjustedLevel"],
+      "additionalProperties": false,
+      "properties": {
+        "confirmed": {
+          "type": "boolean",
+          "description": "True if validator agrees with the assessee's self-reported level."
+        },
+        "adjustedLevel": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 5,
+          "description": "If not confirmed, the validator's adjusted level (0-5). Null if confirmed."
+        }
+      }
+    },
+    "toolEvidence": {
+      "type": "object",
+      "description": "Evidence data from a specific AI tool. Structure varies by tool.",
+      "required": ["completed"],
+      "properties": {
+        "completed": {
+          "type": "boolean",
+          "description": "Whether evidence collection for this tool was completed."
+        },
+        "monthlyTokens": {
+          "type": ["integer", "string"],
+          "description": "Monthly token usage. Empty string if not collected."
+        },
+        "sessionsPerMonth": {
+          "type": ["integer", "string"],
+          "description": "Number of sessions per month. Empty string if not collected."
+        },
+        "dailyStats": {
+          "type": "object",
+          "description": "Daily usage statistics.",
+          "properties": {
+            "min": {
+              "type": ["number", "string"],
+              "description": "Minimum daily tokens. Empty string if not collected."
+            },
+            "max": {
+              "type": ["number", "string"],
+              "description": "Maximum daily tokens. Empty string if not collected."
+            },
+            "avg": {
+              "type": ["number", "string"],
+              "description": "Average daily tokens. Empty string if not collected."
+            }
+          }
+        },
+        "conversationCount": {
+          "type": ["integer", "string"],
+          "description": "Total conversation count (e.g., ChatGPT). Empty string if not collected."
+        },
+        "exportFilename": {
+          "type": "string",
+          "description": "Filename of exported data archive. Empty string if not collected."
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

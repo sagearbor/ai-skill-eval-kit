@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIQ Self-Assessment | Level 1</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="page-header">
+    <div class="container container-narrow">
+      <a href="index.html" class="back-link" style="display: inline-block; margin-bottom: var(--space-4); font-size: var(--font-size-sm);">
+        &larr; Back to Home
+      </a>
+      <h1>AIQ Self-Assessment</h1>
+      <p>Level 1: Quick self-evaluation across five dimensions of AI competency. Takes about 5 minutes.</p>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container container-narrow">
+      <!-- Role Selection -->
+      <div class="card mb-8">
+        <div class="card-header">
+          <h2 class="card-title" style="margin-bottom: 0;">Select Your Role</h2>
+        </div>
+        <div class="card-body">
+          <p>Your role determines how each dimension is weighted in your final score.</p>
+          <div class="form-group mb-0">
+            <label for="role-select" class="form-label form-label-required">Primary Role</label>
+            <select id="role-select" class="form-select" required>
+              <!-- Populated by JavaScript -->
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assessment Form -->
+      <form id="assessment-form">
+        <div id="dimensions-container">
+          <!-- Dimension sections populated by JavaScript -->
+        </div>
+
+        <!-- Validation Error Alert (hidden by default) -->
+        <div id="validation-error" class="alert alert-error hidden">
+          <span class="alert-icon">!</span>
+          <div class="alert-content">
+            <div class="alert-title">Incomplete Assessment</div>
+            <div id="validation-error-message">Please answer all questions before submitting.</div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center mt-8">
+          <button type="submit" class="btn btn-primary btn-large">
+            Calculate My AIQ Score
+          </button>
+        </div>
+      </form>
+
+      <!-- Results Section (hidden initially) -->
+      <div id="results-section" class="hidden mt-8">
+        <hr>
+
+        <!-- Gaming Warning (hidden by default) -->
+        <div id="gaming-warning" class="alert alert-warning hidden mb-6">
+          <span class="alert-icon">!</span>
+          <div class="alert-content">
+            <div class="alert-title">Consider Peer Validation</div>
+            <div>Scores this high are rare (top 5% of AI practitioners). Consider getting peer validation to increase your confidence multiplier from 0.6x to 0.8x.</div>
+          </div>
+        </div>
+
+        <!-- Score Display -->
+        <div class="results-container">
+          <div class="score-display">
+            <div class="score-value" id="score-value">0</div>
+            <div class="score-label">Your AIQ Score</div>
+            <div id="score-band" class="score-band">--</div>
+            <div class="mt-4">
+              <span id="confidence-badge" class="badge badge-low">Confidence: LOW (0.6x)</span>
+            </div>
+          </div>
+
+          <!-- Dimension Breakdown -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title mb-0">Dimension Breakdown</h3>
+              <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">Role: <span id="result-role">General</span></p>
+            </div>
+            <div class="card-body">
+              <table class="breakdown-table">
+                <thead>
+                  <tr>
+                    <th>Dimension</th>
+                    <th>Level</th>
+                    <th>Points</th>
+                    <th>Weight</th>
+                    <th class="score-cell">Weighted</th>
+                  </tr>
+                </thead>
+                <tbody id="breakdown-tbody">
+                  <!-- Populated by JavaScript -->
+                </tbody>
+              </table>
+
+              <!-- Calculation Details -->
+              <div class="mt-6" style="padding: var(--space-4); background: var(--color-bg-alt); border-radius: var(--radius-md);">
+                <p class="mb-0" style="font-family: monospace; font-size: var(--font-size-sm);">
+                  <span id="calc-details"></span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Download Options -->
+          <div class="download-options mt-8">
+            <div class="download-card" onclick="downloadJSON()">
+              <div class="download-icon">{}</div>
+              <div class="download-label">Download Report (JSON)</div>
+              <div class="download-desc">Machine-readable format</div>
+            </div>
+            <div class="download-card" onclick="downloadPDF()">
+              <div class="download-icon">PDF</div>
+              <div class="download-label">Download Summary (PDF)</div>
+              <div class="download-desc">1-page summary</div>
+            </div>
+            <div class="download-card" onclick="goToPeerReview()">
+              <div class="download-icon">L2</div>
+              <div class="download-label">Get Peer Validation</div>
+              <div class="download-desc">Increase confidence to 0.8x</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>Universal AIQ Framework - Standardized AI Competency Measurement</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/shared.js"></script>
+  <script src="js/assessment.js"></script>
+</body>
+</html>

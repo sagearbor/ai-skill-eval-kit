@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIQ Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ============================================
+           AIQ Dashboard - Inline Styles
+           Based on Universal AIQ Framework Design System
+           ============================================ */
+
+        /* CSS Custom Properties (Design Tokens) */
+        :root {
+            /* Colors */
+            --color-primary: #0f172a;
+            --color-secondary: #475569;
+            --color-accent: #4f46e5;
+            --color-accent-hover: #4338ca;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-error: #f43f5e;
+            --color-bg: #ffffff;
+            --color-bg-alt: #f8fafc;
+            --color-border: #e2e8f0;
+            --color-text: #0f172a;
+            --color-text-muted: #64748b;
+
+            /* Score Band Colors */
+            --band-unaware: #94a3b8;
+            --band-user: #22c55e;
+            --band-practitioner: #3b82f6;
+            --band-builder: #8b5cf6;
+            --band-architect: #f59e0b;
+            --band-pioneer: #ef4444;
+
+            /* Typography */
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            --font-size-4xl: 2.25rem;
+
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+
+            /* Borders & Shadows */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-normal: 200ms ease;
+        }
+
+        /* Base Reset & Typography */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            color: var(--color-text);
+            background-color: var(--color-bg-alt);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Layout */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+
+        /* Header */
+        .dashboard-header {
+            background: var(--color-bg);
+            border-bottom: 1px solid var(--color-border);
+            padding: var(--space-6) 0;
+            margin-bottom: var(--space-6);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-4);
+        }
+
+        .header-title h1 {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .header-title p {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-muted);
+        }
+
+        .back-link {
+            color: var(--color-accent);
+            text-decoration: none;
+            font-size: var(--font-size-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .summary-card {
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .summary-card-label {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-2);
+        }
+
+        .summary-card-value {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .summary-card-value.accent {
+            color: var(--color-accent);
+        }
+
+        .summary-card-value.warning {
+            color: var(--color-error);
+        }
+
+        .summary-card-subtitle {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-muted);
+            margin-top: var(--space-1);
+        }
+
+        /* File Input Section */
+        .file-input-section {
+            background: var(--color-bg);
+            border: 2px dashed var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-8);
+            text-align: center;
+            margin-bottom: var(--space-6);
+        }
+
+        .file-input-section.hidden {
+            display: none;
+        }
+
+        .file-input-section h2 {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--space-2);
+        }
+
+        .file-input-section p {
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-4);
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: var(--space-3) var(--space-6);
+            background: var(--color-accent);
+            color: white;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 500;
+            transition: background var(--transition-fast);
+        }
+
+        .file-input-label:hover {
+            background: var(--color-accent-hover);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .loading-message {
+            text-align: center;
+            padding: var(--space-8);
+            color: var(--color-text-muted);
+        }
+
+        /* Filter Controls */
+        .filter-section {
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4) var(--space-5);
+            margin-bottom: var(--space-6);
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-4);
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .filter-label {
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .filter-select {
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--font-size-sm);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-bg);
+            min-width: 150px;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: var(--space-2);
+            margin-left: auto;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            font-family: var(--font-family);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-primary {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--color-bg);
+            color: var(--color-text);
+            border-color: var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-bg-alt);
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            gap: var(--space-1);
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-1);
+            margin-bottom: var(--space-6);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: var(--space-3) var(--space-4);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-family);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            color: var(--color-text);
+            background: var(--color-bg-alt);
+        }
+
+        .tab-btn.active {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Chart Containers */
+        .chart-container {
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--space-4);
+            color: var(--color-primary);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+        }
+
+        /* Skill Gaps Tab */
+        .skill-gaps-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-6);
+        }
+
+        .recommendations-box {
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+        }
+
+        .recommendations-title {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            margin-bottom: var(--space-3);
+            color: var(--color-primary);
+        }
+
+        .recommendations-list {
+            list-style: none;
+        }
+
+        .recommendations-list li {
+            padding: var(--space-3);
+            margin-bottom: var(--space-2);
+            background: var(--color-bg-alt);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-sm);
+            border-left: 3px solid var(--color-accent);
+        }
+
+        .lowest-dimension-highlight {
+            color: var(--color-error);
+            font-weight: 600;
+        }
+
+        /* Leaderboard Tab */
+        .leaderboard-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+            flex-wrap: wrap;
+            gap: var(--space-3);
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--color-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+
+        .toggle-switch.active {
+            background: var(--color-accent);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform var(--transition-fast);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+
+        .toggle-label {
+            font-size: var(--font-size-sm);
+            color: var(--color-text);
+        }
+
+        .leaderboard-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--font-size-sm);
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: var(--space-3) var(--space-4);
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .leaderboard-table th {
+            background: var(--color-bg-alt);
+            font-weight: 600;
+            color: var(--color-text);
+            cursor: pointer;
+            user-select: none;
+            transition: background var(--transition-fast);
+        }
+
+        .leaderboard-table th:hover {
+            background: var(--color-border);
+        }
+
+        .leaderboard-table th.sorted-asc::after {
+            content: ' \2191';
+        }
+
+        .leaderboard-table th.sorted-desc::after {
+            content: ' \2193';
+        }
+
+        .leaderboard-table tbody tr:hover {
+            background: var(--color-bg-alt);
+        }
+
+        .band-badge {
+            display: inline-block;
+            padding: var(--space-1) var(--space-2);
+            border-radius: 9999px;
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .band-unaware { background: var(--band-unaware); color: white; }
+        .band-user { background: var(--band-user); color: white; }
+        .band-practitioner { background: var(--band-practitioner); color: white; }
+        .band-builder { background: var(--band-builder); color: white; }
+        .band-architect { background: var(--band-architect); color: var(--color-primary); }
+        .band-pioneer { background: var(--band-pioneer); color: white; }
+
+        .confidence-badge {
+            display: inline-block;
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+        }
+
+        .confidence-low { background: rgba(244, 63, 94, 0.1); color: var(--color-error); }
+        .confidence-medium { background: rgba(245, 158, 11, 0.1); color: var(--color-warning); }
+        .confidence-high { background: rgba(16, 185, 129, 0.1); color: var(--color-success); }
+
+        /* Trends Tab */
+        .trends-note {
+            background: rgba(79, 70, 229, 0.05);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            margin-bottom: var(--space-4);
+            color: var(--color-accent);
+            font-size: var(--font-size-sm);
+        }
+
+        .role-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-3);
+            margin-top: var(--space-4);
+        }
+
+        .role-legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--font-size-sm);
+        }
+
+        .role-legend-color {
+            width: 16px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-12);
+            color: var(--color-text-muted);
+        }
+
+        .empty-state h3 {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--space-2);
+            color: var(--color-primary);
+        }
+
+        /* No Trends Message */
+        .no-trends {
+            text-align: center;
+            padding: var(--space-8);
+            color: var(--color-text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .skill-gaps-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 var(--space-4);
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .tab-navigation {
+                flex-wrap: wrap;
+            }
+
+            .tab-btn {
+                flex-basis: calc(50% - var(--space-1));
+            }
+
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-buttons {
+                margin-left: 0;
+                justify-content: flex-end;
+            }
+
+            .leaderboard-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .chart-wrapper {
+                height: 300px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .dashboard-header,
+            .filter-section,
+            .tab-navigation,
+            .file-input-section,
+            .back-link {
+                display: none;
+            }
+
+            .tab-content {
+                display: block !important;
+                page-break-after: always;
+            }
+
+            .chart-container {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>AIQ Analytics Dashboard</h1>
+                    <p>Organization AI Skills Overview</p>
+                </div>
+                <a href="../index.html" class="back-link">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M11 4L7 8l4 4" stroke="currentColor" stroke-width="2" fill="none"/>
+                    </svg>
+                    Back to Assessment Tools
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- File Input Section (shown when no data) -->
+        <section id="fileInputSection" class="file-input-section">
+            <h2>Load Assessment Data</h2>
+            <p>Select an <code>aiq_combined.json</code> file to visualize your organization's AI skills data.</p>
+            <label class="file-input-label">
+                Choose File
+                <input type="file" id="fileInput" class="file-input" accept=".json">
+            </label>
+            <p id="loadingMessage" class="loading-message" style="display: none;">Attempting to load aiq_combined.json from current directory...</p>
+        </section>
+
+        <!-- Dashboard Content (hidden until data loaded) -->
+        <div id="dashboardContent" style="display: none;">
+            <!-- Summary Cards -->
+            <section class="summary-cards" id="summaryCards">
+                <div class="summary-card">
+                    <div class="summary-card-label">Total Reports</div>
+                    <div class="summary-card-value" id="totalReports">0</div>
+                    <div class="summary-card-subtitle" id="reportPeriods">-</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Average Score</div>
+                    <div class="summary-card-value accent" id="avgScore">0</div>
+                    <div class="summary-card-subtitle">out of 100</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Most Common Band</div>
+                    <div class="summary-card-value" id="commonBand">-</div>
+                    <div class="summary-card-subtitle" id="bandCount">-</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Lowest Dimension</div>
+                    <div class="summary-card-value warning" id="lowestDimension">-</div>
+                    <div class="summary-card-subtitle" id="lowestAvg">-</div>
+                </div>
+            </section>
+
+            <!-- Filter Controls -->
+            <section class="filter-section">
+                <div class="filter-group">
+                    <label class="filter-label">Role</label>
+                    <select id="filterRole" class="filter-select">
+                        <option value="">All Roles</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Level</label>
+                    <select id="filterLevel" class="filter-select">
+                        <option value="">All Levels</option>
+                        <option value="1">Level 1 (Self)</option>
+                        <option value="2">Level 2 (Peer)</option>
+                        <option value="3">Level 3 (Auto/Audit)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Period</label>
+                    <select id="filterPeriod" class="filter-select">
+                        <option value="">All Periods</option>
+                    </select>
+                </div>
+                <div class="filter-buttons">
+                    <button id="applyFilters" class="btn btn-primary">Apply</button>
+                    <button id="clearFilters" class="btn btn-secondary">Clear</button>
+                </div>
+            </section>
+
+            <!-- Tab Navigation -->
+            <nav class="tab-navigation">
+                <button class="tab-btn active" data-tab="distribution">Score Distribution</button>
+                <button class="tab-btn" data-tab="gaps">Skill Gaps</button>
+                <button class="tab-btn" data-tab="leaderboard">Leaderboard</button>
+                <button class="tab-btn" data-tab="trends">Trends Over Time</button>
+            </nav>
+
+            <!-- Tab 1: Score Distribution -->
+            <section id="tab-distribution" class="tab-content active">
+                <div class="chart-container">
+                    <h3 class="chart-title">Score Distribution</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 2: Skill Gaps -->
+            <section id="tab-gaps" class="tab-content">
+                <div class="skill-gaps-content">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Dimension Averages (S-C-O-R-Es)</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="gapsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="recommendations-box">
+                        <h4 class="recommendations-title">Recommendations</h4>
+                        <ul class="recommendations-list" id="recommendationsList">
+                            <li>Loading recommendations...</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 3: Leaderboard -->
+            <section id="tab-leaderboard" class="tab-content">
+                <div class="chart-container">
+                    <div class="leaderboard-controls">
+                        <h3 class="chart-title" style="margin-bottom: 0;">Leaderboard</h3>
+                        <div style="display: flex; gap: var(--space-4); align-items: center; flex-wrap: wrap;">
+                            <div class="toggle-container">
+                                <div id="anonymizeToggle" class="toggle-switch"></div>
+                                <span class="toggle-label">Anonymize Names</span>
+                            </div>
+                            <button id="exportCsv" class="btn btn-secondary">Export CSV</button>
+                        </div>
+                    </div>
+                    <div class="leaderboard-table-wrapper">
+                        <table class="leaderboard-table" id="leaderboardTable">
+                            <thead>
+                                <tr>
+                                    <th data-sort="rank">Rank</th>
+                                    <th data-sort="name">Name</th>
+                                    <th data-sort="role">Role</th>
+                                    <th data-sort="score">Score</th>
+                                    <th data-sort="band">Band</th>
+                                    <th data-sort="confidence">Confidence</th>
+                                    <th data-sort="level">Level</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 4: Trends Over Time -->
+            <section id="tab-trends" class="tab-content">
+                <div class="chart-container">
+                    <h3 class="chart-title">Average Score Over Time</h3>
+                    <div id="trendsNote" class="trends-note" style="display: none;">
+                        Tip: Toggle roles on/off by clicking their labels in the legend below.
+                    </div>
+                    <div id="noTrendsMessage" class="no-trends" style="display: none;">
+                        <p>Trends require data from multiple time periods.</p>
+                        <p>Organize reports into period folders (e.g., 2025-Q1/, 2025-Q2/) and re-aggregate.</p>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="trendsChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // ============================================
+        // AIQ Dashboard - JavaScript
+        // ============================================
+
+        // Global state
+        let originalData = null;
+        let filteredData = null;
+        let charts = {};
+        let anonymized = false;
+        let currentSort = { column: 'score', direction: 'desc' };
+
+        // Dimension labels and colors
+        const DIMENSIONS = ['study', 'copy', 'output', 'research', 'ethical'];
+        const DIMENSION_LABELS = {
+            study: 'Study (S)',
+            copy: 'Copy (C)',
+            output: 'Output (O)',
+            research: 'Research (R)',
+            ethical: 'Ethical (Es)'
+        };
+        const DIMENSION_SHORT = {
+            study: 'S',
+            copy: 'C',
+            output: 'O',
+            research: 'R',
+            ethical: 'Es'
+        };
+
+        // Score band colors
+        const BAND_COLORS = {
+            'Unaware': '#94a3b8',
+            'User': '#22c55e',
+            'Practitioner': '#3b82f6',
+            'Builder': '#8b5cf6',
+            'Architect': '#f59e0b',
+            'Pioneer': '#ef4444'
+        };
+
+        // Distribution bucket colors
+        const DISTRIBUTION_COLORS = ['#f43f5e', '#f59e0b', '#4f46e5', '#10b981', '#8b5cf6'];
+
+        // Role colors for trends
+        const ROLE_COLORS = [
+            '#4f46e5', '#10b981', '#f59e0b', '#f43f5e',
+            '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16'
+        ];
+
+        // ============================================
+        // Data Loading
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Try to fetch from same directory
+            const loadingMessage = document.getElementById('loadingMessage');
+            loadingMessage.style.display = 'block';
+
+            fetch('aiq_combined.json')
+                .then(response => {
+                    if (!response.ok) throw new Error('Not found');
+                    return response.json();
+                })
+                .then(data => {
+                    loadingMessage.style.display = 'none';
+                    loadDashboard(data);
+                })
+                .catch(() => {
+                    loadingMessage.style.display = 'none';
+                    // Show file input
+                    document.getElementById('fileInputSection').classList.remove('hidden');
+                });
+
+            // File input handler
+            document.getElementById('fileInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        loadDashboard(data);
+                    } catch (err) {
+                        alert('Error parsing JSON file: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            });
+
+            // Tab navigation
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+
+                    // Update buttons
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Update content
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    document.getElementById('tab-' + tabId).classList.add('active');
+                });
+            });
+
+            // Filter buttons
+            document.getElementById('applyFilters').addEventListener('click', applyFilters);
+            document.getElementById('clearFilters').addEventListener('click', clearFilters);
+
+            // Anonymize toggle
+            document.getElementById('anonymizeToggle').addEventListener('click', function() {
+                this.classList.toggle('active');
+                anonymized = this.classList.contains('active');
+                renderLeaderboard();
+            });
+
+            // Export CSV
+            document.getElementById('exportCsv').addEventListener('click', exportToCsv);
+
+            // Leaderboard sorting
+            document.querySelectorAll('.leaderboard-table th[data-sort]').forEach(th => {
+                th.addEventListener('click', function() {
+                    const column = this.dataset.sort;
+                    if (currentSort.column === column) {
+                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.column = column;
+                        currentSort.direction = column === 'score' ? 'desc' : 'asc';
+                    }
+                    renderLeaderboard();
+                });
+            });
+        });
+
+        // ============================================
+        // Dashboard Loading
+        // ============================================
+
+        function loadDashboard(data) {
+            // Normalize data structure
+            originalData = normalizeData(data);
+            filteredData = [...originalData];
+
+            // Hide file input, show dashboard
+            document.getElementById('fileInputSection').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
+
+            // Populate filter dropdowns
+            populateFilters();
+
+            // Render all views
+            updateSummaryCards();
+            renderDistributionChart();
+            renderGapsChart();
+            renderLeaderboard();
+            renderTrendsChart();
+        }
+
+        function normalizeData(data) {
+            // Handle both direct array and wrapped format
+            let reports = [];
+
+            if (Array.isArray(data)) {
+                reports = data;
+            } else if (data.reports && Array.isArray(data.reports)) {
+                reports = data.reports;
+            } else {
+                console.error('Invalid data format');
+                return [];
+            }
+
+            // Normalize each report
+            return reports.map((report, index) => {
+                // Handle various schema formats
+                const normalized = {
+                    name: report.assessee?.name || report.name || 'Unknown',
+                    role: report.assessee?.role || report.role || 'General',
+                    level: report.assessmentLevel || report.level || 1,
+                    period: report.period || extractPeriod(report.generatedAt) || 'Unknown',
+                    dimensions: {},
+                    score: 0,
+                    band: 'Unknown',
+                    confidence: 'LOW'
+                };
+
+                // Extract dimension data
+                const dims = report.dimensions || report.scores?.dimensions || {};
+                DIMENSIONS.forEach(dim => {
+                    const dimData = dims[dim] || {};
+                    normalized.dimensions[dim] = {
+                        level: dimData.level || 0,
+                        points: dimData.points || dimData.weightedScore || 0
+                    };
+                });
+
+                // Extract calculation/score data
+                const calc = report.calculation || report.scores || {};
+                normalized.score = calc.normalizedScore || calc.finalScore || 0;
+                normalized.band = calc.scoreBand || calc.band || 'Unknown';
+                normalized.confidence = calc.confidence || 'LOW';
+
+                return normalized;
+            });
+        }
+
+        function extractPeriod(dateString) {
+            if (!dateString) return null;
+            try {
+                const date = new Date(dateString);
+                const year = date.getFullYear();
+                const quarter = Math.ceil((date.getMonth() + 1) / 3);
+                return `${year}-Q${quarter}`;
+            } catch {
+                return null;
+            }
+        }
+
+        // ============================================
+        // Filter Functions
+        // ============================================
+
+        function populateFilters() {
+            // Get unique roles
+            const roles = [...new Set(originalData.map(r => r.role))].sort();
+            const roleSelect = document.getElementById('filterRole');
+            roleSelect.innerHTML = '<option value="">All Roles</option>';
+            roles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role;
+                option.textContent = role;
+                roleSelect.appendChild(option);
+            });
+
+            // Get unique periods
+            const periods = [...new Set(originalData.map(r => r.period))].sort();
+            const periodSelect = document.getElementById('filterPeriod');
+            periodSelect.innerHTML = '<option value="">All Periods</option>';
+            periods.forEach(period => {
+                const option = document.createElement('option');
+                option.value = period;
+                option.textContent = period;
+                periodSelect.appendChild(option);
+            });
+        }
+
+        function applyFilters() {
+            const role = document.getElementById('filterRole').value;
+            const level = document.getElementById('filterLevel').value;
+            const period = document.getElementById('filterPeriod').value;
+
+            filteredData = originalData.filter(report => {
+                if (role && report.role !== role) return false;
+                if (level && report.level !== parseInt(level)) return false;
+                if (period && report.period !== period) return false;
+                return true;
+            });
+
+            // Update all views
+            updateSummaryCards();
+            renderDistributionChart();
+            renderGapsChart();
+            renderLeaderboard();
+            renderTrendsChart();
+        }
+
+        function clearFilters() {
+            document.getElementById('filterRole').value = '';
+            document.getElementById('filterLevel').value = '';
+            document.getElementById('filterPeriod').value = '';
+            filteredData = [...originalData];
+
+            updateSummaryCards();
+            renderDistributionChart();
+            renderGapsChart();
+            renderLeaderboard();
+            renderTrendsChart();
+        }
+
+        // ============================================
+        // Summary Cards
+        // ============================================
+
+        function updateSummaryCards() {
+            const data = filteredData;
+
+            // Total reports
+            document.getElementById('totalReports').textContent = data.length;
+            const periods = [...new Set(data.map(r => r.period))];
+            document.getElementById('reportPeriods').textContent =
+                periods.length === 1 ? periods[0] : `${periods.length} periods`;
+
+            // Average score
+            const avgScore = data.length > 0
+                ? Math.round(data.reduce((sum, r) => sum + r.score, 0) / data.length)
+                : 0;
+            document.getElementById('avgScore').textContent = avgScore;
+
+            // Most common band
+            if (data.length > 0) {
+                const bandCounts = {};
+                data.forEach(r => {
+                    bandCounts[r.band] = (bandCounts[r.band] || 0) + 1;
+                });
+                const maxBand = Object.entries(bandCounts)
+                    .sort((a, b) => b[1] - a[1])[0];
+                document.getElementById('commonBand').textContent = maxBand[0];
+                document.getElementById('bandCount').textContent =
+                    `${maxBand[1]} of ${data.length} reports`;
+            } else {
+                document.getElementById('commonBand').textContent = '-';
+                document.getElementById('bandCount').textContent = '-';
+            }
+
+            // Lowest dimension
+            if (data.length > 0) {
+                const dimAvgs = {};
+                DIMENSIONS.forEach(dim => {
+                    const levels = data.map(r => r.dimensions[dim]?.level || 0);
+                    dimAvgs[dim] = levels.reduce((a, b) => a + b, 0) / levels.length;
+                });
+                const lowest = Object.entries(dimAvgs)
+                    .sort((a, b) => a[1] - b[1])[0];
+                document.getElementById('lowestDimension').textContent =
+                    DIMENSION_SHORT[lowest[0]];
+                document.getElementById('lowestAvg').textContent =
+                    `Avg: ${lowest[1].toFixed(1)} / 5`;
+            } else {
+                document.getElementById('lowestDimension').textContent = '-';
+                document.getElementById('lowestAvg').textContent = '-';
+            }
+        }
+
+        // ============================================
+        // Score Distribution Chart
+        // ============================================
+
+        function renderDistributionChart() {
+            const ctx = document.getElementById('distributionChart').getContext('2d');
+
+            // Destroy existing chart
+            if (charts.distribution) {
+                charts.distribution.destroy();
+            }
+
+            // Calculate distribution
+            const buckets = [0, 0, 0, 0, 0]; // 0-20, 21-40, 41-60, 61-80, 81-100
+            filteredData.forEach(r => {
+                const score = r.score;
+                if (score <= 20) buckets[0]++;
+                else if (score <= 40) buckets[1]++;
+                else if (score <= 60) buckets[2]++;
+                else if (score <= 80) buckets[3]++;
+                else buckets[4]++;
+            });
+
+            charts.distribution = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['0-20\nUnaware', '21-40\nUser', '41-60\nPractitioner', '61-80\nBuilder', '81-100\nArchitect+'],
+                    datasets: [{
+                        label: 'Number of Reports',
+                        data: buckets,
+                        backgroundColor: DISTRIBUTION_COLORS,
+                        borderColor: DISTRIBUTION_COLORS.map(c => c),
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const count = context.raw;
+                                    const pct = filteredData.length > 0
+                                        ? ((count / filteredData.length) * 100).toFixed(1)
+                                        : 0;
+                                    return `${count} reports (${pct}%)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            },
+                            title: {
+                                display: true,
+                                text: 'Count'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Score Range'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // Skill Gaps Chart
+        // ============================================
+
+        function renderGapsChart() {
+            const ctx = document.getElementById('gapsChart').getContext('2d');
+
+            // Destroy existing chart
+            if (charts.gaps) {
+                charts.gaps.destroy();
+            }
+
+            // Calculate averages
+            const dimAvgs = {};
+            DIMENSIONS.forEach(dim => {
+                const levels = filteredData.map(r => r.dimensions[dim]?.level || 0);
+                dimAvgs[dim] = levels.length > 0
+                    ? levels.reduce((a, b) => a + b, 0) / levels.length
+                    : 0;
+            });
+
+            // Find lowest
+            const lowestDim = Object.entries(dimAvgs)
+                .sort((a, b) => a[1] - b[1])[0]?.[0];
+
+            const colors = DIMENSIONS.map(dim =>
+                dim === lowestDim ? '#f43f5e' : '#4f46e5'
+            );
+
+            charts.gaps = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: DIMENSIONS.map(d => DIMENSION_LABELS[d]),
+                    datasets: [{
+                        label: 'Average Level',
+                        data: DIMENSIONS.map(d => dimAvgs[d].toFixed(2)),
+                        backgroundColor: colors,
+                        borderColor: colors,
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Average: ${context.raw} / 5`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 5,
+                            title: {
+                                display: true,
+                                text: 'Average Level (0-5)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Update recommendations
+            updateRecommendations(dimAvgs, lowestDim);
+        }
+
+        function updateRecommendations(dimAvgs, lowestDim) {
+            const list = document.getElementById('recommendationsList');
+            const recommendations = [];
+
+            // Lowest dimension recommendation
+            if (lowestDim) {
+                const fullName = {
+                    study: 'Study (information diet & conceptual fluency)',
+                    copy: 'Copy (evaluation skill & scientific rigor)',
+                    output: 'Output (deployment capability & workflow integration)',
+                    research: 'Research (innovation & novel methods)',
+                    ethical: 'Ethical Security (safety practices & compliance)'
+                };
+                recommendations.push(
+                    `<span class="lowest-dimension-highlight">${DIMENSION_LABELS[lowestDim]}</span> is your organization's weakest area (avg: ${dimAvgs[lowestDim].toFixed(1)}). Consider targeted training in ${fullName[lowestDim]}.`
+                );
+            }
+
+            // Additional recommendations based on patterns
+            const avgTotal = Object.values(dimAvgs).reduce((a, b) => a + b, 0) / 5;
+
+            if (avgTotal < 2) {
+                recommendations.push(
+                    'Overall AI maturity is low. Start with foundational AI literacy programs before specialized training.'
+                );
+            } else if (avgTotal < 3) {
+                recommendations.push(
+                    'Organization is developing AI competency. Focus on hands-on practice and peer learning.'
+                );
+            } else if (avgTotal < 4) {
+                recommendations.push(
+                    'Good AI competency levels. Consider advanced topics and leadership development.'
+                );
+            } else {
+                recommendations.push(
+                    'Strong AI expertise. Focus on knowledge sharing and mentoring less experienced team members.'
+                );
+            }
+
+            // Check for specific gaps
+            if (dimAvgs.ethical < 2 && avgTotal >= 2) {
+                recommendations.push(
+                    'Warning: AI ethics and security knowledge lags behind other skills. Prioritize safety training.'
+                );
+            }
+
+            if (dimAvgs.research < dimAvgs.output - 1.5) {
+                recommendations.push(
+                    'The team is strong at deploying but weak at innovating. Encourage experimentation time.'
+                );
+            }
+
+            list.innerHTML = recommendations.map(r => `<li>${r}</li>`).join('');
+        }
+
+        // ============================================
+        // Leaderboard
+        // ============================================
+
+        function renderLeaderboard() {
+            const tbody = document.getElementById('leaderboardBody');
+
+            // Sort data
+            const sorted = [...filteredData].sort((a, b) => {
+                let valA, valB;
+
+                switch (currentSort.column) {
+                    case 'rank':
+                    case 'score':
+                        valA = a.score;
+                        valB = b.score;
+                        break;
+                    case 'name':
+                        valA = a.name.toLowerCase();
+                        valB = b.name.toLowerCase();
+                        break;
+                    case 'role':
+                        valA = a.role.toLowerCase();
+                        valB = b.role.toLowerCase();
+                        break;
+                    case 'band':
+                        const bandOrder = ['Pioneer', 'Architect', 'Builder', 'Practitioner', 'User', 'Unaware'];
+                        valA = bandOrder.indexOf(a.band);
+                        valB = bandOrder.indexOf(b.band);
+                        break;
+                    case 'confidence':
+                        const confOrder = ['HIGH', 'MEDIUM', 'LOW'];
+                        valA = confOrder.indexOf(a.confidence);
+                        valB = confOrder.indexOf(b.confidence);
+                        break;
+                    case 'level':
+                        valA = a.level;
+                        valB = b.level;
+                        break;
+                    default:
+                        valA = a.score;
+                        valB = b.score;
+                }
+
+                if (typeof valA === 'string') {
+                    return currentSort.direction === 'asc'
+                        ? valA.localeCompare(valB)
+                        : valB.localeCompare(valA);
+                }
+                return currentSort.direction === 'asc' ? valA - valB : valB - valA;
+            });
+
+            // Update header indicators
+            document.querySelectorAll('.leaderboard-table th').forEach(th => {
+                th.classList.remove('sorted-asc', 'sorted-desc');
+                if (th.dataset.sort === currentSort.column) {
+                    th.classList.add('sorted-' + currentSort.direction);
+                }
+            });
+
+            // Render rows
+            tbody.innerHTML = sorted.map((report, index) => {
+                const name = anonymized ? `Person ${index + 1}` : report.name;
+                const bandClass = 'band-' + report.band.toLowerCase();
+                const confClass = 'confidence-' + report.confidence.toLowerCase();
+
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${escapeHtml(name)}</td>
+                        <td>${escapeHtml(report.role)}</td>
+                        <td><strong>${report.score}</strong></td>
+                        <td><span class="band-badge ${bandClass}">${report.band}</span></td>
+                        <td><span class="confidence-badge ${confClass}">${report.confidence}</span></td>
+                        <td>L${report.level}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function exportToCsv() {
+            const headers = ['Rank', 'Name', 'Role', 'Score', 'Band', 'Confidence', 'Level'];
+            const rows = filteredData
+                .sort((a, b) => b.score - a.score)
+                .map((r, i) => [
+                    i + 1,
+                    anonymized ? `Person ${i + 1}` : r.name,
+                    r.role,
+                    r.score,
+                    r.band,
+                    r.confidence,
+                    r.level
+                ]);
+
+            const csv = [headers, ...rows]
+                .map(row => row.map(cell =>
+                    typeof cell === 'string' && cell.includes(',')
+                        ? `"${cell}"`
+                        : cell
+                ).join(','))
+                .join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'aiq_leaderboard.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ============================================
+        // Trends Chart
+        // ============================================
+
+        function renderTrendsChart() {
+            const ctx = document.getElementById('trendsChart').getContext('2d');
+
+            // Destroy existing chart
+            if (charts.trends) {
+                charts.trends.destroy();
+            }
+
+            // Get unique periods
+            const periods = [...new Set(filteredData.map(r => r.period))].sort();
+
+            // Check if we have multiple periods
+            const trendsNote = document.getElementById('trendsNote');
+            const noTrendsMessage = document.getElementById('noTrendsMessage');
+
+            if (periods.length < 2) {
+                noTrendsMessage.style.display = 'block';
+                trendsNote.style.display = 'none';
+                ctx.canvas.style.display = 'none';
+                return;
+            }
+
+            noTrendsMessage.style.display = 'none';
+            trendsNote.style.display = 'block';
+            ctx.canvas.style.display = 'block';
+
+            // Get unique roles
+            const roles = [...new Set(filteredData.map(r => r.role))].sort();
+
+            // Calculate average per period per role
+            const datasets = roles.map((role, roleIndex) => {
+                const data = periods.map(period => {
+                    const reports = filteredData.filter(r => r.period === period && r.role === role);
+                    if (reports.length === 0) return null;
+                    return reports.reduce((sum, r) => sum + r.score, 0) / reports.length;
+                });
+
+                return {
+                    label: role,
+                    data: data,
+                    borderColor: ROLE_COLORS[roleIndex % ROLE_COLORS.length],
+                    backgroundColor: ROLE_COLORS[roleIndex % ROLE_COLORS.length] + '20',
+                    fill: false,
+                    tension: 0.3,
+                    spanGaps: true
+                };
+            });
+
+            // Add overall average line
+            datasets.unshift({
+                label: 'Overall Average',
+                data: periods.map(period => {
+                    const reports = filteredData.filter(r => r.period === period);
+                    if (reports.length === 0) return null;
+                    return reports.reduce((sum, r) => sum + r.score, 0) / reports.length;
+                }),
+                borderColor: '#0f172a',
+                backgroundColor: '#0f172a20',
+                fill: false,
+                tension: 0.3,
+                borderWidth: 3,
+                spanGaps: true
+            });
+
+            charts.trends = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: periods,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.raw === null) return null;
+                                    return `${context.dataset.label}: ${context.raw.toFixed(1)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Average Score'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Period'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

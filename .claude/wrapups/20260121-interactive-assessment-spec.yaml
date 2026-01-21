@@ -1,0 +1,112 @@
+session:
+  date: "2026-01-21"
+  duration: "~1.5 hours"
+  branch: feature/interactive-assessment-tools
+
+summary: |
+  Conducted detailed interview to spec out interactive assessment tools for the AIQ Framework.
+  Created comprehensive implementation specification covering all 3 levels, JSON schema design,
+  org aggregation tools, and visual dashboard. Added live Mermaid diagram to landing page.
+  Updated README and CLAUDE.md with current project state.
+
+changes:
+  - file: docs/specs/interactive-assessment-tools.md
+    description: Created comprehensive 950-line implementation spec covering L1/L2/L3 tools, JSON schema, aggregator, dashboard
+
+  - file: docs/index.html
+    description: Added collapsible Mermaid flowchart diagram at bottom (renders via CDN, no plugins needed)
+
+  - file: README.md
+    description: Updated with interactive tools info, correct SCOREs dimensions, org aggregation instructions
+
+  - file: CLAUDE.md
+    description: Updated project structure, key technical decisions, working with assessment tools guidance
+
+discoveries:
+  - JSON should be primary output (not PDF) for org-wide aggregation
+  - Schema versioning essential for future compatibility ("schemaVersion": "1.0")
+  - L2 peer validation can work without backend using URL-encoded state (base64 in URL params)
+  - Empty strings preferred over "N/A" for missing data (enables numeric calculations)
+  - Mermaid.js from CDN renders diagrams universally without requiring user plugins
+  - Folder-per-period convention (2025-Q1/, 2025-Q2/) enables trends-over-time analysis
+  - Browser cannot scan file system - L3 desktop scanner requires signed Electron/Tauri app (future)
+
+decisions:
+  - All 3 levels output JSON; PDFs are human-readable derivatives
+  - L2 uses two pages: level2.html (assessee) + level2-validate.html (validator via shared URL)
+  - L3 MVP: role-based evidence guides + form with tool metrics (not automated scanner)
+  - Python aggregator outputs CSV + stats JSON + combined JSON for dashboard
+  - Dashboard has 4 views: Score Distribution, Skill Gaps, Leaderboard, Trends
+  - Clean corporate design (Stripe/Notion aesthetic) with new color palette
+  - CDN dependencies (html2pdf.js, Chart.js, Mermaid.js) - internet required
+
+next_steps:
+  - Merge PR #2 to see Mermaid diagram live on GitHub Pages
+  - Start new session with orchestrator prompt to implement all tools in parallel
+  - Phase 1: CSS + shared.js + JSON schema (parallel)
+  - Phase 2: index.html redesign + level1/2/3 pages (parallel)
+  - Phase 3: JSON export + PDF generator (parallel)
+  - Phase 4: aggregate.py + dashboard.html (parallel)
+  - Future: Signed desktop app for L3 automated scanning
+
+files_to_create:
+  - docs/css/styles.css
+  - docs/js/shared.js
+  - docs/js/assessment.js
+  - docs/js/peer-form.js
+  - docs/js/json-export.js
+  - docs/js/pdf-generator.js
+  - docs/schemas/aiq-report-v1.schema.json
+  - docs/level1.html
+  - docs/level2.html
+  - docs/level2-validate.html
+  - docs/level3.html
+  - docs/tools/aggregate.py
+  - docs/tools/dashboard.html
+  - docs/tools/README.md
+
+urls:
+  github_pages: https://sagearbor.github.io/ai-skill-eval-kit/
+  pull_request: https://github.com/sagearbor/ai-skill-eval-kit/pull/2
+  spec_file: docs/specs/interactive-assessment-tools.md
+
+prompt_for_next_session: |
+  I'm implementing interactive assessment tools for the AIQ Framework. The spec is complete at `docs/specs/interactive-assessment-tools.md` - read it first.
+
+  **Your role: Orchestrator.** Use agents in parallel to maximize speed. Do NOT do the work yourself - delegate everything to Task agents.
+
+  ## Files to Create
+
+  **Phase 1 - Core Infrastructure (parallel):**
+  - Agent 1: `docs/css/styles.css` - clean corporate design system (colors, typography, components per spec)
+  - Agent 2: `docs/js/shared.js` - common utilities, role weights, dimension data, score calculation
+  - Agent 3: `docs/schemas/aiq-report-v1.schema.json` - formal JSON Schema per spec
+
+  **Phase 2 - Assessment Pages (parallel, after Phase 1):**
+  - Agent 4: `docs/index.html` - redesigned landing page with 3 quick-start buttons + accordions
+  - Agent 5: `docs/level1.html` + `docs/js/assessment.js` - self-assessment survey
+  - Agent 6: `docs/level2.html` + `docs/level2-validate.html` + `docs/js/peer-form.js` - peer validation with URL encoding
+  - Agent 7: `docs/level3.html` - evidence collection guides + form for all 7 roles, 10 tools
+
+  **Phase 3 - Output Generation (parallel, after Phase 2):**
+  - Agent 8: `docs/js/json-export.js` - JSON report generation for all levels
+  - Agent 9: `docs/js/pdf-generator.js` - html2pdf wrapper with simple templates
+
+  **Phase 4 - Org Tools (parallel, after Phase 3):**
+  - Agent 10: `docs/tools/aggregate.py` - Python aggregator (CSV + stats JSON + combined JSON)
+  - Agent 11: `docs/tools/dashboard.html` - Chart.js dashboard with 4 views
+  - Agent 12: `docs/tools/README.md` - org admin instructions
+
+  ## Key Technical Decisions (from spec)
+  - JSON is primary output, PDFs secondary
+  - Schema version "1.0" in all outputs
+  - Empty strings for missing data (not "N/A")
+  - L2 uses URL-encoded base64 state (no backend)
+  - html2pdf.js and Chart.js from CDN
+  - Mobile responsive required
+
+  ## Dependencies
+  - Read `docs/ai_mastery_eval.md` for dimension rubrics, role weights, score bands
+  - Read `docs/specs/interactive-assessment-tools.md` for full implementation details
+
+  Start by reading the spec, then launch Phase 1 agents in parallel. Report back when each phase completes before starting the next.

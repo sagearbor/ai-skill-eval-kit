@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 3: Full Verification Evidence Guide | AIQ Assessment</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Additional styles for L3 page */
+        .intro-box {
+            background: var(--color-bg-alt);
+            border-left: 4px solid var(--color-success);
+            padding: var(--space-5);
+            margin-bottom: var(--space-8);
+            border-radius: var(--radius-md);
+        }
+        .intro-box p {
+            margin: 0;
+            font-size: var(--font-size-lg);
+            color: var(--color-secondary);
+        }
+        .intro-box strong {
+            color: var(--color-success);
+        }
+
+        /* Role Guide Content */
+        .role-guide {
+            margin-bottom: var(--space-6);
+        }
+        .role-guide h3 {
+            margin-bottom: var(--space-4);
+        }
+        .dimension-evidence {
+            margin-bottom: var(--space-4);
+            padding: var(--space-4);
+            background: var(--color-bg-alt);
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--color-accent);
+        }
+        .dimension-evidence h4 {
+            margin-bottom: var(--space-2);
+            color: var(--color-accent);
+            font-size: var(--font-size-base);
+        }
+        .dimension-evidence ul {
+            margin: 0;
+            padding-left: var(--space-5);
+        }
+        .dimension-evidence li {
+            margin-bottom: var(--space-1);
+            font-size: var(--font-size-sm);
+        }
+
+        .recommended-tools {
+            margin-top: var(--space-4);
+            padding: var(--space-3);
+            background: rgba(79, 70, 229, 0.05);
+            border-radius: var(--radius-md);
+        }
+        .recommended-tools h5 {
+            margin: 0 0 var(--space-2) 0;
+            font-size: var(--font-size-sm);
+            color: var(--color-text-muted);
+        }
+        .recommended-tools .tool-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+        }
+        .tool-badge {
+            background: var(--color-accent);
+            color: white;
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+        }
+
+        /* Tool Evidence Cards */
+        .tool-evidence-card {
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            margin-bottom: var(--space-3);
+            transition: border-color var(--transition-fast);
+        }
+        .tool-evidence-card:has(input:checked) {
+            border-color: var(--color-accent);
+            background: rgba(79, 70, 229, 0.02);
+        }
+        .tool-fields {
+            margin-top: var(--space-4);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--color-border);
+            display: grid;
+            gap: var(--space-3);
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+        .tool-fields input {
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--font-size-sm);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+        }
+
+        /* Dimension Score Selects */
+        .dimension-scores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+        .dimension-score-card {
+            background: var(--color-bg-alt);
+            padding: var(--space-4);
+            border-radius: var(--radius-md);
+        }
+        .dimension-score-card label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+            color: var(--color-primary);
+        }
+        .dimension-score-card select {
+            width: 100%;
+        }
+
+        /* Tool sections (accordion) */
+        .tools-section {
+            margin-bottom: var(--space-8);
+        }
+        .tools-section h2 {
+            margin-bottom: var(--space-4);
+        }
+        .tool-category-header {
+            margin-top: var(--space-6);
+            margin-bottom: var(--space-4);
+            font-size: var(--font-size-lg);
+            color: var(--color-secondary);
+        }
+
+        /* Results section */
+        #results-section {
+            display: none;
+        }
+        #results-section.visible {
+            display: block;
+        }
+
+        /* Future app section */
+        .future-dev-card {
+            background: linear-gradient(135deg, var(--color-bg-alt) 0%, rgba(79, 70, 229, 0.05) 100%);
+            border: 1px dashed var(--color-accent);
+        }
+        .future-dev-card h3 {
+            color: var(--color-accent);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="page-header">
+        <div class="container container-narrow">
+            <p style="margin-bottom: var(--space-2);"><a href="index.html">&larr; Back to Assessment Levels</a></p>
+            <h1>Full Verification Evidence Guide</h1>
+            <p>Level 3: Auto/Audit Verification for 1.0x Confidence</p>
+        </div>
+    </div>
+
+    <div class="container container-narrow">
+        <!-- Intro Text -->
+        <section class="section">
+            <div class="intro-box">
+                <p>Level 3 verification achieves <strong>1.0x confidence</strong> through automated logs or comprehensive audit. Select your role below for specific evidence collection instructions.</p>
+            </div>
+        </section>
+
+        <!-- Role Tabs -->
+        <section class="section">
+            <div class="role-tabs" id="role-tabs">
+                <!-- Tabs populated by JS -->
+            </div>
+
+            <!-- Role Content Panels -->
+            <div id="role-content-container">
+                <!-- Content populated by JS -->
+            </div>
+        </section>
+
+        <!-- Tool Instructions Section -->
+        <section class="tools-section section">
+            <h2>Evidence Collection by Tool</h2>
+            <p class="text-muted">Click on each tool to see detailed instructions for exporting your usage data.</p>
+
+            <h3 class="tool-category-header">Consumer Tools</h3>
+            <div id="consumer-tools-container">
+                <!-- Consumer tools populated by JS -->
+            </div>
+
+            <h3 class="tool-category-header">Developer Tools</h3>
+            <div id="developer-tools-container">
+                <!-- Developer tools populated by JS -->
+            </div>
+        </section>
+
+        <!-- Evidence Form -->
+        <section class="section">
+            <div class="card">
+                <form id="evidence-form">
+                    <h2>Record Your Evidence</h2>
+
+                    <div class="form-group">
+                        <label class="form-label form-label-required">Your Name</label>
+                        <input type="text" id="assessee-name" class="form-input" required placeholder="Enter your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Your Email</label>
+                        <input type="email" id="assessee-email" class="form-input" placeholder="Enter your email (optional)">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label form-label-required">Your Role</label>
+                        <select id="role-select" class="form-select" required>
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+
+                    <hr>
+
+                    <h3>Tool Evidence (check all that apply)</h3>
+                    <p class="text-muted">Select the tools you use and optionally provide usage metrics.</p>
+
+                    <div id="tool-evidence-container">
+                        <!-- Tool evidence cards populated by JS -->
+                    </div>
+
+                    <hr>
+
+                    <h3>Your Dimension Scores</h3>
+                    <p class="text-muted">Based on your evidence, rate yourself on each dimension (0-5):</p>
+
+                    <div class="dimension-scores-grid" id="dimension-scores-grid">
+                        <!-- Dimension score selects populated by JS -->
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Audit Notes</label>
+                        <textarea id="audit-notes" class="form-textarea" placeholder="Additional context about your evidence, verification methods used, or notes for auditors..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-large btn-block">Generate L3 Report</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="section" id="results-section">
+            <div class="results-container">
+                <div class="score-display" id="score-display">
+                    <div class="score-value" id="final-score">--</div>
+                    <div class="score-label">AIQ Score (Level 3 - 1.0x Confidence)</div>
+                    <div class="score-band" id="score-band">--</div>
+                </div>
+
+                <div class="card">
+                    <h3>Score Breakdown</h3>
+                    <table class="breakdown-table" id="breakdown-table">
+                        <thead>
+                            <tr>
+                                <th>Dimension</th>
+                                <th>Level</th>
+                                <th>Points</th>
+                                <th>Weight</th>
+                                <th class="score-cell">Weighted</th>
+                            </tr>
+                        </thead>
+                        <tbody id="breakdown-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="download-options">
+                    <div class="download-card" onclick="downloadJSON()">
+                        <div class="download-icon">{ }</div>
+                        <div class="download-label">Download JSON</div>
+                        <div class="download-desc">Machine-readable report</div>
+                    </div>
+                    <div class="download-card" onclick="downloadPDF()">
+                        <div class="download-icon">PDF</div>
+                        <div class="download-label">Download PDF</div>
+                        <div class="download-desc">Human-readable report</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Future Desktop App Section -->
+        <section class="section">
+            <div class="card future-dev-card">
+                <h3>Potential Future Development</h3>
+                <p>We're exploring a cross-platform desktop application that could automatically scan for AI tool usage and generate verification reports with real metrics.</p>
+                <p style="margin-bottom: 0;">This would enable true "one-click" Level 3 validation. No timeline has been set for this development.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Universal AIQ Framework. <a href="https://github.com/sagearbor/ai-skill-eval-kit" target="_blank" rel="noopener">View on GitHub</a></p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/shared.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        // =============================================================================
+        // TOOL INSTRUCTIONS DATA
+        // =============================================================================
+
+        const TOOL_INSTRUCTIONS = {
+            chatgpt: {
+                icon: '🤖',
+                accessSteps: [
+                    'Go to Settings (gear icon in bottom left)',
+                    'Click "Data Controls"',
+                    'Click "Export Data"',
+                    'Wait for email with download link (usually within 24 hours)',
+                    'Download ZIP containing full chat history'
+                ],
+                whatItProves: [
+                    'Conversation volume and frequency',
+                    'Topics and complexity of usage',
+                    'Date range of activity'
+                ]
+            },
+            claudeai: {
+                icon: '🧠',
+                accessSteps: [
+                    'No direct export available yet',
+                    'Screenshot your conversation list showing dates and topics',
+                    'Document the number of conversations',
+                    'Note any patterns in your usage (work projects, learning, etc.)'
+                ],
+                whatItProves: [
+                    'Active engagement with Claude',
+                    'Breadth of use cases',
+                    'Consistency of usage over time'
+                ]
+            },
+            copilot: {
+                icon: '🔷',
+                accessSteps: [
+                    'Sign in to your Microsoft Account',
+                    'Go to account.microsoft.com/privacy',
+                    'Navigate to "Activity History"',
+                    'Filter by "Copilot" or "Bing Chat" activities',
+                    'Export or screenshot relevant data'
+                ],
+                whatItProves: [
+                    'Usage frequency within Microsoft ecosystem',
+                    'Integration with work tools (Word, Excel, etc.)',
+                    'Types of tasks assisted'
+                ]
+            },
+            gemini: {
+                icon: '💎',
+                accessSteps: [
+                    'Go to takeout.google.com',
+                    'Click "Deselect All"',
+                    'Scroll and select "Gemini Apps"',
+                    'Click "Next Step" and create export',
+                    'Wait for email and download archive'
+                ],
+                whatItProves: [
+                    'Full conversation history',
+                    'Usage patterns and frequency',
+                    'Types of queries and complexity'
+                ]
+            },
+            perplexity: {
+                icon: '🔍',
+                accessSteps: [
+                    'Click your profile icon (top right)',
+                    'Go to Settings',
+                    'Look for "Export" or "Download Data" option',
+                    'If unavailable, screenshot your library/history',
+                    'Document search patterns and saved threads'
+                ],
+                whatItProves: [
+                    'Research capabilities and depth',
+                    'Source citation habits',
+                    'Information synthesis skills'
+                ]
+            },
+            githubCopilot: {
+                icon: '🐙',
+                accessSteps: [
+                    'In VS Code: View > Command Palette > "Copilot: Usage"',
+                    'Or use CLI: gh copilot usage --json > copilot_usage.json',
+                    'Check GitHub.com > Settings > Copilot for subscription details',
+                    'Review extension logs in VS Code developer console'
+                ],
+                whatItProves: [
+                    'Acceptance rate of suggestions',
+                    'Languages and frameworks used',
+                    'Volume of assisted code generation'
+                ]
+            },
+            claudeCode: {
+                icon: '⌨️',
+                accessSteps: [
+                    'Run: npx ccusage --export json > claude_usage.json',
+                    'This captures session history and token usage',
+                    'Review ~/.claude/sessions for historical data',
+                    'Document projects completed with Claude Code assistance'
+                ],
+                whatItProves: [
+                    'Token consumption and session frequency',
+                    'Project complexity and scope',
+                    'Development velocity improvements'
+                ]
+            },
+            openaiApi: {
+                icon: '🔑',
+                accessSteps: [
+                    'Log in to platform.openai.com',
+                    'Go to Usage page',
+                    'Click "Export" to download CSV of usage',
+                    'Review billing page for total spend and tokens',
+                    'Note which models and endpoints used'
+                ],
+                whatItProves: [
+                    'API integration capabilities',
+                    'Model selection expertise',
+                    'Production usage patterns'
+                ]
+            },
+            cursor: {
+                icon: '🖱️',
+                accessSteps: [
+                    'Open Cursor Settings (Cmd/Ctrl + ,)',
+                    'Navigate to Usage Statistics section',
+                    'Screenshot or export usage data',
+                    'Document completion acceptance rates'
+                ],
+                whatItProves: [
+                    'AI-assisted coding frequency',
+                    'Integration into development workflow',
+                    'Productivity multiplier effect'
+                ]
+            },
+            replitAi: {
+                icon: '🌀',
+                accessSteps: [
+                    'Go to your Replit profile page',
+                    'Review "Activity" and "Repls" sections',
+                    'Note AI features used (Ghostwriter, code completion)',
+                    'Export or screenshot project history'
+                ],
+                whatItProves: [
+                    'Cloud development with AI assistance',
+                    'Project breadth and complexity',
+                    'Collaborative AI usage patterns'
+                ]
+            }
+        };
+
+        // =============================================================================
+        // ROLE-SPECIFIC EVIDENCE GUIDES
+        // =============================================================================
+
+        const ROLE_GUIDES = {
+            'General': {
+                overview: 'For general roles, focus on demonstrating well-rounded AI usage across all dimensions with practical, everyday applications.',
+                dimensions: {
+                    study: ['Bookmarked AI newsletters and blogs', 'Course completion certificates', 'Conference attendance records'],
+                    copy: ['Side projects replicating tutorials', 'Notes from hands-on experiments', 'Test results from AI tool comparisons'],
+                    output: ['Personal productivity gains documented', 'Time savings logs', 'Workflow automation examples'],
+                    research: ['Blog posts or documentation written', 'Internal presentations shared', 'Community forum contributions'],
+                    ethical: ['Privacy-conscious usage patterns', 'Fact-checking habits documented', 'No incident history']
+                },
+                tools: ['ChatGPT', 'Claude.ai', 'Microsoft Copilot', 'Google Gemini']
+            },
+            'Software Engineer': {
+                overview: 'Software engineers should prioritize Output and Copy dimensions, showing production deployments and rigorous evaluation of AI-generated code.',
+                dimensions: {
+                    study: ['GitHub stars on AI repos', 'Technical blog RSS feeds', 'Model architecture understanding'],
+                    copy: ['Git commits showing eval code', 'Test coverage for AI features', 'Code review comments on AI PRs'],
+                    output: ['Production deployments with AI', 'CI/CD logs showing AI pipelines', 'Performance metrics before/after'],
+                    research: ['Open source contributions', 'Published libraries or tools', 'Technical blog posts'],
+                    ethical: ['Audit logs for AI usage', 'Code review comments on safety', 'Security scan results']
+                },
+                tools: ['GitHub Copilot', 'Claude Code', 'Cursor', 'OpenAI API']
+            },
+            'Data / ML Engineer': {
+                overview: 'Data and ML engineers should demonstrate deep technical understanding, model evaluation rigor, and production ML systems.',
+                dimensions: {
+                    study: ['ML paper reading lists', 'Course completions (fast.ai, etc.)', 'Conference paper notes'],
+                    copy: ['Model benchmark results', 'Reproducibility documentation', 'Experiment tracking logs (MLflow, W&B)'],
+                    output: ['Model deployment pipelines', 'Feature stores and ML ops', 'A/B test results'],
+                    research: ['Published models on HuggingFace', 'Kaggle competition results', 'Research paper contributions'],
+                    ethical: ['Bias audits conducted', 'Data privacy compliance', 'Model cards and documentation']
+                },
+                tools: ['OpenAI API', 'Claude Code', 'GitHub Copilot', 'Replit AI']
+            },
+            'Product Manager': {
+                overview: 'Product managers should show strategic AI understanding, ability to evaluate AI products, and successful AI feature launches.',
+                dimensions: {
+                    study: ['AI product teardowns documented', 'Industry trend analysis', 'Competitive intelligence on AI'],
+                    copy: ['User research on AI features', 'Prototype evaluations', 'Feature comparison matrices'],
+                    output: ['AI feature launches and metrics', 'ROI documentation', 'User adoption data'],
+                    research: ['Published product strategies', 'Conference presentations', 'Thought leadership content'],
+                    ethical: ['Privacy impact assessments', 'User consent flows designed', 'Responsible AI guidelines']
+                },
+                tools: ['ChatGPT', 'Claude.ai', 'Perplexity', 'Microsoft Copilot']
+            },
+            'Research Scientist': {
+                overview: 'Research scientists should demonstrate novel contributions, publication record, and deep technical expertise.',
+                dimensions: {
+                    study: ['ArXiv paper reading logs', 'Conference attendance', 'Research group participation'],
+                    copy: ['Paper reproductions', 'Benchmark implementations', 'Ablation studies'],
+                    output: ['Research tool deployments', 'Demo systems', 'Prototype applications'],
+                    research: ['Published papers', 'Citation metrics', 'Patents and inventions'],
+                    ethical: ['Research ethics compliance', 'Responsible disclosure', 'Dual-use consideration']
+                },
+                tools: ['OpenAI API', 'Claude Code', 'GitHub Copilot', 'Perplexity']
+            },
+            'Executive / Leader': {
+                overview: 'Executives should demonstrate strategic vision, organizational AI adoption, and responsible governance.',
+                dimensions: {
+                    study: ['Executive AI briefings attended', 'Board presentations on AI', 'Industry analyst relationships'],
+                    copy: ['AI vendor evaluations', 'Pilot program results', 'Due diligence documentation'],
+                    output: ['AI strategy implementation', 'Organizational AI adoption metrics', 'ROI at scale'],
+                    research: ['Thought leadership articles', 'Speaking engagements', 'Industry influence'],
+                    ethical: ['AI governance frameworks', 'Risk committee participation', 'Policy development']
+                },
+                tools: ['ChatGPT', 'Claude.ai', 'Microsoft Copilot', 'Perplexity']
+            },
+            'Operations / Support': {
+                overview: 'Operations roles should show process automation, efficiency gains, and practical AI integration in daily workflows.',
+                dimensions: {
+                    study: ['Tool training completions', 'Best practices documentation', 'Process improvement research'],
+                    copy: ['Workflow templates tested', 'SOP comparisons', 'Quality metrics tracking'],
+                    output: ['Automation implementations', 'Ticket resolution improvements', 'Cost savings documented'],
+                    research: ['Process documentation shared', 'Training materials created', 'Internal knowledge base'],
+                    ethical: ['Data handling compliance', 'Customer privacy protection', 'Incident-free track record']
+                },
+                tools: ['ChatGPT', 'Microsoft Copilot', 'Claude.ai', 'Perplexity']
+            },
+            'Legal / Compliance': {
+                overview: 'Legal and compliance professionals should demonstrate regulatory knowledge, risk assessment, and responsible AI governance.',
+                dimensions: {
+                    study: ['AI regulation tracking', 'Case law research', 'Policy analysis documentation'],
+                    copy: ['Contract clause evaluation', 'Compliance checklist testing', 'Risk framework application'],
+                    output: ['Policy implementations', 'Compliance audits completed', 'Training programs delivered'],
+                    research: ['Published guidance', 'Industry standards contributions', 'Regulatory submissions'],
+                    ethical: ['AI ethics frameworks authored', 'Incident response protocols', 'Governance structures designed']
+                },
+                tools: ['Perplexity', 'ChatGPT', 'Claude.ai', 'Microsoft Copilot']
+            }
+        };
+
+        // =============================================================================
+        // STATE
+        // =============================================================================
+
+        let currentRole = 'General';
+        let reportData = null;
+
+        // =============================================================================
+        // INITIALIZATION
+        // =============================================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initRoleTabs();
+            initToolSections();
+            initEvidenceForm();
+            initDimensionScores();
+            populateRoleSelect(document.getElementById('role-select'), 'General');
+        });
+
+        // =============================================================================
+        // ROLE TABS
+        // =============================================================================
+
+        function initRoleTabs() {
+            const tabContainer = document.getElementById('role-tabs');
+            const contentContainer = document.getElementById('role-content-container');
+
+            // Create tabs (exclude 'General' from tabs, use for default content)
+            const displayRoles = ROLES.filter(r => r !== 'General');
+
+            displayRoles.forEach((role, index) => {
+                const tab = document.createElement('button');
+                tab.className = 'role-tab' + (index === 0 ? ' active' : '');
+                tab.setAttribute('data-role', role);
+                tab.textContent = role;
+                tab.onclick = () => switchRole(role);
+                tabContainer.appendChild(tab);
+            });
+
+            // Create content panels
+            displayRoles.forEach((role, index) => {
+                const content = document.createElement('div');
+                content.className = 'role-content' + (index === 0 ? ' active' : '');
+                content.id = `role-${role.replace(/[\s\/]/g, '-').toLowerCase()}`;
+                content.innerHTML = createRoleGuideHTML(role);
+                contentContainer.appendChild(content);
+            });
+
+            currentRole = displayRoles[0];
+        }
+
+        function switchRole(role) {
+            // Update tabs
+            document.querySelectorAll('.role-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.getAttribute('data-role') === role);
+            });
+
+            // Update content
+            document.querySelectorAll('.role-content').forEach(content => {
+                const contentRole = content.id.replace('role-', '').replace(/-/g, ' ');
+                // Normalize both for comparison
+                const normalizedContentRole = contentRole.toLowerCase();
+                const normalizedRole = role.toLowerCase().replace(/[\s\/]/g, ' ');
+                content.classList.toggle('active', normalizedContentRole === normalizedRole ||
+                    content.id === `role-${role.replace(/[\s\/]/g, '-').toLowerCase()}`);
+            });
+
+            currentRole = role;
+
+            // Update role select to match
+            const roleSelect = document.getElementById('role-select');
+            if (roleSelect) {
+                roleSelect.value = role;
+            }
+        }
+
+        function createRoleGuideHTML(role) {
+            const guide = ROLE_GUIDES[role] || ROLE_GUIDES['General'];
+            const dimensionNames = {
+                study: 'S - Study',
+                copy: 'C - Copy',
+                output: 'O - Output',
+                research: 'R - Research',
+                ethical: 'Es - Ethical'
+            };
+
+            let html = `
+                <div class="role-guide">
+                    <h3>${role}</h3>
+                    <p class="text-muted">${guide.overview}</p>
+
+                    <h4 style="margin-top: var(--space-6); margin-bottom: var(--space-4);">Evidence by Dimension</h4>
+            `;
+
+            for (const [dim, evidence] of Object.entries(guide.dimensions)) {
+                html += `
+                    <div class="dimension-evidence">
+                        <h4>${dimensionNames[dim]}</h4>
+                        <ul>
+                            ${evidence.map(e => `<li>${e}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            html += `
+                    <div class="recommended-tools">
+                        <h5>Recommended Tools for This Role</h5>
+                        <div class="tool-badges">
+                            ${guide.tools.map(t => `<span class="tool-badge">${t}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return html;
+        }
+
+        // =============================================================================
+        // TOOL SECTIONS
+        // =============================================================================
+
+        function initToolSections() {
+            const consumerContainer = document.getElementById('consumer-tools-container');
+            const developerContainer = document.getElementById('developer-tools-container');
+
+            AI_TOOLS.consumer.forEach(tool => {
+                consumerContainer.appendChild(createToolSection(tool, 'Consumer Tool'));
+            });
+
+            AI_TOOLS.developer.forEach(tool => {
+                developerContainer.appendChild(createToolSection(tool, 'Developer Tool'));
+            });
+        }
+
+        function createToolSection(tool, category) {
+            const instructions = TOOL_INSTRUCTIONS[tool.id] || {
+                icon: '🤖',
+                accessSteps: ['No specific instructions available'],
+                whatItProves: ['Tool usage evidence']
+            };
+
+            const section = document.createElement('div');
+            section.className = 'tool-section';
+            section.innerHTML = `
+                <div class="tool-header" onclick="toggleToolSection(this)">
+                    <div class="tool-info">
+                        <span class="tool-icon">${instructions.icon}</span>
+                        <div>
+                            <span class="tool-name">${tool.name}</span>
+                            <span class="tool-category">${category} - ${tool.provider}</span>
+                        </div>
+                    </div>
+                    <span class="accordion-icon">&#9660;</span>
+                </div>
+                <div class="tool-body">
+                    <h4>Access your data:</h4>
+                    <ol>
+                        ${instructions.accessSteps.map(step => `<li>${step}</li>`).join('')}
+                    </ol>
+                    <h4 style="margin-top: var(--space-4);">What this proves:</h4>
+                    <ul>
+                        ${instructions.whatItProves.map(proof => `<li>${proof}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+            return section;
+        }
+
+        function toggleToolSection(header) {
+            const section = header.parentElement;
+            section.classList.toggle('open');
+        }
+
+        // =============================================================================
+        // EVIDENCE FORM
+        // =============================================================================
+
+        function initEvidenceForm() {
+            const container = document.getElementById('tool-evidence-container');
+
+            // Consumer tools
+            AI_TOOLS.consumer.forEach(tool => {
+                container.appendChild(createToolEvidenceCard(tool));
+            });
+
+            // Developer tools
+            AI_TOOLS.developer.forEach(tool => {
+                container.appendChild(createToolEvidenceCard(tool));
+            });
+
+            // Form submission
+            document.getElementById('evidence-form').addEventListener('submit', handleFormSubmit);
+        }
+
+        function createToolEvidenceCard(tool) {
+            const card = document.createElement('div');
+            card.className = 'tool-evidence-card';
+            card.innerHTML = `
+                <label class="form-check">
+                    <input type="checkbox" class="form-check-input" data-tool="${tool.id}" onchange="toggleToolFields(this)">
+                    <span class="form-check-label"><strong>${tool.name}</strong> <span class="text-muted">(${tool.provider})</span></span>
+                </label>
+                <div class="tool-fields" style="display: none;">
+                    <input type="number" class="form-input" placeholder="Monthly tokens/queries" data-field="tokens" min="0">
+                    <input type="number" class="form-input" placeholder="Sessions per month" data-field="sessions" min="0">
+                    <input type="text" class="form-input" placeholder="Export filename (optional)" data-field="exportFile">
+                </div>
+            `;
+            return card;
+        }
+
+        function toggleToolFields(checkbox) {
+            const card = checkbox.closest('.tool-evidence-card');
+            const fields = card.querySelector('.tool-fields');
+            fields.style.display = checkbox.checked ? 'grid' : 'none';
+        }
+
+        // =============================================================================
+        // DIMENSION SCORES
+        // =============================================================================
+
+        function initDimensionScores() {
+            const container = document.getElementById('dimension-scores-grid');
+
+            for (const [key, dim] of Object.entries(DIMENSIONS)) {
+                const card = document.createElement('div');
+                card.className = 'dimension-score-card';
+                card.innerHTML = `
+                    <label for="score-${key}">${dim.fullName}</label>
+                    <select id="score-${key}" class="form-select" required>
+                        ${dim.levels.map(level => `
+                            <option value="${level.level}">${level.level} - ${level.description.substring(0, 50)}${level.description.length > 50 ? '...' : ''}</option>
+                        `).join('')}
+                    </select>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        // =============================================================================
+        // FORM SUBMISSION & SCORE CALCULATION
+        // =============================================================================
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            // Collect form data
+            const name = document.getElementById('assessee-name').value.trim();
+            const email = document.getElementById('assessee-email').value.trim();
+            const role = document.getElementById('role-select').value;
+            const notes = document.getElementById('audit-notes').value.trim();
+
+            // Collect dimension scores
+            const levels = {};
+            for (const dim of Object.keys(DIMENSIONS)) {
+                levels[dim] = parseInt(document.getElementById(`score-${dim}`).value);
+            }
+
+            // Collect tool evidence
+            const toolEvidence = {};
+            document.querySelectorAll('.tool-evidence-card input[type="checkbox"]:checked').forEach(checkbox => {
+                const toolId = checkbox.getAttribute('data-tool');
+                const card = checkbox.closest('.tool-evidence-card');
+                const fields = card.querySelectorAll('.tool-fields input');
+
+                toolEvidence[toolId] = {
+                    used: true,
+                    tokens: parseInt(fields[0].value) || null,
+                    sessions: parseInt(fields[1].value) || null,
+                    exportFile: fields[2].value || ''
+                };
+            });
+
+            // Calculate score using shared.js (assessmentLevel = 3)
+            const scoreResult = calculateAIQScore(levels, role, 3);
+
+            // Build report object
+            reportData = {
+                schemaVersion: '1.0',
+                reportId: generateReportId(),
+                generatedAt: formatISOTimestamp(),
+                assessmentLevel: 3,
+                assessee: {
+                    name,
+                    email: email || '',
+                    role
+                },
+                scores: {
+                    dimensions: Object.fromEntries(
+                        Object.entries(scoreResult.dimensions).map(([key, val]) => [
+                            key,
+                            {
+                                level: val.level,
+                                points: val.rawPoints,
+                                weight: val.weight,
+                                weightedScore: Math.round(val.weightedScore * 100) / 100
+                            }
+                        ])
+                    ),
+                    rawTotal: scoreResult.rawWeightedTotal,
+                    evidenceMultiplier: scoreResult.evidenceMultiplier,
+                    confidence: scoreResult.confidence,
+                    finalScore: scoreResult.normalizedScore,
+                    band: scoreResult.scoreBand.name
+                },
+                evidence: {
+                    tools: toolEvidence,
+                    collectionDate: formatISODate()
+                },
+                notes: notes || undefined
+            };
+
+            // Display results
+            displayResults(scoreResult);
+        }
+
+        function displayResults(scoreResult) {
+            // Show results section
+            const resultsSection = document.getElementById('results-section');
+            resultsSection.classList.add('visible');
+
+            // Update score display
+            document.getElementById('final-score').textContent = scoreResult.normalizedScore;
+
+            const bandElement = document.getElementById('score-band');
+            bandElement.textContent = scoreResult.scoreBand.name;
+            bandElement.className = 'score-band band-' + scoreResult.scoreBand.name.toLowerCase();
+
+            // Build breakdown table
+            const tbody = document.getElementById('breakdown-body');
+            tbody.innerHTML = '';
+
+            const dimensionNames = {
+                study: 'S - Study',
+                copy: 'C - Copy',
+                output: 'O - Output',
+                research: 'R - Research',
+                ethical: 'Es - Ethical'
+            };
+
+            for (const [key, data] of Object.entries(scoreResult.dimensions)) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${dimensionNames[key]}</td>
+                    <td>${data.level}</td>
+                    <td>${data.rawPoints}</td>
+                    <td>${(data.weight * 100).toFixed(0)}%</td>
+                    <td class="score-cell">${data.weightedScore.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            }
+
+            // Add totals row
+            const totalsRow = document.createElement('tr');
+            totalsRow.innerHTML = `
+                <td colspan="3"><strong>Total (before 1.0x multiplier)</strong></td>
+                <td></td>
+                <td class="score-cell"><strong>${scoreResult.rawWeightedTotal.toFixed(2)}</strong></td>
+            `;
+            tbody.appendChild(totalsRow);
+
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // =============================================================================
+        // DOWNLOAD FUNCTIONS
+        // =============================================================================
+
+        function downloadJSON() {
+            if (!reportData) {
+                alert('Please complete the form first.');
+                return;
+            }
+
+            const jsonStr = JSON.stringify(reportData, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `aiq-l3-${reportData.reportId}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadPDF() {
+            if (!reportData) {
+                alert('Please complete the form first.');
+                return;
+            }
+
+            // Create a PDF-friendly HTML structure
+            const pdfContent = document.createElement('div');
+            pdfContent.style.padding = '20px';
+            pdfContent.style.fontFamily = 'Arial, sans-serif';
+            pdfContent.style.maxWidth = '800px';
+            pdfContent.innerHTML = `
+                <h1 style="color: #0f172a; border-bottom: 2px solid #4f46e5; padding-bottom: 10px;">
+                    AIQ Assessment Report - Level 3
+                </h1>
+                <p style="color: #64748b;">Report ID: ${reportData.reportId}</p>
+                <p style="color: #64748b;">Generated: ${new Date(reportData.generatedAt).toLocaleString()}</p>
+
+                <h2 style="color: #0f172a; margin-top: 30px;">Assessee Information</h2>
+                <p><strong>Name:</strong> ${reportData.assessee.name}</p>
+                <p><strong>Role:</strong> ${reportData.assessee.role}</p>
+                ${reportData.assessee.email ? `<p><strong>Email:</strong> ${reportData.assessee.email}</p>` : ''}
+
+                <h2 style="color: #0f172a; margin-top: 30px;">Overall Score</h2>
+                <div style="text-align: center; padding: 20px; background: #f8fafc; border-radius: 8px;">
+                    <div style="font-size: 48px; font-weight: bold; color: #0f172a;">${reportData.scores.finalScore}</div>
+                    <div style="font-size: 18px; color: #64748b;">AIQ Score (${reportData.scores.confidence} Confidence)</div>
+                    <div style="display: inline-block; padding: 8px 16px; background: #4f46e5; color: white; border-radius: 4px; margin-top: 10px;">
+                        ${reportData.scores.band}
+                    </div>
+                </div>
+
+                <h2 style="color: #0f172a; margin-top: 30px;">Dimension Breakdown</h2>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <tr style="background: #0f172a; color: white;">
+                        <th style="padding: 10px; text-align: left;">Dimension</th>
+                        <th style="padding: 10px; text-align: center;">Level</th>
+                        <th style="padding: 10px; text-align: center;">Points</th>
+                        <th style="padding: 10px; text-align: center;">Weight</th>
+                        <th style="padding: 10px; text-align: right;">Weighted</th>
+                    </tr>
+                    ${Object.entries(reportData.scores.dimensions).map(([key, val]) => `
+                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 10px;">${DIMENSIONS[key].fullName}</td>
+                            <td style="padding: 10px; text-align: center;">${val.level}</td>
+                            <td style="padding: 10px; text-align: center;">${val.points}</td>
+                            <td style="padding: 10px; text-align: center;">${(val.weight * 100).toFixed(0)}%</td>
+                            <td style="padding: 10px; text-align: right;">${val.weightedScore.toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                    <tr style="background: #f8fafc; font-weight: bold;">
+                        <td colspan="4" style="padding: 10px;">Total (1.0x multiplier applied)</td>
+                        <td style="padding: 10px; text-align: right;">${reportData.scores.rawTotal.toFixed(2)}</td>
+                    </tr>
+                </table>
+
+                <h2 style="color: #0f172a; margin-top: 30px;">Evidence Collection</h2>
+                <p><strong>Collection Date:</strong> ${reportData.evidence.collectionDate}</p>
+                <p><strong>Tools Used:</strong> ${Object.keys(reportData.evidence.tools).length > 0
+                    ? Object.keys(reportData.evidence.tools).map(id => {
+                        const allTools = [...AI_TOOLS.consumer, ...AI_TOOLS.developer];
+                        const tool = allTools.find(t => t.id === id);
+                        return tool ? tool.name : id;
+                    }).join(', ')
+                    : 'None specified'}</p>
+
+                ${reportData.notes ? `
+                    <h2 style="color: #0f172a; margin-top: 30px;">Audit Notes</h2>
+                    <p style="background: #f8fafc; padding: 15px; border-radius: 4px;">${reportData.notes}</p>
+                ` : ''}
+
+                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 12px;">
+                    <p>Generated by Universal AIQ Framework - Level 3 Full Verification</p>
+                    <p>Evidence Multiplier: 1.0x (AUTO/AUDIT verified)</p>
+                </div>
+            `;
+
+            // Generate PDF
+            const opt = {
+                margin: 10,
+                filename: `aiq-l3-${reportData.reportId}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(pdfContent).save();
+        }
+    </script>
+</body>
+</html>
