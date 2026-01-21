@@ -191,10 +191,16 @@
             padding: var(--space-8);
             text-align: center;
             margin-bottom: var(--space-6);
+            transition: all var(--transition-fast);
         }
 
         .file-input-section.hidden {
             display: none;
+        }
+
+        .file-input-section.drag-over {
+            border-color: var(--color-accent);
+            background: rgba(79, 70, 229, 0.05);
         }
 
         .file-input-section h2 {
@@ -226,9 +232,43 @@
             display: none;
         }
 
+        .drop-hint {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-muted);
+            margin-top: var(--space-4);
+        }
+
+        .drop-hint strong {
+            color: var(--color-text);
+        }
+
         .loading-message {
             text-align: center;
             padding: var(--space-8);
+            color: var(--color-text-muted);
+        }
+
+        .processing-message {
+            margin-top: var(--space-4);
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg-alt);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-sm);
+        }
+
+        .processing-message.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--color-success);
+        }
+
+        .processing-message.error {
+            background: rgba(244, 63, 94, 0.1);
+            color: var(--color-error);
+        }
+
+        .processing-message .skipped-files {
+            margin-top: var(--space-2);
+            font-size: var(--font-size-xs);
             color: var(--color-text-muted);
         }
 
@@ -823,10 +863,11 @@
         <!-- Onboarding Section -->
         <section class="onboarding-section open" id="onboardingSection">
             <div class="onboarding-header" onclick="toggleOnboarding()">
-                <h3><span class="arrow">&#9654;</span> How to Generate Data for the Dashboard</h3>
+                <h3><span class="arrow">&#9654;</span> How to Load Data into the Dashboard</h3>
             </div>
             <div class="onboarding-content">
-                <div class="onboarding-steps">
+                <h4 style="font-size: var(--font-size-base); margin-bottom: var(--space-4); color: var(--color-accent);">Option A: Drag &amp; Drop (Easy)</h4>
+                <div class="onboarding-steps" style="margin-bottom: var(--space-6);">
                     <div class="onboarding-step">
                         <div class="onboarding-step-number">1</div>
                         <h4>Employees Take Assessments</h4>
@@ -835,25 +876,21 @@
                     <div class="onboarding-step">
                         <div class="onboarding-step-number">2</div>
                         <h4>Collect JSON Files</h4>
-                        <p>Admin collects all individual JSON report files into a single folder (or multiple folders for different periods).</p>
+                        <p>Gather the individual JSON report files from your team (via email, shared drive, etc.).</p>
                     </div>
                     <div class="onboarding-step">
                         <div class="onboarding-step-number">3</div>
-                        <h4>Run the Aggregator</h4>
-                        <p>Use the Python script to combine all JSON files into one <code>aiq_combined.json</code> file.</p>
-                    </div>
-                    <div class="onboarding-step">
-                        <div class="onboarding-step-number">4</div>
-                        <h4>Upload &amp; Visualize</h4>
-                        <p>Upload the combined file here to see score distributions, skill gaps, and trends.</p>
+                        <h4>Drag &amp; Drop Here</h4>
+                        <p>Select or drag all JSON files directly into the upload area below. No scripts required!</p>
                     </div>
                 </div>
 
-                <p style="font-size: var(--font-size-sm); color: var(--color-text); margin-bottom: var(--space-2);"><strong>Run the aggregator script:</strong></p>
+                <h4 style="font-size: var(--font-size-base); margin-bottom: var(--space-4); color: var(--color-secondary);">Option B: Use Aggregator Script (Advanced)</h4>
+                <p style="font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: var(--space-2);">For CSV export, automation, or processing hundreds of files, use the Python script:</p>
                 <div class="onboarding-command">
                     <code>python aggregate.py ./reports-folder/</code>
                 </div>
-                <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin: 0;">This creates <code>aiq_combined.json</code> in the current directory. For period-based trends, organize reports into folders like <code>2025-Q1/</code>, <code>2025-Q2/</code>.</p>
+                <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin: 0;">This creates <code>aiq_combined.json</code> and <code>aiq_export.csv</code>. For period-based trends, organize reports into folders like <code>2025-Q1/</code>, <code>2025-Q2/</code>.</p>
 
                 <div class="onboarding-links">
                     <a href="https://github.com/sagearbor/ai-skill-eval-kit/blob/main/docs/tools/aggregate.py" class="onboarding-link" target="_blank" rel="noopener noreferrer">
@@ -871,11 +908,15 @@
         <!-- File Input Section (shown when no data) -->
         <section id="fileInputSection" class="file-input-section">
             <h2>Load Assessment Data</h2>
-            <p>Select an <code>aiq_combined.json</code> file to visualize your organization's AI skills data.</p>
+            <p>Drag &amp; drop JSON report files here, or click to select files.</p>
             <label class="file-input-label">
-                Choose File
-                <input type="file" id="fileInput" class="file-input" accept=".json">
+                Choose Files
+                <input type="file" id="fileInput" class="file-input" accept=".json" multiple>
             </label>
+            <p class="drop-hint">
+                <strong>Accepts:</strong> Individual AIQ report JSONs or combined <code>aiq_combined.json</code> files
+            </p>
+            <div id="processingMessage" class="processing-message" style="display: none;"></div>
             <p id="loadingMessage" class="loading-message" style="display: none;">Attempting to load aiq_combined.json from current directory...</p>
         </section>
 
@@ -1033,6 +1074,124 @@
             section.classList.toggle('open');
         }
 
+        // ============================================
+        // File Processing & Aggregation
+        // ============================================
+
+        function showProcessingMessage(message, type = 'info', skippedFiles = []) {
+            const msgEl = document.getElementById('processingMessage');
+            msgEl.className = 'processing-message' + (type ? ' ' + type : '');
+            let html = message;
+            if (skippedFiles.length > 0) {
+                html += '<div class="skipped-files">Skipped files: ' + skippedFiles.join(', ') + '</div>';
+            }
+            msgEl.innerHTML = html;
+            msgEl.style.display = 'block';
+        }
+
+        function hideProcessingMessage() {
+            document.getElementById('processingMessage').style.display = 'none';
+        }
+
+        async function processFiles(files) {
+            showProcessingMessage(`Processing ${files.length} file${files.length > 1 ? 's' : ''}...`);
+
+            const reports = [];
+            const skippedFiles = [];
+            let combinedFileFound = false;
+
+            // Read all files
+            const filePromises = files.map(file => {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            resolve({ file: file.name, data: data, error: null });
+                        } catch (err) {
+                            resolve({ file: file.name, data: null, error: 'Invalid JSON' });
+                        }
+                    };
+                    reader.onerror = function() {
+                        resolve({ file: file.name, data: null, error: 'Read error' });
+                    };
+                    reader.readAsText(file);
+                });
+            });
+
+            const results = await Promise.all(filePromises);
+
+            // Process results
+            for (const result of results) {
+                if (result.error) {
+                    skippedFiles.push(`${result.file} (${result.error})`);
+                    continue;
+                }
+
+                const data = result.data;
+
+                // Check if this is a combined file (has reports array)
+                if (data.reports && Array.isArray(data.reports)) {
+                    combinedFileFound = true;
+                    // Validate and add each report from combined file
+                    for (const report of data.reports) {
+                        if (isValidAiqReport(report)) {
+                            reports.push(report);
+                        }
+                    }
+                }
+                // Check if this is an individual AIQ report
+                else if (isValidAiqReport(data)) {
+                    reports.push(data);
+                }
+                // Unknown format
+                else {
+                    skippedFiles.push(`${result.file} (not a valid AIQ report)`);
+                }
+            }
+
+            // Check if we have any valid reports
+            if (reports.length === 0) {
+                showProcessingMessage('No valid AIQ reports found. Files must have a "schemaVersion" field.', 'error', skippedFiles);
+                return;
+            }
+
+            // Show success message
+            const fileWord = files.length === 1 ? 'file' : 'files';
+            const reportWord = reports.length === 1 ? 'report' : 'reports';
+            showProcessingMessage(
+                `Loaded ${reports.length} ${reportWord} from ${files.length} ${fileWord}.`,
+                'success',
+                skippedFiles
+            );
+
+            // Create combined data structure
+            const combinedData = {
+                generatedAt: new Date().toISOString(),
+                reports: reports
+            };
+
+            // Short delay to show the success message, then load dashboard
+            setTimeout(() => {
+                hideProcessingMessage();
+                loadDashboard(combinedData);
+            }, 1000);
+        }
+
+        function isValidAiqReport(data) {
+            // Check for schemaVersion field (required for all AIQ reports)
+            if (!data || typeof data !== 'object') return false;
+
+            // Primary check: schemaVersion field
+            if (data.schemaVersion) return true;
+
+            // Fallback: check for typical AIQ report structure
+            // (assessee + dimensions + calculation OR scores)
+            if (data.assessee && (data.dimensions || data.scores)) return true;
+
+            return false;
+        }
+
         // Global state
         let originalData = null;
         let filteredData = null;
@@ -1102,19 +1261,37 @@
 
             // File input handler
             document.getElementById('fileInput').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
+                const files = Array.from(e.target.files);
+                if (files.length === 0) return;
+                processFiles(files);
+            });
 
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    try {
-                        const data = JSON.parse(event.target.result);
-                        loadDashboard(data);
-                    } catch (err) {
-                        alert('Error parsing JSON file: ' + err.message);
-                    }
-                };
-                reader.readAsText(file);
+            // Drag and drop handlers
+            const dropZone = document.getElementById('fileInputSection');
+
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.classList.add('drag-over');
+            });
+
+            dropZone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.classList.remove('drag-over');
+            });
+
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.classList.remove('drag-over');
+
+                const files = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.json'));
+                if (files.length === 0) {
+                    showProcessingMessage('No JSON files found. Please drop .json files only.', 'error');
+                    return;
+                }
+                processFiles(files);
             });
 
             // Tab navigation
