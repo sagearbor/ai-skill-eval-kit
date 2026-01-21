@@ -1,0 +1,52 @@
+session:
+  date: "2026-01-20"
+  duration: "~2 hours"
+  branch: feature/interactive-assessment-tools
+
+summary: |
+  Implemented the SCOREs framework for AI skill assessment, created an interactive
+  HTML assessment tool, set up GitHub Pages, and configured sandboxuser for autonomous
+  git operations.
+
+changes:
+  - file: docs/ai_mastery_eval.md
+    description: Renamed dimensions from KNOW/TEST/SHIP/CREATE/GUARD to SCOREs (Study, Copy, Output, Research, Ethical security)
+
+  - file: docs/index.html
+    description: Created interactive bubble chart assessment tool with clickable levels and detailed breakdowns
+
+  - file: docs/diagrams/assessment_flow.md
+    description: Added Mermaid flowchart for assessment decision flow
+
+  - file: .github/workflows/doc_pipeline.yml
+    description: Updated CI/CD with markdown linting, table border fixes, moved reference.docx path
+
+  - file: docs/templates/reference.docx
+    description: Moved from repo root to docs/templates/
+
+  - file: CLAUDE.md
+    description: Created AI assistant guidance document for the repo
+
+  - file: .markdownlint.json
+    description: Added markdown linting configuration
+
+  - file: tmp/sandboxCC-guide.md
+    description: Updated with Section 5 on git commits/pushing for sandboxuser (needs to be copied out of repo)
+
+discoveries:
+  - SSH keys work for sandboxuser git operations after adding to GitHub
+  - gh CLI authentication works in WSL even when browser fails to auto-open (use manual URL)
+  - Consolidating 4 verification levels to 3 (Self, Peer, Auto/Audit) simplified the framework
+  - GitHub Pages serves from /docs folder with index.html as landing page
+
+next_steps:
+  - Copy tmp/sandboxCC-guide.md to original location outside repo
+  - Use interview mode to plan interactive "easy button" features
+  - Level 1 (Self): Survey that outputs downloadable report
+  - Level 2 (Peer): TBD - shareable assessment or template
+  - Level 3 (Auto/Audit): Downloadable scanner for AI usage detection
+  - Delete tmp/ folder after copying guide out
+
+urls:
+  github_pages: https://sagearbor.github.io/ai-skill-eval-kit/
+  pull_request: https://github.com/sagearbor/ai-skill-eval-kit/pull/1
