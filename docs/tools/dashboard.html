@@ -584,6 +584,144 @@
             color: var(--color-primary);
         }
 
+        /* Onboarding Section */
+        .onboarding-section {
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-6);
+            overflow: hidden;
+        }
+
+        .onboarding-header {
+            padding: var(--space-4) var(--space-5);
+            background: var(--color-bg-alt);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .onboarding-header:hover {
+            background: var(--color-border);
+        }
+
+        .onboarding-header h3 {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            margin: 0;
+        }
+
+        .onboarding-header .arrow {
+            transition: transform 0.2s;
+            font-size: 12px;
+            color: var(--color-text-muted);
+        }
+
+        .onboarding-section.open .onboarding-header .arrow {
+            transform: rotate(90deg);
+        }
+
+        .onboarding-content {
+            display: none;
+            padding: var(--space-5);
+        }
+
+        .onboarding-section.open .onboarding-content {
+            display: block;
+        }
+
+        .onboarding-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-5);
+        }
+
+        .onboarding-step {
+            background: var(--color-bg-alt);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            text-align: center;
+        }
+
+        .onboarding-step-number {
+            width: 28px;
+            height: 28px;
+            background: var(--color-accent);
+            color: white;
+            font-weight: 700;
+            font-size: var(--font-size-sm);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-2);
+        }
+
+        .onboarding-step h4 {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+            color: var(--color-primary);
+        }
+
+        .onboarding-step p {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-muted);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .onboarding-command {
+            background: var(--color-primary);
+            color: #e2e8f0;
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-md);
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: var(--font-size-sm);
+            margin: var(--space-4) 0;
+            overflow-x: auto;
+        }
+
+        .onboarding-command code {
+            color: #e2e8f0;
+        }
+
+        .onboarding-links {
+            display: flex;
+            gap: var(--space-3);
+            flex-wrap: wrap;
+            margin-top: var(--space-4);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--color-border);
+        }
+
+        .onboarding-link {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--font-size-sm);
+            color: var(--color-accent);
+            text-decoration: none;
+            border: 1px solid var(--color-accent);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-fast);
+        }
+
+        .onboarding-link:hover {
+            background: var(--color-accent);
+            color: white;
+            text-decoration: none;
+        }
+
         /* No Trends Message */
         .no-trends {
             text-align: center;
@@ -682,6 +820,54 @@
     </header>
 
     <main class="container">
+        <!-- Onboarding Section -->
+        <section class="onboarding-section open" id="onboardingSection">
+            <div class="onboarding-header" onclick="toggleOnboarding()">
+                <h3><span class="arrow">&#9654;</span> How to Generate Data for the Dashboard</h3>
+            </div>
+            <div class="onboarding-content">
+                <div class="onboarding-steps">
+                    <div class="onboarding-step">
+                        <div class="onboarding-step-number">1</div>
+                        <h4>Employees Take Assessments</h4>
+                        <p>Team members complete assessments at any level (L1, L2, or L3) and download their JSON report.</p>
+                    </div>
+                    <div class="onboarding-step">
+                        <div class="onboarding-step-number">2</div>
+                        <h4>Collect JSON Files</h4>
+                        <p>Admin collects all individual JSON report files into a single folder (or multiple folders for different periods).</p>
+                    </div>
+                    <div class="onboarding-step">
+                        <div class="onboarding-step-number">3</div>
+                        <h4>Run the Aggregator</h4>
+                        <p>Use the Python script to combine all JSON files into one <code>aiq_combined.json</code> file.</p>
+                    </div>
+                    <div class="onboarding-step">
+                        <div class="onboarding-step-number">4</div>
+                        <h4>Upload &amp; Visualize</h4>
+                        <p>Upload the combined file here to see score distributions, skill gaps, and trends.</p>
+                    </div>
+                </div>
+
+                <p style="font-size: var(--font-size-sm); color: var(--color-text); margin-bottom: var(--space-2);"><strong>Run the aggregator script:</strong></p>
+                <div class="onboarding-command">
+                    <code>python aggregate.py ./reports-folder/</code>
+                </div>
+                <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin: 0;">This creates <code>aiq_combined.json</code> in the current directory. For period-based trends, organize reports into folders like <code>2025-Q1/</code>, <code>2025-Q2/</code>.</p>
+
+                <div class="onboarding-links">
+                    <a href="https://github.com/sagearbor/ai-skill-eval-kit/blob/main/docs/tools/aggregate.py" class="onboarding-link" target="_blank" rel="noopener noreferrer">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M3 3a2 2 0 012-2h4.586A2 2 0 0111 1.586L13.414 4A2 2 0 0114 5.414V13a2 2 0 01-2 2H5a2 2 0 01-2-2V3zm9 10V5.414L9.586 3H5v10h7z"/></svg>
+                        Download aggregate.py
+                    </a>
+                    <a href="README.md" class="onboarding-link">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zM0 8a8 8 0 1116 0A8 8 0 010 8zm8 3a1 1 0 01-1-1V8a1 1 0 012 0v2a1 1 0 01-1 1zm0-6a1 1 0 100 2 1 1 0 000-2z"/></svg>
+                        Full Admin Guide
+                    </a>
+                </div>
+            </div>
+        </section>
+
         <!-- File Input Section (shown when no data) -->
         <section id="fileInputSection" class="file-input-section">
             <h2>Load Assessment Data</h2>
@@ -840,6 +1026,12 @@
         // ============================================
         // AIQ Dashboard - JavaScript
         // ============================================
+
+        // Toggle onboarding section
+        function toggleOnboarding() {
+            const section = document.getElementById('onboardingSection');
+            section.classList.toggle('open');
+        }
 
         // Global state
         let originalData = null;
