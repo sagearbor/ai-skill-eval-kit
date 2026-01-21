@@ -216,7 +216,17 @@ let validatedReport = null;
  * Called on DOMContentLoaded for level2-validate.html
  */
 function initValidatorForm() {
-    // Get URL parameter
+    // First, check for ?r= parameter (completed report)
+    const completedReportEncoded = getUrlParam('r');
+    if (completedReportEncoded) {
+        const report = decodeState(completedReportEncoded);
+        if (report && report.schemaVersion && report.scores) {
+            displayCompletedReport(report);
+            return;
+        }
+    }
+
+    // Otherwise, check for ?d= parameter (initial validation request)
     const encoded = getUrlParam('d');
 
     if (!encoded) {
@@ -249,6 +259,70 @@ function initValidatorForm() {
     if (form) {
         form.addEventListener('submit', completeValidation);
     }
+}
+
+/**
+ * Display a completed report loaded from URL (?r= parameter)
+ * @param {object} report - The completed report object
+ */
+function displayCompletedReport(report) {
+    // Store the report for download functions
+    validatedReport = report;
+
+    // Hide error state and validation form
+    document.getElementById('errorState').classList.add('hidden');
+    document.getElementById('validationContent').classList.add('hidden');
+
+    // Show results section
+    const resultsSection = document.getElementById('resultsSection');
+    resultsSection.classList.remove('hidden');
+
+    // Display score
+    document.getElementById('finalScoreValue').textContent = report.scores.finalScore;
+
+    // Display band
+    const bandBadge = document.getElementById('scoreBandBadge');
+    bandBadge.textContent = report.scores.band;
+    bandBadge.className = `score-band band-${report.scores.band.toLowerCase()}`;
+
+    // Populate breakdown table
+    const tbody = document.getElementById('breakdownTableBody');
+    tbody.innerHTML = '';
+
+    for (const [dimKey, dimData] of Object.entries(DIMENSIONS)) {
+        const validation = report.validation.dimensions[dimKey];
+        const scoreData = report.scores.dimensions[dimKey];
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><strong>${dimData.name}</strong></td>
+            <td>Level ${validation.claimedLevel}</td>
+            <td>Level ${validation.finalLevel}</td>
+            <td>${validation.confirmed ?
+                '<span class="badge badge-high">Confirmed</span>' :
+                '<span class="badge badge-medium">Adjusted</span>'}</td>
+            <td class="score-cell">${scoreData.weightedScore.toFixed(2)}</td>
+        `;
+        tbody.appendChild(row);
+    }
+
+    // Show adjustments summary if any
+    const hasAdjustments = Object.values(report.validation.dimensions).some(v => !v.confirmed);
+    if (hasAdjustments) {
+        const summaryDiv = document.getElementById('adjustmentsSummary');
+        const listEl = document.getElementById('adjustmentsList');
+
+        listEl.innerHTML = Object.entries(report.validation.dimensions)
+            .filter(([_, v]) => !v.confirmed)
+            .map(([dimKey, v]) => `
+                <li><strong>${DIMENSIONS[dimKey].name}:</strong> Level ${v.claimedLevel} → Level ${v.finalLevel}${v.adjustmentReason ? ` - "${v.adjustmentReason}"` : ''}</li>
+            `).join('');
+
+        summaryDiv.classList.remove('hidden');
+    }
+
+    // Set the completed URL (it's already in the URL bar)
+    document.getElementById('completedUrl').value = window.location.href;
 }
 
 /**
