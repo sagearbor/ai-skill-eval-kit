@@ -480,6 +480,207 @@ function createReportObject(params) {
 }
 
 // =============================================================================
+// JSON SCHEMA VALIDATION
+// =============================================================================
+
+// Cache for the loaded schema
+let cachedSchema = null;
+let cachedAjvInstance = null;
+
+/**
+ * Validate a report object against the AIQ JSON Schema
+ * @param {object} report - The report object to validate
+ * @returns {Promise<{valid: boolean, errors: string[]}>} Validation result with user-friendly errors
+ */
+async function validateReportSchema(report) {
+  // Graceful fallback if Ajv is not loaded
+  if (typeof Ajv === 'undefined') {
+    console.warn('Ajv library not loaded - skipping schema validation');
+    return { valid: true, errors: [] };
+  }
+
+  try {
+    // Fetch and cache the schema if not already loaded
+    if (!cachedSchema) {
+      const schemaUrl = getSchemaUrl();
+      const response = await fetch(schemaUrl);
+      if (!response.ok) {
+        console.error('Failed to fetch schema:', response.status);
+        return { valid: true, errors: [] }; // Graceful fallback
+      }
+      cachedSchema = await response.json();
+    }
+
+    // Create Ajv instance if not already created
+    if (!cachedAjvInstance) {
+      cachedAjvInstance = new Ajv({
+        allErrors: true,
+        strict: false
+      });
+    }
+
+    // Compile and validate
+    const validate = cachedAjvInstance.compile(cachedSchema);
+    const valid = validate(report);
+
+    if (valid) {
+      return { valid: true, errors: [] };
+    }
+
+    // Convert Ajv errors to user-friendly messages
+    const errors = formatValidationErrors(validate.errors);
+
+    // Log full errors to console for debugging
+    console.error('Schema validation errors:', validate.errors);
+
+    return { valid: false, errors };
+  } catch (error) {
+    console.error('Schema validation error:', error);
+    return { valid: true, errors: [] }; // Graceful fallback on error
+  }
+}
+
+/**
+ * Get the schema URL (works both locally and on GitHub Pages)
+ * @returns {string} The URL to the schema file
+ */
+function getSchemaUrl() {
+  // Get base path from current location
+  const basePath = window.location.pathname.replace(/\/[^\/]*$/, '');
+  return `${window.location.origin}${basePath}/schemas/aiq-report-v1.schema.json`;
+}
+
+/**
+ * Convert Ajv errors to user-friendly messages
+ * @param {Array} ajvErrors - Array of Ajv error objects
+ * @returns {string[]} Array of user-friendly error messages
+ */
+function formatValidationErrors(ajvErrors) {
+  if (!ajvErrors || ajvErrors.length === 0) {
+    return [];
+  }
+
+  const friendlyMessages = [];
+  const seenPaths = new Set();
+
+  for (const error of ajvErrors) {
+    const path = error.instancePath || 'root';
+
+    // Avoid duplicate messages for the same path
+    const msgKey = `${path}:${error.keyword}`;
+    if (seenPaths.has(msgKey)) continue;
+    seenPaths.add(msgKey);
+
+    let message = '';
+    const fieldName = path.split('/').pop() || 'Report';
+
+    switch (error.keyword) {
+      case 'required':
+        message = `Missing required field: ${error.params.missingProperty}`;
+        break;
+      case 'minLength':
+        message = `"${fieldName}" cannot be empty`;
+        break;
+      case 'type':
+        message = `"${fieldName}" has incorrect type (expected ${error.params.type})`;
+        break;
+      case 'enum':
+        message = `"${fieldName}" has invalid value. Allowed values: ${error.params.allowedValues.join(', ')}`;
+        break;
+      case 'minimum':
+      case 'maximum':
+        message = `"${fieldName}" value is out of range`;
+        break;
+      case 'format':
+        message = `"${fieldName}" has invalid format (expected ${error.params.format})`;
+        break;
+      case 'additionalProperties':
+        message = `Unexpected property: ${error.params.additionalProperty}`;
+        break;
+      case 'const':
+        message = `"${fieldName}" must be ${error.params.allowedValue}`;
+        break;
+      default:
+        message = `Validation error at ${path}: ${error.message}`;
+    }
+
+    friendlyMessages.push(message);
+  }
+
+  return friendlyMessages;
+}
+
+/**
+ * Display validation errors in the UI
+ * @param {string[]} errors - Array of error messages
+ * @param {HTMLElement} container - Container element to show errors in (or create one)
+ * @param {HTMLElement} [anchorElement] - Element to insert error display near (if container not found)
+ */
+function displayValidationErrors(errors, container, anchorElement) {
+  // Remove any existing error display
+  const existingError = document.getElementById('schema-validation-error');
+  if (existingError) {
+    existingError.remove();
+  }
+
+  if (!errors || errors.length === 0) {
+    return;
+  }
+
+  // Create error display element
+  const errorDiv = document.createElement('div');
+  errorDiv.id = 'schema-validation-error';
+  errorDiv.className = 'alert alert-error';
+  errorDiv.innerHTML = `
+    <span class="alert-icon">!</span>
+    <div class="alert-content">
+      <div class="alert-title">Report Validation Failed</div>
+      <ul style="margin: 0.5rem 0 0 1rem; padding: 0;">
+        ${errors.map(e => `<li>${escapeHtmlForValidation(e)}</li>`).join('')}
+      </ul>
+      <p style="margin-top: 0.5rem; font-size: 0.875rem; opacity: 0.8;">
+        Please fix these issues before downloading. Check the browser console for details.
+      </p>
+    </div>
+  `;
+
+  // Insert the error display
+  if (container) {
+    container.insertBefore(errorDiv, container.firstChild);
+  } else if (anchorElement) {
+    anchorElement.parentNode.insertBefore(errorDiv, anchorElement);
+  } else {
+    // Fallback: insert at top of main content
+    const main = document.querySelector('main') || document.body;
+    main.insertBefore(errorDiv, main.firstChild);
+  }
+
+  // Scroll to error
+  errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/**
+ * Clear any displayed validation errors
+ */
+function clearValidationErrors() {
+  const existingError = document.getElementById('schema-validation-error');
+  if (existingError) {
+    existingError.remove();
+  }
+}
+
+/**
+ * Helper to escape HTML for validation error display
+ * @param {string} text - Text to escape
+ * @returns {string} Escaped text
+ */
+function escapeHtmlForValidation(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// =============================================================================
 // EXPORT TO GLOBAL SCOPE
 // =============================================================================
 
@@ -508,3 +709,6 @@ window.setUrlParam = setUrlParam;
 window.populateRoleSelect = populateRoleSelect;
 window.getLevelDescription = getLevelDescription;
 window.createReportObject = createReportObject;
+window.validateReportSchema = validateReportSchema;
+window.displayValidationErrors = displayValidationErrors;
+window.clearValidationErrors = clearValidationErrors;

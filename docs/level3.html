@@ -314,6 +314,7 @@
     </footer>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv.bundle.min.js"></script>
     <script src="js/shared.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
@@ -934,9 +935,21 @@
         // DOWNLOAD FUNCTIONS
         // =============================================================================
 
-        function downloadJSON() {
+        async function downloadJSON() {
             if (!reportData) {
                 alert('Please complete the form first.');
+                return;
+            }
+
+            // Clear any previous validation errors
+            clearValidationErrors();
+
+            // Validate against JSON schema
+            const validation = await validateReportSchema(reportData);
+            if (!validation.valid) {
+                // Find download options container to show errors near
+                const downloadOptions = document.querySelector('.download-options');
+                displayValidationErrors(validation.errors, null, downloadOptions);
                 return;
             }
 

@@ -719,8 +719,20 @@ function copyCompletedUrl() {
 /**
  * Download the validated report as JSON
  */
-function downloadValidatedJSON() {
+async function downloadValidatedJSON() {
     if (!validatedReport) return;
+
+    // Clear any previous validation errors
+    clearValidationErrors();
+
+    // Validate against JSON schema
+    const validation = await validateReportSchema(validatedReport);
+    if (!validation.valid) {
+        // Find download options container to show errors near
+        const downloadOptions = document.querySelector('.download-options');
+        displayValidationErrors(validation.errors, null, downloadOptions);
+        return;
+    }
 
     const jsonStr = JSON.stringify(validatedReport, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json' });

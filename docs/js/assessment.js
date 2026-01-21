@@ -337,11 +337,14 @@ function checkForGaming(levels) {
 /**
  * Download JSON report
  */
-function downloadJSON() {
+async function downloadJSON() {
   if (!currentResults || !currentLevels) {
     alert('Please complete the assessment first.');
     return;
   }
+
+  // Clear any previous validation errors
+  clearValidationErrors();
 
   // Create report object using shared utility
   const report = createReportObject({
@@ -351,6 +354,15 @@ function downloadJSON() {
     levels: currentLevels,
     assessmentLevel: 1
   });
+
+  // Validate against JSON schema
+  const validation = await validateReportSchema(report);
+  if (!validation.valid) {
+    // Find download options container to show errors near
+    const downloadOptions = document.querySelector('.download-options');
+    displayValidationErrors(validation.errors, null, downloadOptions);
+    return;
+  }
 
   // Create and download blob
   const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
