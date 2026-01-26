@@ -113,16 +113,46 @@ Every individual is scored on the same five dimensions that form the **SCOREs** 
 
 Different roles require different skill mixes. A researcher needs Research; an engineer needs Output; an executive needs Study and Ethical security. Weights normalize scores so roles can be compared.
 
-| Role | Study | Copy | Output | Research | Ethical |
+### **Combined Weights (Single Score)**
+
+| Role | Study | Copy | Output | Research | Ethical security |
 | --- | --- | --- | --- | --- | --- |
-| **General (default)** | 20% | 20% | 30% | 15% | 15% |
-| **Software Engineer** | 10% | 25% | 40% | 15% | 10% |
-| **Data / ML Engineer** | 15% | 30% | 25% | 20% | 10% |
-| **Product Manager** | 25% | 25% | 30% | 10% | 10% |
-| **Research Scientist** | 15% | 20% | 10% | 45% | 10% |
-| **Executive / Leader** | 30% | 15% | 20% | 10% | 25% |
-| **Operations / Support** | 20% | 15% | 40% | 10% | 15% |
-| **Legal / Compliance** | 25% | 15% | 15% | 10% | 35% |
+| **General (default)** | 20% | 30% | 30% | 5% | 15% |
+| **Developer** | 10% | 25% | 40% | 15% | 10% |
+| **Researcher** | 15% | 25% | 25% | 25% | 10% |
+| **Support** | 25% | 20% | 30% | 10% | 15% |
+| **Leader** | 30% | 15% | 20% | 10% | 25% |
+
+### **Dual Scoring (v1.1)**
+
+The AIQ framework now supports dual scoring to separate individual skills from organizational enablement:
+
+| Score Type | Measures | Core Question |
+| --- | --- | --- |
+| **Personal Readiness** | Individual capability to deliver AI value | "Am I ready to use AI effectively?" |
+| **Corporate Impact** | Organizational deployment and governance | "Has my org enabled AI delivery?" |
+| **Gap** | Personal − Corporate | Identifies misalignment between skills and enablement |
+
+**Gap Interpretation:**
+
+| Gap | Meaning | Recommended Action |
+| --- | --- | --- |
+| **> +30** | High skills, low org enablement | Advocate for AI pilot projects |
+| **+10 to +30** | Moderate positive gap | Seek deployment opportunities |
+| **−10 to +10** | Balanced | Continue current trajectory |
+| **< −10** | Org ahead of individual | Invest in learning/upskilling |
+
+### **Company Type Modifiers**
+
+Organizations have different AI priorities. Company type modifiers adjust dimension weights to reflect strategic focus:
+
+| Company Type | Philosophy | Key Adjustments |
+| --- | --- | --- |
+| **Startup** | "Ship it, learn, iterate" | Output ×1.4, Research ×1.2, Copy ×0.7, Ethical ×0.7 |
+| **Enterprise** | "Reliable, scalable, governed" | Copy ×1.2, Output ×0.8 |
+| **Aspirational** | "Build AI the right way" | Ethical ×1.2, Research ×1.2, Study ×0.8, Copy ×0.8 |
+
+*Modifiers are applied to base role weights, then renormalized to 100%.*
 
 ## **Part III: Evidence Multiplier**
 
@@ -145,6 +175,19 @@ Every AIQ score is reported with a confidence level based on average evidence qu
 | **\< 0.7** | LOW | Mostly self-reported. Treat score as aspirational. |
 | **0.7 \- 0.9** | MEDIUM | Peer-validated. Reasonable working estimate. |
 | **\> 0.9** | HIGH | Auto/audit verified. Score is trustworthy. |
+
+### **Point Distribution Curves (v1.1)**
+
+Different organizations may prefer different point distributions across levels. The default is Bell Curve, which provides more granularity where most people score (levels 2-3).
+
+| Distribution | L0 | L1 | L2 | L3 | L4 | L5 | Best For |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **Linear** | 0% | 12.5% | 32.5% | 52.5% | 72.5% | 92.5% | Legacy compatibility |
+| **Bell Curve (default)** | 0% | 10% | 30% | 70% | 90% | 100% | Workforce differentiation |
+| **Progressive** | 0% | 10% | 25% | 50% | 80% | 100% | Rewarding excellence |
+| **Sigmoid** | 0% | 5% | 25% | 75% | 95% | 100% | Emphasizing L2→L3 breakthrough |
+
+*Percentages show points awarded as fraction of dimension maximum.*
 
 ## **Part IV: Time Decay**
 

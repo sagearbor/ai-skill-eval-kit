@@ -25,10 +25,11 @@ from statistics import mean
 from typing import Any, Dict, List, Optional, Tuple
 
 
-# CSV column headers
+# CSV column headers (v1.1 with dual scoring)
 CSV_HEADERS = [
     "name",
     "role",
+    "company_type",
     "assessment_level",
     "period",
     "study_level",
@@ -41,10 +42,12 @@ CSV_HEADERS = [
     "research_points",
     "ethical_level",
     "ethical_points",
-    "raw_total",
-    "evidence_multiplier",
-    "final_score",
+    "personal_score",
+    "corporate_score",
+    "gap",
+    "combined_score",
     "score_band",
+    "evidence_multiplier",
     "confidence",
     "validator_name",
     "validated_at",
@@ -149,28 +152,51 @@ def safe_get(data: Dict[str, Any], *keys, default: Any = "") -> Any:
 
 
 def extract_row(report: Dict[str, Any], period: str) -> Dict[str, Any]:
-    """Extract a CSV row from a report dictionary."""
+    """Extract a CSV row from a report dictionary.
+
+    Handles both v1.0 and v1.1 schema formats.
+    """
+    schema_version = safe_get(report, "schemaVersion", default="1.0")
+
     row = {
         "name": safe_get(report, "assessee", "name"),
         "role": safe_get(report, "assessee", "role"),
+        "company_type": safe_get(report, "assessee", "companyType", default=""),
         "assessment_level": safe_get(report, "assessmentLevel", default=""),
         "period": period,
     }
 
-    # Extract dimension scores
-    dimensions = safe_get(report, "scores", "dimensions", default={})
+    # Extract dimension scores - v1.1 uses "dimensions" at root, v1.0 uses "scores.dimensions"
+    if schema_version == "1.1":
+        dimensions = safe_get(report, "dimensions", default={})
+    else:
+        dimensions = safe_get(report, "scores", "dimensions", default={})
+
     for dim in DIMENSIONS:
         dim_data = dimensions.get(dim, {})
         row[f"{dim}_level"] = safe_get(dim_data, "level", default="")
         row[f"{dim}_points"] = safe_get(dim_data, "points", default="")
 
-    # Extract overall scores
-    scores = safe_get(report, "scores", default={})
-    row["raw_total"] = safe_get(scores, "rawTotal", default="")
-    row["evidence_multiplier"] = safe_get(scores, "evidenceMultiplier", default="")
-    row["final_score"] = safe_get(scores, "finalScore", default="")
-    row["score_band"] = safe_get(scores, "band", default="")
-    row["confidence"] = safe_get(scores, "confidence", default="")
+    # Extract scores - v1.1 uses "calculation" with dual scores, v1.0 uses "scores"
+    if schema_version == "1.1":
+        calc = safe_get(report, "calculation", default={})
+        row["personal_score"] = safe_get(calc, "personalScore", "normalizedScore", default="")
+        row["corporate_score"] = safe_get(calc, "corporateScore", "normalizedScore", default="")
+        row["gap"] = safe_get(calc, "gap", default="")
+        row["combined_score"] = safe_get(calc, "combinedScore", "normalizedScore", default="")
+        row["score_band"] = safe_get(calc, "combinedScore", "scoreBand", default="")
+        row["evidence_multiplier"] = safe_get(calc, "evidenceMultiplier", default="")
+        row["confidence"] = safe_get(calc, "confidence", default="")
+    else:
+        # v1.0 format
+        scores = safe_get(report, "scores", default={})
+        row["personal_score"] = ""
+        row["corporate_score"] = ""
+        row["gap"] = ""
+        row["combined_score"] = safe_get(scores, "finalScore", default="")
+        row["score_band"] = safe_get(scores, "band", default="")
+        row["evidence_multiplier"] = safe_get(scores, "evidenceMultiplier", default="")
+        row["confidence"] = safe_get(scores, "confidence", default="")
 
     # Extract validation info (L2/L3 only)
     validation = safe_get(report, "validation", default={})
@@ -188,6 +214,7 @@ def calculate_stats(reports: List[Tuple[Dict[str, Any], str]]) -> Dict[str, Any]
         "totalReports": len(reports),
         "byLevel": {},
         "byRole": {},
+        "byCompanyType": {},
         "scoreDistribution": {
             "0-20": 0,
             "21-40": 0,
@@ -198,6 +225,12 @@ def calculate_stats(reports: List[Tuple[Dict[str, Any], str]]) -> Dict[str, Any]
         "dimensionAverages": {},
         "lowestDimension": "",
         "periodTrends": {},
+        "gapAnalysis": {
+            "avgGap": 0,
+            "positiveGaps": 0,
+            "negativeGaps": 0,
+            "balanced": 0,
+        },
     }
 
     # Track unique periods
@@ -209,8 +242,12 @@ def calculate_stats(reports: List[Tuple[Dict[str, Any], str]]) -> Dict[str, Any]
     # Track scores by period
     period_scores: Dict[str, List[int]] = {}
 
+    # Track gaps for v1.1
+    gaps: List[int] = []
+
     for report, period in reports:
         periods_seen.add(period)
+        schema_version = safe_get(report, "schemaVersion", default="1.0")
 
         # Count by assessment level
         level = safe_get(report, "assessmentLevel", default=None)
@@ -223,8 +260,26 @@ def calculate_stats(reports: List[Tuple[Dict[str, Any], str]]) -> Dict[str, Any]
         if role:
             stats["byRole"][role] = stats["byRole"].get(role, 0) + 1
 
-        # Score distribution
-        final_score = safe_get(report, "scores", "finalScore", default=None)
+        # Count by company type (v1.1)
+        company_type = safe_get(report, "assessee", "companyType", default="")
+        if company_type:
+            stats["byCompanyType"][company_type] = stats["byCompanyType"].get(company_type, 0) + 1
+
+        # Score distribution - handle both v1.0 and v1.1
+        if schema_version == "1.1":
+            final_score = safe_get(report, "calculation", "combinedScore", "normalizedScore", default=None)
+            gap = safe_get(report, "calculation", "gap", default=None)
+            if gap is not None and isinstance(gap, (int, float)):
+                gaps.append(int(gap))
+                if gap > 10:
+                    stats["gapAnalysis"]["positiveGaps"] += 1
+                elif gap < -10:
+                    stats["gapAnalysis"]["negativeGaps"] += 1
+                else:
+                    stats["gapAnalysis"]["balanced"] += 1
+        else:
+            final_score = safe_get(report, "scores", "finalScore", default=None)
+
         if final_score is not None and isinstance(final_score, (int, float)):
             score = int(final_score)
             if 0 <= score <= 20:
@@ -243,8 +298,12 @@ def calculate_stats(reports: List[Tuple[Dict[str, Any], str]]) -> Dict[str, Any]
                 period_scores[period] = []
             period_scores[period].append(score)
 
-        # Dimension levels for averaging
-        dimensions = safe_get(report, "scores", "dimensions", default={})
+        # Dimension levels for averaging - handle both v1.0 and v1.1
+        if schema_version == "1.1":
+            dimensions = safe_get(report, "dimensions", default={})
+        else:
+            dimensions = safe_get(report, "scores", "dimensions", default={})
+
         for dim in DIMENSIONS:
             level_val = safe_get(dimensions, dim, "level", default=None)
             if level_val is not None and isinstance(level_val, (int, float)):
@@ -261,6 +320,10 @@ def calculate_stats(reports: List[Tuple[Dict[str, Any], str]]) -> Dict[str, Any]
     if stats["dimensionAverages"]:
         lowest = min(stats["dimensionAverages"].items(), key=lambda x: x[1])
         stats["lowestDimension"] = lowest[0]
+
+    # Calculate average gap (v1.1 reports only)
+    if gaps:
+        stats["gapAnalysis"]["avgGap"] = round(mean(gaps))
 
     # Period trends
     for period, scores in period_scores.items():
