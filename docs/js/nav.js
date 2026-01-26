@@ -9,6 +9,14 @@
   // Detect current page from URL
   function getCurrentPage() {
     const path = window.location.pathname;
+    const hash = window.location.hash;
+    if (path.includes('reference')) {
+      // Map hash to nav item id
+      if (hash === '#weights') return 'weights';
+      if (hash === '#matrix') return 'matrix';
+      if (hash === '#rubrics') return 'rubrics';
+      return 'reference';
+    }
     if (path.endsWith('index.html') || path.endsWith('/') || path.endsWith('/docs/')) return 'home';
     if (path.includes('level1')) return 'level1';
     if (path.includes('level2-validate')) return 'level2-validate';
@@ -34,16 +42,19 @@
     const base = getBasePath();
 
     const navItems = [
+      { section: 'Start', items: [
+        { id: 'home', label: 'Home', icon: '🏠', href: base + 'index.html' },
+      ]},
       { section: 'Assess', items: [
         { id: 'level1', label: 'Level 1: Self', icon: '①', href: base + 'level1.html', badge: '0.6x' },
         { id: 'level2', label: 'Level 2: Peer', icon: '②', href: base + 'level2.html', badge: '0.8x' },
         { id: 'level3', label: 'Level 3: Verified', icon: '③', href: base + 'level3.html', badge: '1.0x' },
       ]},
       { section: 'Reference', items: [
-        { id: 'home', label: 'Framework Overview', icon: '📖', href: base + 'index.html' },
-        { id: 'weights', label: 'Weight Tables', icon: '⚖️', href: base + 'index.html#weights-section' },
-        { id: 'matrix', label: 'Validation Matrix', icon: '✓', href: base + 'index.html#matrix-section' },
-        { id: 'rubrics', label: 'Full Rubrics', icon: '📋', href: base + 'index.html#rubrics-section' },
+        { id: 'reference', label: 'Framework Overview', icon: '📖', href: base + 'reference.html#overview' },
+        { id: 'weights', label: 'Weight Tables', icon: '⚖️', href: base + 'reference.html#weights' },
+        { id: 'matrix', label: 'Validation Matrix', icon: '✓', href: base + 'reference.html#matrix' },
+        { id: 'rubrics', label: 'Full Rubrics', icon: '📋', href: base + 'reference.html#rubrics' },
       ]},
       { section: 'Analytics', items: [
         { id: 'dashboard', label: 'Dashboard', icon: '📊', href: base + 'tools/dashboard.html' },
