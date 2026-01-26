@@ -48,18 +48,19 @@ let descriptionsLoadPromise = null;
 // DIMENSION DATA
 // =============================================================================
 
+// DIMENSIONS contains only point ranges - descriptions come from level-descriptions.json
 const DIMENSIONS = {
   study: {
     name: 'Study',
     fullName: 'S - Study (Information & Fluency)',
     question: 'Where do you learn about AI? Can you explain why things work or fail?',
     levels: [
-      { level: 0, points: 0, description: 'No AI awareness. Avoids or fears the technology.' },
-      { level: 1, minPoints: 1, maxPoints: 4, midpoint: 2.5, description: 'Mainstream news only. Passive consumption of hype/fear cycles.' },
-      { level: 2, minPoints: 5, maxPoints: 8, midpoint: 6.5, description: 'LinkedIn influencers, YouTube "Top 10 Tools" content.' },
-      { level: 3, minPoints: 9, maxPoints: 12, midpoint: 10.5, description: 'Developer blogs, release notes, AI-focused newsletters.' },
-      { level: 4, minPoints: 13, maxPoints: 16, midpoint: 14.5, description: 'Technical reports, GitHub repos. Can explain why models fail.' },
-      { level: 5, minPoints: 17, maxPoints: 20, midpoint: 18.5, description: 'ArXiv papers, model weights, source code. Predicts capability shifts.' }
+      { level: 0, points: 0 },
+      { level: 1, minPoints: 1, maxPoints: 4, midpoint: 2.5 },
+      { level: 2, minPoints: 5, maxPoints: 8, midpoint: 6.5 },
+      { level: 3, minPoints: 9, maxPoints: 12, midpoint: 10.5 },
+      { level: 4, minPoints: 13, maxPoints: 16, midpoint: 14.5 },
+      { level: 5, minPoints: 17, maxPoints: 20, midpoint: 18.5 }
     ]
   },
   copy: {
@@ -67,12 +68,12 @@ const DIMENSIONS = {
     fullName: 'C - Copy (Evaluation & Rigor)',
     question: 'How do you know if AI output is good? Can you prove it?',
     levels: [
-      { level: 0, points: 0, description: 'No validation. Blind trust: "It looks right to me."' },
-      { level: 1, minPoints: 1, maxPoints: 4, midpoint: 2.5, description: '"Vibes check." Runs prompt once, manually reviews.' },
-      { level: 2, minPoints: 5, maxPoints: 8, midpoint: 6.5, description: 'Maintains test cases. Systematic manual Pass/Fail grading.' },
-      { level: 3, minPoints: 9, maxPoints: 12, midpoint: 10.5, description: 'A/B tests models. Comparative benchmarks. Uses eval tools.' },
-      { level: 4, minPoints: 13, maxPoints: 16, midpoint: 14.5, description: 'Automated evals. LLM-as-Judge. Quantified metrics (precision, recall).' },
-      { level: 5, minPoints: 17, maxPoints: 20, midpoint: 18.5, description: 'Statistical confidence intervals. CI/CD for prompts. Regression testing.' }
+      { level: 0, points: 0 },
+      { level: 1, minPoints: 1, maxPoints: 4, midpoint: 2.5 },
+      { level: 2, minPoints: 5, maxPoints: 8, midpoint: 6.5 },
+      { level: 3, minPoints: 9, maxPoints: 12, midpoint: 10.5 },
+      { level: 4, minPoints: 13, maxPoints: 16, midpoint: 14.5 },
+      { level: 5, minPoints: 17, maxPoints: 20, midpoint: 18.5 }
     ]
   },
   output: {
@@ -80,12 +81,12 @@ const DIMENSIONS = {
     fullName: 'O - Output (Deployment & Impact)',
     question: 'What have you built that others actually use? What value did it create?',
     levels: [
-      { level: 0, points: 0, description: 'Chat interface only. No deployment or workflow integration.' },
-      { level: 1, minPoints: 1, maxPoints: 5, midpoint: 3, description: 'Personal productivity (Copilot, ChatGPT Plus). Time savings only.' },
-      { level: 2, minPoints: 6, maxPoints: 10, midpoint: 8, description: 'Simple wrapper apps. Basic API integration. Likely negative ROI.' },
-      { level: 3, minPoints: 11, maxPoints: 15, midpoint: 13, description: 'Internal tools used by team. RAG pipelines. $10k+ verified savings.' },
-      { level: 4, minPoints: 16, maxPoints: 20, midpoint: 18, description: 'Production agentic systems. Revenue-generating. External users.' },
-      { level: 5, minPoints: 21, maxPoints: 25, midpoint: 23, description: 'Vertical AI platform. Fine-tuned models. $100k+ verified value.' }
+      { level: 0, points: 0 },
+      { level: 1, minPoints: 1, maxPoints: 5, midpoint: 3 },
+      { level: 2, minPoints: 6, maxPoints: 10, midpoint: 8 },
+      { level: 3, minPoints: 11, maxPoints: 15, midpoint: 13 },
+      { level: 4, minPoints: 16, maxPoints: 20, midpoint: 18 },
+      { level: 5, minPoints: 21, maxPoints: 25, midpoint: 23 }
     ]
   },
   research: {
@@ -93,12 +94,12 @@ const DIMENSIONS = {
     fullName: 'R - Research (Innovation & Contribution)',
     question: 'Do you advance the field or just consume it?',
     levels: [
-      { level: 0, points: 0, description: 'Treats AI as magic. No understanding of mechanisms.' },
-      { level: 1, minPoints: 1, maxPoints: 4, midpoint: 2.5, description: 'Conceptual understanding: tokens, temperature, context windows.' },
-      { level: 2, minPoints: 5, maxPoints: 8, midpoint: 6.5, description: 'Architectural knowledge. Understands Transformers. Implements papers.' },
-      { level: 3, minPoints: 9, maxPoints: 12, midpoint: 10.5, description: 'Contributes: fine-tunes models, publishes weights, shares methods.' },
-      { level: 4, minPoints: 13, maxPoints: 16, midpoint: 14.5, description: 'Researches: novel architectures, publishes at conferences.' },
-      { level: 5, minPoints: 17, maxPoints: 20, midpoint: 18.5, description: 'Invents: paradigm-shifting discoveries. Industry-recognized impact.' }
+      { level: 0, points: 0 },
+      { level: 1, minPoints: 1, maxPoints: 4, midpoint: 2.5 },
+      { level: 2, minPoints: 5, maxPoints: 8, midpoint: 6.5 },
+      { level: 3, minPoints: 9, maxPoints: 12, midpoint: 10.5 },
+      { level: 4, minPoints: 13, maxPoints: 16, midpoint: 14.5 },
+      { level: 5, minPoints: 17, maxPoints: 20, midpoint: 18.5 }
     ]
   },
   ethical: {
@@ -106,12 +107,12 @@ const DIMENSIONS = {
     fullName: 'Es - Ethical Security (Safety & Responsibility)',
     question: 'Can you be trusted with AI? Do you use it safely?',
     levels: [
-      { level: 0, points: 0, description: 'Dangerous. Pastes PII into public models. Ignores bias.' },
-      { level: 1, minPoints: 1, maxPoints: 3, midpoint: 2, description: 'Compliant. Follows rules. Uses only sanctioned tools.' },
-      { level: 2, minPoints: 4, maxPoints: 6, midpoint: 5, description: 'Cautious. Fact-checks outputs. Human-in-the-loop for decisions.' },
-      { level: 3, minPoints: 7, maxPoints: 9, midpoint: 8, description: 'Proactive. Tests for hallucinations. Documents failure modes.' },
-      { level: 4, minPoints: 10, maxPoints: 12, midpoint: 11, description: 'Guardian. Catches risks in others\' work. Designs safety protocols.' },
-      { level: 5, minPoints: 13, maxPoints: 15, midpoint: 14, description: 'Leader. Shapes org policies. Trains others on safe practices.' }
+      { level: 0, points: 0 },
+      { level: 1, minPoints: 1, maxPoints: 3, midpoint: 2 },
+      { level: 2, minPoints: 4, maxPoints: 6, midpoint: 5 },
+      { level: 3, minPoints: 7, maxPoints: 9, midpoint: 8 },
+      { level: 4, minPoints: 10, maxPoints: 12, midpoint: 11 },
+      { level: 5, minPoints: 13, maxPoints: 15, midpoint: 14 }
     ]
   }
 };
@@ -443,7 +444,7 @@ function calculateDualScores(levels, role, companyType, assessmentLevel) {
       rawPoints,
       weight,
       weightedScore: rawPoints * weight,
-      levelDescription: DIMENSIONS[dimKey].levels.find(l => l.level === dimLevel)?.description || ''
+      levelDescription: getLevelDescription(dimKey, dimLevel, role)
     };
   }
 
