@@ -1129,6 +1129,122 @@
                 </div>
             </div>
 
+            <!-- Weight Tables (v1.1) -->
+            <div class="collapsible" id="weights-section">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h2><span class="arrow">&#9654;</span> Scoring Weight Tables</h2>
+                    <span>How roles and company types affect your score</span>
+                </div>
+                <div class="collapsible-content">
+                    <p class="mb-4">Your final score is calculated by weighting each dimension differently based on your role. The weights shown below are for the <strong>combined score</strong> (legacy single-number view).</p>
+
+                    <h4 class="mb-2">Role Weights (Combined Score)</h4>
+                    <table class="matrix-table mb-6">
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>Study</th>
+                                <th>Copy</th>
+                                <th>Output</th>
+                                <th>Research</th>
+                                <th>Ethical</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>General</strong></td>
+                                <td>20%</td>
+                                <td>30%</td>
+                                <td>30%</td>
+                                <td>5%</td>
+                                <td>15%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Developer</strong></td>
+                                <td>10%</td>
+                                <td>25%</td>
+                                <td style="background: rgba(79, 70, 229, 0.1);"><strong>40%</strong></td>
+                                <td>15%</td>
+                                <td>10%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Researcher</strong></td>
+                                <td>15%</td>
+                                <td>25%</td>
+                                <td>25%</td>
+                                <td style="background: rgba(79, 70, 229, 0.1);"><strong>25%</strong></td>
+                                <td>10%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Support</strong></td>
+                                <td style="background: rgba(79, 70, 229, 0.1);"><strong>25%</strong></td>
+                                <td>20%</td>
+                                <td>30%</td>
+                                <td>10%</td>
+                                <td>15%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Leader</strong></td>
+                                <td style="background: rgba(79, 70, 229, 0.1);"><strong>30%</strong></td>
+                                <td>15%</td>
+                                <td>20%</td>
+                                <td>10%</td>
+                                <td style="background: rgba(79, 70, 229, 0.1);"><strong>25%</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 class="mb-2">Company Type Modifiers</h4>
+                    <p class="text-muted mb-3" style="font-size: var(--font-size-sm);">Company type applies a multiplier to base role weights, then renormalizes to 100%.</p>
+                    <table class="matrix-table mb-6">
+                        <thead>
+                            <tr>
+                                <th>Company Type</th>
+                                <th>Study</th>
+                                <th>Copy</th>
+                                <th>Output</th>
+                                <th>Research</th>
+                                <th>Ethical</th>
+                                <th>Philosophy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Startup</strong></td>
+                                <td>1.0x</td>
+                                <td style="background: rgba(244, 63, 94, 0.1);">0.7x</td>
+                                <td style="background: rgba(16, 185, 129, 0.1);"><strong>1.4x</strong></td>
+                                <td style="background: rgba(16, 185, 129, 0.1);">1.2x</td>
+                                <td style="background: rgba(244, 63, 94, 0.1);">0.7x</td>
+                                <td style="font-style: italic;">"Ship it, learn, iterate"</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Enterprise</strong></td>
+                                <td>1.0x</td>
+                                <td style="background: rgba(16, 185, 129, 0.1);"><strong>1.2x</strong></td>
+                                <td style="background: rgba(244, 63, 94, 0.1);">0.8x</td>
+                                <td>1.0x</td>
+                                <td>1.0x</td>
+                                <td style="font-style: italic;">"Reliable, scalable, governed"</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Aspirational</strong></td>
+                                <td style="background: rgba(244, 63, 94, 0.1);">0.8x</td>
+                                <td style="background: rgba(244, 63, 94, 0.1);">0.8x</td>
+                                <td>1.0x</td>
+                                <td style="background: rgba(16, 185, 129, 0.1);">1.2x</td>
+                                <td style="background: rgba(16, 185, 129, 0.1);"><strong>1.2x</strong></td>
+                                <td style="font-style: italic;">"Build AI the right way"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="best-for">
+                        <strong>Example:</strong> A Developer at a Startup would have Output weighted at 40% &times; 1.4 = 56% (before renormalization), emphasizing deployed AI solutions over governance.
+                    </div>
+                </div>
+            </div>
+
             <!-- Validation Matrix -->
             <div class="collapsible" id="matrix-section">
                 <div class="collapsible-header" onclick="toggleCollapsible(this)">

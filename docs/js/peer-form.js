@@ -22,6 +22,10 @@ async function initAssesseeForm() {
   const roleSelect = document.getElementById('assesseeRole');
   if (roleSelect) {
     populateRoleSelect(roleSelect, 'General');
+    // Update descriptions when role changes
+    roleSelect.addEventListener('change', function() {
+      updateAssesseeDimensionDescriptions(this.value);
+    });
   }
 
   // Populate company type dropdown
@@ -30,8 +34,8 @@ async function initAssesseeForm() {
     populateCompanyTypeSelect(companyTypeSelect, '', true);
   }
 
-  // Create dimension score dropdowns
-  createDimensionScoreInputs();
+  // Create dimension score dropdowns (with initial role)
+  createDimensionScoreInputs('General');
 
   // Check for prefill data from L1
   const prefillEncoded = getUrlParam('prefill');
@@ -79,8 +83,9 @@ async function initAssesseeForm() {
 
 /**
  * Create score dropdowns for each dimension
+ * @param {string} role - Current role for role-specific descriptions
  */
-function createDimensionScoreInputs() {
+function createDimensionScoreInputs(role = 'General') {
   const container = document.getElementById('dimensionScores');
   if (!container) return;
 
@@ -89,6 +94,7 @@ function createDimensionScoreInputs() {
   for (const [dimKey, dimData] of Object.entries(DIMENSIONS)) {
     const dimensionGroup = document.createElement('div');
     dimensionGroup.className = 'dimension-section mb-6';
+    dimensionGroup.setAttribute('data-dimension', dimKey);
 
     // Dimension header
     const header = document.createElement('div');
@@ -124,11 +130,13 @@ function createDimensionScoreInputs() {
     defaultOpt.textContent = 'Select your level...';
     select.appendChild(defaultOpt);
 
-    // Add level options (0-5)
+    // Add level options (0-5) with role-specific descriptions
     for (const levelData of dimData.levels) {
       const option = document.createElement('option');
       option.value = levelData.level;
-      option.textContent = `Level ${levelData.level}: ${levelData.description}`;
+      option.setAttribute('data-level', levelData.level);
+      const description = getLevelDescription(dimKey, levelData.level, role);
+      option.textContent = `Level ${levelData.level}: ${description}`;
       select.appendChild(option);
     }
 
@@ -144,8 +152,9 @@ function createDimensionScoreInputs() {
     // Update hint when selection changes
     select.addEventListener('change', (e) => {
       const level = parseInt(e.target.value);
+      const currentRole = document.getElementById('assesseeRole')?.value || 'General';
       if (!isNaN(level)) {
-        hint.textContent = getLevelDescription(dimKey, level);
+        hint.textContent = getLevelDescription(dimKey, level, currentRole);
         hint.style.color = 'var(--color-accent)';
       } else {
         hint.textContent = '';
@@ -154,6 +163,38 @@ function createDimensionScoreInputs() {
 
     dimensionGroup.appendChild(formGroup);
     container.appendChild(dimensionGroup);
+  }
+}
+
+/**
+ * Update dimension descriptions when role changes (assessee form)
+ * @param {string} role - New role
+ */
+function updateAssesseeDimensionDescriptions(role) {
+  for (const [dimKey, dimData] of Object.entries(DIMENSIONS)) {
+    const select = document.getElementById(`score_${dimKey}`);
+    if (!select) continue;
+
+    // Save current selection
+    const currentValue = select.value;
+
+    // Update option text for each level
+    for (const levelData of dimData.levels) {
+      const option = select.querySelector(`option[data-level="${levelData.level}"]`);
+      if (option) {
+        const description = getLevelDescription(dimKey, levelData.level, role);
+        option.textContent = `Level ${levelData.level}: ${description}`;
+      }
+    }
+
+    // Update hint if a value is selected
+    const hint = document.getElementById(`hint_${dimKey}`);
+    if (hint && currentValue !== '') {
+      const level = parseInt(currentValue);
+      if (!isNaN(level)) {
+        hint.textContent = getLevelDescription(dimKey, level, role);
+      }
+    }
   }
 }
 
@@ -572,7 +613,7 @@ function renderClaimedScores(data) {
             <select id="adjustLevel_${dimKey}" name="adjustLevel_${dimKey}" class="form-select">
               ${dimData.levels.map(l => `
                 <option value="${l.level}" ${l.level === claimedLevel ? 'selected' : ''}>
-                  Level ${l.level}: ${l.description}
+                  Level ${l.level}: ${getLevelDescription(dimKey, l.level, data.role)}
                 </option>
               `).join('')}
             </select>
@@ -1044,3 +1085,4 @@ window.completeValidation = completeValidation;
 window.downloadValidatedJSON = downloadValidatedJSON;
 window.downloadValidatedPDF = downloadValidatedPDF;
 window.copyCompletedUrl = copyCompletedUrl;
+window.updateAssesseeDimensionDescriptions = updateAssesseeDimensionDescriptions;

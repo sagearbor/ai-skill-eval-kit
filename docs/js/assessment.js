@@ -29,6 +29,8 @@ async function initAssessment() {
     populateRoleSelect(roleSelect, 'General');
     roleSelect.addEventListener('change', function() {
       currentRole = this.value;
+      // Update dimension descriptions for new role
+      updateDimensionDescriptions(currentRole);
     });
   }
 
@@ -82,11 +84,13 @@ async function initAssessment() {
 
 /**
  * Render HTML for a single dimension's assessment form
+ * Uses role-specific descriptions from level-descriptions.json
  * @param {string} dimensionKey - The dimension key (study, copy, etc.)
  * @param {object} dimensionData - The dimension data from DIMENSIONS
+ * @param {string} role - Current role for role-specific descriptions
  * @returns {string} HTML string for the dimension section
  */
-function renderDimensionForm(dimensionKey, dimensionData) {
+function renderDimensionForm(dimensionKey, dimensionData, role = 'General') {
   const letter = dimensionData.name.charAt(0).toUpperCase();
   const subtitle = dimensionData.fullName.split(' - ')[1] || dimensionData.fullName.split('(')[1]?.replace(')', '') || '';
 
@@ -96,13 +100,16 @@ function renderDimensionForm(dimensionKey, dimensionData) {
       ? '0 pts'
       : `${levelData.minPoints}-${levelData.maxPoints} pts`;
 
+    // Get description from level-descriptions.json based on role
+    const description = getLevelDescription(dimensionKey, levelData.level, role);
+
     radioCardsHtml += `
       <label class="radio-card" data-dimension="${dimensionKey}" data-level="${levelData.level}">
         <input type="radio" name="${dimensionKey}" value="${levelData.level}">
         <div class="radio-card-indicator"></div>
         <div class="radio-card-content">
           <div class="radio-card-label">Level ${levelData.level} (${pointsText})</div>
-          <div class="radio-card-desc">${escapeHtml(levelData.description)}</div>
+          <div class="radio-card-desc">${escapeHtml(description)}</div>
         </div>
       </label>
     `;
@@ -123,6 +130,56 @@ function renderDimensionForm(dimensionKey, dimensionData) {
       </div>
     </div>
   `;
+}
+
+/**
+ * Re-render all dimension forms with new role-specific descriptions
+ * Preserves current selections
+ * @param {string} role - The new role
+ */
+function updateDimensionDescriptions(role) {
+  // Save current selections
+  const selections = {};
+  for (const dimKey of Object.keys(DIMENSIONS)) {
+    const selected = document.querySelector(`input[name="${dimKey}"]:checked`);
+    if (selected) {
+      selections[dimKey] = selected.value;
+    }
+  }
+
+  // Re-render each dimension's descriptions
+  for (const [dimKey, dimData] of Object.entries(DIMENSIONS)) {
+    const section = document.querySelector(`.dimension-section[data-dimension="${dimKey}"]`);
+    if (!section) continue;
+
+    // Update each radio card's description
+    for (const levelData of dimData.levels) {
+      const card = section.querySelector(`.radio-card[data-level="${levelData.level}"]`);
+      if (!card) continue;
+
+      const descEl = card.querySelector('.radio-card-desc');
+      if (descEl) {
+        const description = getLevelDescription(dimKey, levelData.level, role);
+        descEl.textContent = description;
+      }
+    }
+  }
+
+  // Restore selections
+  for (const [dimKey, value] of Object.entries(selections)) {
+    const radio = document.querySelector(`input[name="${dimKey}"][value="${value}"]`);
+    if (radio) {
+      radio.checked = true;
+      const card = radio.closest('.radio-card');
+      if (card) {
+        // Re-apply selected class
+        document.querySelectorAll(`.radio-card[data-dimension="${dimKey}"]`).forEach(c => {
+          c.classList.remove('selected');
+        });
+        card.classList.add('selected');
+      }
+    }
+  }
 }
 
 /**
