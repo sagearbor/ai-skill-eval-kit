@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIQ Analytics Dashboard</title>
     <link rel="stylesheet" href="../css/styles.css">
@@ -1402,10 +1403,16 @@
                 });
 
                 // Extract calculation/score data
+                // v1.1 uses personalScore as primary (individual readiness)
+                // v1.0 fallback uses normalizedScore at top level
                 const calc = report.calculation || report.scores || {};
-                normalized.score = calc.normalizedScore || calc.finalScore || 0;
-                normalized.band = calc.scoreBand || calc.band || 'Unknown';
+                normalized.score = calc.personalScore?.normalizedScore || calc.normalizedScore || calc.finalScore || 0;
+                normalized.band = calc.personalScore?.scoreBand || calc.scoreBand || calc.band || 'Unknown';
                 normalized.confidence = calc.confidence || 'LOW';
+
+                // Store corporate score separately for dual-score views
+                normalized.corporateScore = calc.corporateScore?.normalizedScore || null;
+                normalized.gap = calc.gap || null;
 
                 return normalized;
             });

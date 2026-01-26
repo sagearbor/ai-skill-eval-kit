@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AIQ Self-Assessment | Level 1</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/nav.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv.bundle.min.js" defer></script>
   <style>
     /* Dual Score Display Styles */
     .dual-score-container {
@@ -90,22 +91,86 @@
       color: var(--color-text-muted);
     }
 
-    .legacy-score-toggle {
-      margin-top: var(--space-4);
-      padding-top: var(--space-4);
-      border-top: 1px solid var(--color-border);
+    /* Info Tooltip Styles - Click-based for mobile support */
+    .info-tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      vertical-align: middle;
+      margin-left: var(--space-2);
     }
 
-    .legacy-score-section {
+    .info-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--color-border);
+      color: var(--color-text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .info-tooltip:hover .info-icon,
+    .info-tooltip.active .info-icon {
+      background: var(--color-accent);
+      color: white;
+    }
+
+    .info-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: var(--space-2);
+      padding: var(--space-4);
       background: var(--color-bg);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-lg);
-      padding: var(--space-5);
-      margin-top: var(--space-4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      width: 280px;
+      font-size: var(--font-size-sm);
+      font-weight: normal;
+      text-align: left;
+      z-index: 100;
+      line-height: 1.5;
     }
 
-    .legacy-score-section .score-display {
-      margin-bottom: 0;
+    /* Show on click (via .active class) */
+    .info-tooltip.active .info-content {
+      display: block;
+    }
+
+    .info-content strong {
+      color: var(--color-text);
+    }
+
+    /* Close button for tooltip */
+    .info-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      padding: 0;
+      line-height: 1;
+    }
+
+    .info-close:hover {
+      color: var(--color-text);
+    }
+
+    .info-content em {
+      color: var(--color-accent);
+      font-style: normal;
+      font-weight: 500;
     }
   </style>
 </head>
@@ -287,7 +352,22 @@
 
         <!-- Dual Score Display (v1.1) -->
         <div class="results-container">
-          <h2 class="text-center mb-6">Your AIQ Results</h2>
+          <h2 class="text-center mb-6">
+            Your AIQ Results
+            <span class="info-tooltip" id="dual-score-info" onclick="toggleTooltip(this, event)">
+              <span class="info-icon">?</span>
+              <span class="info-content" id="dual-score-tooltip-content">
+                <button class="info-close" onclick="closeTooltip(event)">&times;</button>
+                <strong>Why two scores?</strong><br><br>
+                <strong>Personal Readiness</strong> measures your individual AI knowledge.<br>
+                <em id="personal-emphasis">Emphasizes Study + Copy</em><br><br>
+                <strong>Corporate Impact</strong> measures deployment in practice.<br>
+                <em id="corporate-emphasis">Emphasizes Output + Ethical</em><br><br>
+                A gap shows when skills don't match deployment opportunities.<br><br>
+                <a href="reference.html#dual-weights" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent);">View weight tables →</a>
+              </span>
+            </span>
+          </h2>
 
           <!-- Dual Score Cards -->
           <div class="dual-score-container" id="dual-score-display">
@@ -337,22 +417,6 @@
           <!-- Confidence Badge -->
           <div class="text-center mb-6">
             <span id="confidence-badge" class="badge badge-low">Confidence: LOW (0.70x)</span>
-          </div>
-
-          <!-- Legacy Score Toggle -->
-          <div class="legacy-score-toggle">
-            <label class="form-check">
-              <input type="checkbox" class="form-check-input" id="show-combined-score" onchange="toggleCombinedScore()">
-              <span class="form-check-label">Show combined score (legacy single-number view)</span>
-            </label>
-
-            <div id="combined-score-section" class="legacy-score-section hidden">
-              <div class="score-display">
-                <div class="score-value" id="score-value">0</div>
-                <div class="score-label">Combined AIQ Score</div>
-                <div id="score-band" class="score-band">--</div>
-              </div>
-            </div>
           </div>
 
           <!-- Dimension Breakdown -->

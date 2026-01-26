@@ -57,12 +57,6 @@ async function initAssessment() {
     }
   }
 
-  // Check for ?scoreType=combined URL param
-  const scoreType = getUrlParam('scoreType');
-  if (scoreType === 'combined') {
-    // Will be handled in results display
-  }
-
   // Populate point distribution dropdown
   const distributionSelect = document.getElementById('point-distribution-select');
   if (distributionSelect) {
@@ -379,8 +373,8 @@ function drawConfidenceChart(scoreData) {
   // Clear canvas
   ctx.clearRect(0, 0, width, height);
 
-  // Get the combined score's raw score (before multiplier)
-  const rawScore = scoreData.combinedScore.range.rawScore;
+  // Get the personal score's raw score (before multiplier) - primary score for individuals
+  const rawScore = scoreData.personalScore.range.rawScore;
   const currentLevel = scoreData.assessmentLevel || 1;
 
   // Calculate scores and ranges for each level
@@ -539,16 +533,11 @@ function calculateAndShowResults() {
   if (resultsSection) {
     resultsSection.classList.remove('hidden');
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
 
-  // Check for ?scoreType=combined and auto-toggle if needed
-  const scoreType = getUrlParam('scoreType');
-  if (scoreType === 'combined') {
-    const checkbox = document.getElementById('show-combined-score');
-    if (checkbox) {
-      checkbox.checked = true;
-      toggleCombinedScore();
-    }
+    // Draw bell curve after section is visible (needs DOM to have updated dimensions)
+    requestAnimationFrame(() => {
+      drawConfidenceChart(currentResults);
+    });
   }
 }
 
@@ -593,8 +582,8 @@ function renderResults(scoreData, role, companyType) {
     corporateBandEl.className = `score-card-band band-${scoreData.corporateScore.scoreBand.toLowerCase()}`;
   }
 
-  // Draw bell curve visualization
-  drawConfidenceChart(scoreData);
+  // Note: Bell curve visualization is drawn after results section is visible
+  // (called from calculateAndShowResults)
 
   // Gap display
   const gapValueEl = document.getElementById('gap-value');
@@ -621,19 +610,6 @@ function renderResults(scoreData, role, companyType) {
   const gapActionEl = document.getElementById('gap-action');
   if (gapActionEl) {
     gapActionEl.textContent = `Recommended: ${scoreData.gapInterpretation.action}`;
-  }
-
-  // Combined score (legacy)
-  const scoreValueEl = document.getElementById('score-value');
-  if (scoreValueEl) {
-    scoreValueEl.textContent = scoreData.combinedScore.normalizedScore;
-  }
-
-  const scoreBandEl = document.getElementById('score-band');
-  if (scoreBandEl) {
-    const bandClass = `band-${scoreData.combinedScore.scoreBand.toLowerCase()}`;
-    scoreBandEl.textContent = scoreData.combinedScore.scoreBand;
-    scoreBandEl.className = `score-band ${bandClass}`;
   }
 
   // Confidence badge
@@ -687,30 +663,37 @@ function renderResults(scoreData, role, companyType) {
   const calcDetailsEl = document.getElementById('calc-details');
   if (calcDetailsEl) {
     calcDetailsEl.innerHTML = `
-      <strong>Dual Scoring (v1.1):</strong><br>
-      Personal Readiness: ${scoreData.personalScore.normalizedScore} (${scoreData.personalScore.scoreBand})<br>
-      Corporate Impact: ${scoreData.corporateScore.normalizedScore} (${scoreData.corporateScore.scoreBand})<br>
-      Gap: ${scoreData.gap > 0 ? '+' : ''}${scoreData.gap} points<br><br>
-      <strong>Combined (legacy):</strong> ${scoreData.combinedScore.normalizedScore} &times; ${scoreData.evidenceMultiplier} = <strong>${scoreData.combinedScore.normalizedScore}</strong>
+      <strong>Personal Readiness:</strong> ${scoreData.personalScore.normalizedScore} (${scoreData.personalScore.scoreBand})<br>
+      <strong>Corporate Impact:</strong> ${scoreData.corporateScore.normalizedScore} (${scoreData.corporateScore.scoreBand})<br>
+      <strong>Gap:</strong> ${scoreData.gap > 0 ? '+' : ''}${scoreData.gap} points &mdash; ${scoreData.gapInterpretation.meaning}
     `;
   }
+
+  // Update tooltip with dynamic weight emphasis
+  updateDualScoreTooltip(role, companyType);
 }
 
 /**
- * Toggle combined score display
+ * Update the dual score info tooltip with dynamic weight percentages
+ * @param {string} role - Current role
+ * @param {string} companyType - Current company type
  */
-function toggleCombinedScore() {
-  const checkbox = document.getElementById('show-combined-score');
-  const section = document.getElementById('combined-score-section');
+function updateDualScoreTooltip(role, companyType) {
+  const personalWeights = getWeightsForScoreType('personal', role, companyType);
+  const corporateWeights = getWeightsForScoreType('corporate', role, companyType);
 
-  if (checkbox && section) {
-    if (checkbox.checked) {
-      section.classList.remove('hidden');
-      setUrlParam('scoreType', 'combined');
-    } else {
-      section.classList.add('hidden');
-      removeUrlParam('scoreType');
-    }
+  // Calculate emphasis percentages
+  const personalKnowledge = Math.round((personalWeights.study + personalWeights.copy) * 100);
+  const corporateDeployment = Math.round((corporateWeights.output + corporateWeights.ethical) * 100);
+
+  const personalEl = document.getElementById('personal-emphasis');
+  if (personalEl) {
+    personalEl.textContent = `Emphasizes Study + Copy (${personalKnowledge}% for ${role})`;
+  }
+
+  const corporateEl = document.getElementById('corporate-emphasis');
+  if (corporateEl) {
+    corporateEl.textContent = `Emphasizes Output + Ethical (${corporateDeployment}% for ${role})`;
   }
 }
 
@@ -1130,15 +1113,67 @@ function updateDistributionPreview() {
 }
 
 // =============================================================================
+// TOOLTIP FUNCTIONS
+// =============================================================================
+
+/**
+ * Toggle info tooltip open/closed
+ * @param {HTMLElement} element - The tooltip container
+ * @param {Event} event - Click event
+ */
+function toggleTooltip(element, event) {
+  // Don't toggle if clicking on the link inside
+  if (event.target.tagName === 'A') return;
+
+  event.stopPropagation();
+  element.classList.toggle('active');
+
+  // Close when clicking outside
+  if (element.classList.contains('active')) {
+    document.addEventListener('click', closeAllTooltips);
+  }
+}
+
+/**
+ * Close tooltip from close button
+ * @param {Event} event - Click event
+ */
+function closeTooltip(event) {
+  event.stopPropagation();
+  const tooltip = event.target.closest('.info-tooltip');
+  if (tooltip) {
+    tooltip.classList.remove('active');
+  }
+  document.removeEventListener('click', closeAllTooltips);
+}
+
+/**
+ * Close all open tooltips (used for clicking outside)
+ * @param {Event} event - Click event
+ */
+function closeAllTooltips(event) {
+  const tooltips = document.querySelectorAll('.info-tooltip.active');
+  tooltips.forEach(tooltip => {
+    if (!tooltip.contains(event.target)) {
+      tooltip.classList.remove('active');
+    }
+  });
+  if (document.querySelectorAll('.info-tooltip.active').length === 0) {
+    document.removeEventListener('click', closeAllTooltips);
+  }
+}
+
+// =============================================================================
 // EXPORT TO GLOBAL SCOPE
 // =============================================================================
 
-window.toggleCombinedScore = toggleCombinedScore;
 window.handleDistributionChange = handleDistributionChange;
 window.populateDistributionSelect = populateDistributionSelect;
 window.updateDistributionPreview = updateDistributionPreview;
 window.updatePointLabels = updatePointLabels;
 window.shareSettings = shareSettings;
+window.toggleTooltip = toggleTooltip;
+window.closeTooltip = closeTooltip;
 
 // =============================================================================
 // DOCUMENT READY
