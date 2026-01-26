@@ -1,11 +1,13 @@
 /**
  * AIQ Assessment Tools - Level 1 Self-Assessment
  * Handles the self-assessment survey logic and scoring
+ * Version 1.1 - Dual scoring support (Personal Readiness + Corporate Impact)
  */
 
 // Store current results for download functions
 let currentResults = null;
 let currentRole = 'General';
+let currentCompanyType = '';
 let currentLevels = null;
 let currentName = '';
 let currentEmail = '';
@@ -17,7 +19,10 @@ let currentEmail = '';
 /**
  * Initialize the assessment page on DOM ready
  */
-function initAssessment() {
+async function initAssessment() {
+  // Wait for shared config to load
+  await initShared();
+
   // Populate role dropdown
   const roleSelect = document.getElementById('role-select');
   if (roleSelect) {
@@ -25,6 +30,28 @@ function initAssessment() {
     roleSelect.addEventListener('change', function() {
       currentRole = this.value;
     });
+  }
+
+  // Populate company type dropdown
+  const companyTypeSelect = document.getElementById('company-type-select');
+  if (companyTypeSelect) {
+    populateCompanyTypeSelect(companyTypeSelect, '', true);
+    companyTypeSelect.addEventListener('change', function() {
+      currentCompanyType = this.value;
+    });
+
+    // Check for URL param
+    const urlCompanyType = getUrlParam('companyType');
+    if (urlCompanyType && COMPANY_TYPES.includes(urlCompanyType)) {
+      companyTypeSelect.value = urlCompanyType;
+      currentCompanyType = urlCompanyType;
+    }
+  }
+
+  // Check for ?scoreType=combined URL param
+  const scoreType = getUrlParam('scoreType');
+  if (scoreType === 'combined') {
+    // Will be handled in results display
   }
 
   // Generate dimension forms
@@ -215,19 +242,21 @@ function calculateAndShowResults() {
     return;
   }
 
-  // Get name, email, role and answers
+  // Get name, email, role, company type and answers
   currentName = nameInput.value.trim();
   const emailInput = document.getElementById('assessee-email');
   currentEmail = emailInput ? emailInput.value.trim() : '';
   const roleSelect = document.getElementById('role-select');
   currentRole = roleSelect ? roleSelect.value : 'General';
+  const companyTypeSelect = document.getElementById('company-type-select');
+  currentCompanyType = companyTypeSelect ? companyTypeSelect.value : '';
   currentLevels = collectAnswers();
 
-  // Calculate score (assessment level is always 1 for L1)
-  currentResults = calculateAIQScore(currentLevels, currentRole, 1);
+  // Calculate score using dual scoring (assessment level is always 1 for L1)
+  currentResults = calculateDualScores(currentLevels, currentRole, currentCompanyType || null, 1);
 
   // Render results
-  renderResults(currentResults, currentRole);
+  renderResults(currentResults, currentRole, currentCompanyType);
 
   // Check for gaming
   if (checkForGaming(currentLevels)) {
@@ -242,25 +271,86 @@ function calculateAndShowResults() {
     resultsSection.classList.remove('hidden');
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
+
+  // Check for ?scoreType=combined and auto-toggle if needed
+  const scoreType = getUrlParam('scoreType');
+  if (scoreType === 'combined') {
+    const checkbox = document.getElementById('show-combined-score');
+    if (checkbox) {
+      checkbox.checked = true;
+      toggleCombinedScore();
+    }
+  }
 }
 
 /**
- * Render the results display
- * @param {object} scoreData - Score data from calculateAIQScore
+ * Render the results display (v1.1 dual scoring)
+ * @param {object} scoreData - Score data from calculateDualScores
  * @param {string} role - Selected role
+ * @param {string} companyType - Selected company type
  */
-function renderResults(scoreData, role) {
-  // Score value
-  const scoreValueEl = document.getElementById('score-value');
-  if (scoreValueEl) {
-    scoreValueEl.textContent = scoreData.normalizedScore;
+function renderResults(scoreData, role, companyType) {
+  // Personal score
+  const personalValueEl = document.getElementById('personal-score-value');
+  if (personalValueEl) {
+    personalValueEl.textContent = scoreData.personalScore.normalizedScore;
   }
 
-  // Score band
+  const personalBandEl = document.getElementById('personal-score-band');
+  if (personalBandEl) {
+    personalBandEl.textContent = scoreData.personalScore.scoreBand;
+    personalBandEl.className = `score-card-band band-${scoreData.personalScore.scoreBand.toLowerCase()}`;
+  }
+
+  // Corporate score
+  const corporateValueEl = document.getElementById('corporate-score-value');
+  if (corporateValueEl) {
+    corporateValueEl.textContent = scoreData.corporateScore.normalizedScore;
+  }
+
+  const corporateBandEl = document.getElementById('corporate-score-band');
+  if (corporateBandEl) {
+    corporateBandEl.textContent = scoreData.corporateScore.scoreBand;
+    corporateBandEl.className = `score-card-band band-${scoreData.corporateScore.scoreBand.toLowerCase()}`;
+  }
+
+  // Gap display
+  const gapValueEl = document.getElementById('gap-value');
+  if (gapValueEl) {
+    const gapSign = scoreData.gap > 0 ? '+' : '';
+    gapValueEl.textContent = `Gap: ${gapSign}${scoreData.gap} points`;
+
+    // Color based on gap
+    gapValueEl.classList.remove('gap-positive', 'gap-negative', 'gap-balanced');
+    if (scoreData.gap > 10) {
+      gapValueEl.classList.add('gap-positive');
+    } else if (scoreData.gap < -10) {
+      gapValueEl.classList.add('gap-negative');
+    } else {
+      gapValueEl.classList.add('gap-balanced');
+    }
+  }
+
+  const gapInterpEl = document.getElementById('gap-interpretation');
+  if (gapInterpEl) {
+    gapInterpEl.textContent = scoreData.gapInterpretation.meaning;
+  }
+
+  const gapActionEl = document.getElementById('gap-action');
+  if (gapActionEl) {
+    gapActionEl.textContent = `Recommended: ${scoreData.gapInterpretation.action}`;
+  }
+
+  // Combined score (legacy)
+  const scoreValueEl = document.getElementById('score-value');
+  if (scoreValueEl) {
+    scoreValueEl.textContent = scoreData.combinedScore.normalizedScore;
+  }
+
   const scoreBandEl = document.getElementById('score-band');
   if (scoreBandEl) {
-    const bandClass = `band-${scoreData.scoreBand.name.toLowerCase()}`;
-    scoreBandEl.textContent = scoreData.scoreBand.name;
+    const bandClass = `band-${scoreData.combinedScore.scoreBand.toLowerCase()}`;
+    scoreBandEl.textContent = scoreData.combinedScore.scoreBand;
     scoreBandEl.className = `score-band ${bandClass}`;
   }
 
@@ -275,6 +365,12 @@ function renderResults(scoreData, role) {
   const resultRoleEl = document.getElementById('result-role');
   if (resultRoleEl) {
     resultRoleEl.textContent = role;
+  }
+
+  // Company type display
+  const resultCompanyTypeEl = document.getElementById('result-company-type');
+  if (resultCompanyTypeEl) {
+    resultCompanyTypeEl.textContent = companyType ? ` | Company: ${companyType}` : '';
   }
 
   // Dimension breakdown table
@@ -308,11 +404,31 @@ function renderResults(scoreData, role) {
   // Calculation details
   const calcDetailsEl = document.getElementById('calc-details');
   if (calcDetailsEl) {
-    const maxPossible = getMaxWeightedScore(role);
     calcDetailsEl.innerHTML = `
-      Raw Total: ${scoreData.rawWeightedTotal.toFixed(2)} &times; ${scoreData.evidenceMultiplier} (evidence multiplier) = ${scoreData.finalWeightedScore.toFixed(2)}<br>
-      Normalized: ${scoreData.finalWeightedScore.toFixed(2)} / ${maxPossible.toFixed(2)} (max for ${role}) &times; 100 = <strong>${scoreData.normalizedScore}</strong>
+      <strong>Dual Scoring (v1.1):</strong><br>
+      Personal Readiness: ${scoreData.personalScore.normalizedScore} (${scoreData.personalScore.scoreBand})<br>
+      Corporate Impact: ${scoreData.corporateScore.normalizedScore} (${scoreData.corporateScore.scoreBand})<br>
+      Gap: ${scoreData.gap > 0 ? '+' : ''}${scoreData.gap} points<br><br>
+      <strong>Combined (legacy):</strong> ${scoreData.combinedScore.normalizedScore} &times; ${scoreData.evidenceMultiplier} = <strong>${scoreData.combinedScore.normalizedScore}</strong>
     `;
+  }
+}
+
+/**
+ * Toggle combined score display
+ */
+function toggleCombinedScore() {
+  const checkbox = document.getElementById('show-combined-score');
+  const section = document.getElementById('combined-score-section');
+
+  if (checkbox && section) {
+    if (checkbox.checked) {
+      section.classList.remove('hidden');
+      setUrlParam('scoreType', 'combined');
+    } else {
+      section.classList.add('hidden');
+      removeUrlParam('scoreType');
+    }
   }
 }
 
@@ -351,6 +467,7 @@ async function downloadJSON() {
     assesseeName: currentName,
     assesseeEmail: currentEmail,
     role: currentRole,
+    companyType: currentCompanyType || null,
     levels: currentLevels,
     assessmentLevel: 1
   });
@@ -377,7 +494,7 @@ async function downloadJSON() {
 }
 
 /**
- * Download PDF summary using html2pdf
+ * Download PDF summary using html2pdf (v1.1 dual scoring)
  */
 function downloadPDF() {
   if (!currentResults || !currentLevels) {
@@ -385,15 +502,13 @@ function downloadPDF() {
     return;
   }
 
-  // Create simple HTML template (table-based for PDF compatibility)
-  const bandClass = currentResults.scoreBand.name.toLowerCase();
   const reportId = generateReportId();
   const dateStr = formatISODate();
 
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
       <h1 style="text-align: center; color: #0f172a; margin-bottom: 5px;">AIQ Assessment Report</h1>
-      <p style="text-align: center; color: #64748b; margin-top: 0;">Level 1: Self-Assessment</p>
+      <p style="text-align: center; color: #64748b; margin-top: 0;">Level 1: Self-Assessment (v1.1 Dual Scoring)</p>
 
       <table style="width: 100%; margin: 30px 0; border-collapse: collapse;">
         <tr>
@@ -412,17 +527,43 @@ function downloadPDF() {
           <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;"><strong>Role:</strong></td>
           <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">${currentRole}</td>
         </tr>
+        ${currentCompanyType ? `
+        <tr>
+          <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;"><strong>Company Type:</strong></td>
+          <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">${currentCompanyType}</td>
+        </tr>
+        ` : ''}
       </table>
 
-      <div style="text-align: center; background: #f8fafc; padding: 30px; border-radius: 12px; margin: 20px 0;">
-        <div style="font-size: 48px; font-weight: bold; color: #0f172a;">${currentResults.normalizedScore}</div>
-        <div style="color: #64748b; margin-top: 5px;">AIQ Score</div>
-        <div style="display: inline-block; padding: 8px 16px; background: #4f46e5; color: white; border-radius: 6px; margin-top: 15px; font-weight: 600;">
-          ${currentResults.scoreBand.name}
+      <!-- Dual Scores -->
+      <div style="display: flex; gap: 20px; margin: 20px 0;">
+        <div style="flex: 1; text-align: center; background: #f8fafc; padding: 20px; border-radius: 12px;">
+          <div style="font-size: 12px; color: #64748b; text-transform: uppercase; margin-bottom: 5px;">Personal Readiness</div>
+          <div style="font-size: 36px; font-weight: bold; color: #0f172a;">${currentResults.personalScore.normalizedScore}</div>
+          <div style="display: inline-block; padding: 4px 12px; background: #4f46e5; color: white; border-radius: 6px; margin-top: 8px; font-size: 12px;">
+            ${currentResults.personalScore.scoreBand}
+          </div>
         </div>
-        <div style="margin-top: 10px; color: #64748b; font-size: 14px;">
-          Confidence: ${currentResults.confidence} (${currentResults.evidenceMultiplier}x)
+        <div style="flex: 1; text-align: center; background: #f8fafc; padding: 20px; border-radius: 12px;">
+          <div style="font-size: 12px; color: #64748b; text-transform: uppercase; margin-bottom: 5px;">Corporate Impact</div>
+          <div style="font-size: 36px; font-weight: bold; color: #0f172a;">${currentResults.corporateScore.normalizedScore}</div>
+          <div style="display: inline-block; padding: 4px 12px; background: #4f46e5; color: white; border-radius: 6px; margin-top: 8px; font-size: 12px;">
+            ${currentResults.corporateScore.scoreBand}
+          </div>
         </div>
+      </div>
+
+      <!-- Gap -->
+      <div style="text-align: center; background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
+        <div style="font-size: 16px; font-weight: bold; color: ${currentResults.gap > 10 ? '#22c55e' : currentResults.gap < -10 ? '#f59e0b' : '#4f46e5'};">
+          Gap: ${currentResults.gap > 0 ? '+' : ''}${currentResults.gap} points
+        </div>
+        <div style="font-size: 14px; color: #64748b; margin-top: 5px;">${currentResults.gapInterpretation.meaning}</div>
+        <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">Recommended: ${currentResults.gapInterpretation.action}</div>
+      </div>
+
+      <div style="text-align: center; margin: 15px 0; color: #64748b; font-size: 12px;">
+        Confidence: ${currentResults.confidence} (${currentResults.evidenceMultiplier}x)
       </div>
 
       <h3 style="color: #0f172a; margin-top: 30px;">Dimension Breakdown</h3>
@@ -446,21 +587,11 @@ function downloadPDF() {
               <td style="padding: 10px; text-align: right; border-bottom: 1px solid #e2e8f0;">${dimData.weightedScore.toFixed(2)}</td>
             </tr>
           `).join('')}
-          <tr style="font-weight: bold;">
-            <td colspan="4" style="padding: 10px; border-top: 2px solid #e2e8f0;">Total (before multiplier)</td>
-            <td style="padding: 10px; text-align: right; border-top: 2px solid #e2e8f0;">${currentResults.rawWeightedTotal.toFixed(2)}</td>
-          </tr>
         </tbody>
       </table>
 
-      <div style="margin-top: 30px; padding: 15px; background: #f8fafc; border-radius: 8px; font-size: 14px;">
-        <strong>Score Calculation:</strong><br>
-        Raw Total (${currentResults.rawWeightedTotal.toFixed(2)}) x Evidence Multiplier (${currentResults.evidenceMultiplier}) = ${currentResults.finalWeightedScore.toFixed(2)}<br>
-        Normalized to 0-100 scale = <strong>${currentResults.normalizedScore}</strong>
-      </div>
-
       <div style="margin-top: 30px; text-align: center; color: #64748b; font-size: 12px;">
-        <p>Universal AIQ Framework - Level 1 Self-Assessment</p>
+        <p>Universal AIQ Framework - Level 1 Self-Assessment (v1.1)</p>
         <p>For higher confidence scores, complete Level 2 (Peer Validation) or Level 3 (Evidence Collection)</p>
       </div>
     </div>
@@ -500,6 +631,7 @@ function goToPeerReview() {
     name: currentName,
     email: currentEmail,
     role: currentRole,
+    companyType: currentCompanyType,
     levels: currentLevels,
     fromL1: true
   };
@@ -507,6 +639,12 @@ function goToPeerReview() {
   const encoded = encodeState(stateData);
   window.location.href = `level2.html?prefill=${encoded}`;
 }
+
+// =============================================================================
+// EXPORT TO GLOBAL SCOPE
+// =============================================================================
+
+window.toggleCombinedScore = toggleCombinedScore;
 
 // =============================================================================
 // DOCUMENT READY
