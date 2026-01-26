@@ -1,0 +1,67 @@
+date: 2026-01-26
+time: "01:35"
+session_type: implementation
+description: "Implement v1.1 Role & Company Weights spec with dual scoring"
+
+changes:
+  - path: docs/config/weights-config.json
+    action: created
+    summary: "New config file with all three score types (personal, corporate, combined) and company modifiers (Startup, Enterprise, Aspirational)"
+
+  - path: docs/config/level-descriptions.json
+    action: created
+    summary: "New config file with universal (study, copy) and role-specific (output, research, ethical) level descriptions"
+
+  - path: docs/schemas/aiq-report-v1.schema.json
+    action: modified
+    summary: "Updated to v1.1 - added companyType, role enum, personalScore, corporateScore, gap, combinedScore fields"
+
+  - path: docs/js/shared.js
+    action: modified
+    summary: "Added dual scoring functions: loadWeightsConfig, loadLevelDescriptions, applyCompanyModifier, calculateDualScores, getGapInterpretation. Updated ROLES to 5 roles: General, Developer, Researcher, Support, Leader"
+
+  - path: docs/js/assessment.js
+    action: modified
+    summary: "Updated to use dual scoring, render Personal/Corporate/Gap results, handle URL params (?scoreType=combined, ?companyType=), update PDF export for dual scores"
+
+  - path: docs/js/peer-form.js
+    action: modified
+    summary: "Updated generateValidatedReport for v1.1 schema, include companyType in state, dual score display in results"
+
+  - path: docs/level1.html
+    action: modified
+    summary: "Added Company Type dropdown, dual score card display, gap interpretation, legacy combined score toggle"
+
+  - path: docs/level2.html
+    action: modified
+    summary: "Added Company Type dropdown after Role field"
+
+  - path: docs/level2-validate.html
+    action: modified
+    summary: "Added dual score CSS, company type display, results-container class for JS targeting"
+
+discoveries:
+  - "Task tool has permission issues with temp directory - EACCES errors when trying to run background agents"
+  - "Port 8006 was already in use from previous testing"
+  - "Schema validation tools (npx ajv, node ajv) not installed - used JSON.parse for basic validation"
+
+decisions:
+  - "Replaced calculateAIQScore entirely (no backward compat needed per user)"
+  - "Default shows dual scores (Personal + Corporate + Gap)"
+  - "?scoreType=combined shows legacy single score via checkbox toggle"
+  - "Skipped 'Show all profiles' feature for v1.1"
+  - "Level descriptions use universal + roleSpecific structure to avoid repetition"
+  - "5 roles: General, Developer, Researcher, Support, Leader"
+  - "3 company types: Startup, Enterprise, Aspirational"
+
+testing:
+  - "All JSON files validate as proper JSON"
+  - "All JS files pass syntax check (node --check)"
+  - "Manual testing needed: run `cd docs && python -m http.server 8006` and test L1/L2 flows"
+
+next_steps:
+  - "Manual browser testing of L1 assessment flow with company type selection"
+  - "Test L2 peer validation flow with company type in URL state"
+  - "Verify JSON export validates against new schema"
+  - "Test PDF export shows dual scores"
+  - "Consider adding schema validation via npm install ajv in package.json"

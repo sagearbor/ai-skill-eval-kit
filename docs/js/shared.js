@@ -1,37 +1,48 @@
 /**
  * AIQ Assessment Tools - Shared Utilities
  * Common constants and functions used across all assessment levels
+ * Version 1.1 - Adds dual scoring (Personal Readiness + Corporate Impact)
  */
 
 // =============================================================================
-// ROLE WEIGHTS
-// =============================================================================
-
-const ROLE_WEIGHTS = {
-  'General': { study: 0.20, copy: 0.20, output: 0.30, research: 0.15, ethical: 0.15 },
-  'Software Engineer': { study: 0.10, copy: 0.25, output: 0.40, research: 0.15, ethical: 0.10 },
-  'Data / ML Engineer': { study: 0.15, copy: 0.30, output: 0.25, research: 0.20, ethical: 0.10 },
-  'Product Manager': { study: 0.25, copy: 0.25, output: 0.30, research: 0.10, ethical: 0.10 },
-  'Research Scientist': { study: 0.15, copy: 0.20, output: 0.10, research: 0.45, ethical: 0.10 },
-  'Executive / Leader': { study: 0.30, copy: 0.15, output: 0.20, research: 0.10, ethical: 0.25 },
-  'Operations / Support': { study: 0.20, copy: 0.15, output: 0.40, research: 0.10, ethical: 0.15 },
-  'Legal / Compliance': { study: 0.25, copy: 0.15, output: 0.15, research: 0.10, ethical: 0.35 }
-};
-
-// =============================================================================
-// ROLES LIST
+// ROLES & COMPANY TYPES (v1.1)
 // =============================================================================
 
 const ROLES = [
   'General',
-  'Software Engineer',
-  'Data / ML Engineer',
-  'Product Manager',
-  'Research Scientist',
-  'Executive / Leader',
-  'Operations / Support',
-  'Legal / Compliance'
+  'Developer',
+  'Researcher',
+  'Support',
+  'Leader'
 ];
+
+const COMPANY_TYPES = [
+  'Startup',
+  'Enterprise',
+  'Aspirational'
+];
+
+// =============================================================================
+// FALLBACK ROLE WEIGHTS (used before config loads)
+// These are the "combined" weights for backwards compatibility
+// =============================================================================
+
+const ROLE_WEIGHTS = {
+  'General': { study: 0.20, copy: 0.30, output: 0.30, research: 0.05, ethical: 0.15 },
+  'Developer': { study: 0.10, copy: 0.25, output: 0.40, research: 0.15, ethical: 0.10 },
+  'Researcher': { study: 0.15, copy: 0.25, output: 0.25, research: 0.25, ethical: 0.10 },
+  'Support': { study: 0.25, copy: 0.20, output: 0.30, research: 0.10, ethical: 0.15 },
+  'Leader': { study: 0.30, copy: 0.15, output: 0.20, research: 0.10, ethical: 0.25 }
+};
+
+// =============================================================================
+// CONFIG CACHING
+// =============================================================================
+
+let weightsConfig = null;
+let levelDescriptions = null;
+let configLoadPromise = null;
+let descriptionsLoadPromise = null;
 
 // =============================================================================
 // DIMENSION DATA
@@ -150,6 +161,73 @@ const AI_TOOLS = {
 };
 
 // =============================================================================
+// CONFIG LOADING FUNCTIONS
+// =============================================================================
+
+/**
+ * Get the base path for config files
+ * @returns {string} Base path
+ */
+function getConfigBasePath() {
+  const basePath = window.location.pathname.replace(/\/[^\/]*$/, '');
+  return `${window.location.origin}${basePath}`;
+}
+
+/**
+ * Load weights configuration from config file
+ * @returns {Promise<object>} Weights configuration
+ */
+async function loadWeightsConfig() {
+  if (weightsConfig) return weightsConfig;
+
+  if (configLoadPromise) return configLoadPromise;
+
+  configLoadPromise = (async () => {
+    try {
+      const response = await fetch(`${getConfigBasePath()}/config/weights-config.json`);
+      if (!response.ok) {
+        console.warn('Could not load weights config, using defaults');
+        return null;
+      }
+      weightsConfig = await response.json();
+      return weightsConfig;
+    } catch (error) {
+      console.warn('Error loading weights config:', error);
+      return null;
+    }
+  })();
+
+  return configLoadPromise;
+}
+
+/**
+ * Load level descriptions from config file
+ * @returns {Promise<object>} Level descriptions
+ */
+async function loadLevelDescriptions() {
+  if (levelDescriptions) return levelDescriptions;
+
+  if (descriptionsLoadPromise) return descriptionsLoadPromise;
+
+  descriptionsLoadPromise = (async () => {
+    try {
+      const response = await fetch(`${getConfigBasePath()}/config/level-descriptions.json`);
+      if (!response.ok) {
+        console.warn('Could not load level descriptions, using defaults');
+        return null;
+      }
+      levelDescriptions = await response.json();
+      return levelDescriptions;
+    } catch (error) {
+      console.warn('Error loading level descriptions:', error);
+      return null;
+    }
+  })();
+
+  return descriptionsLoadPromise;
+}
+
+// =============================================================================
 // UTILITY FUNCTIONS
 // =============================================================================
 
@@ -189,7 +267,205 @@ function getMaxPointsForDimension(dimension) {
 }
 
 /**
- * Calculate weighted score for a single dimension
+ * Get score band from normalized score
+ * @param {number} normalizedScore - Score from 0-100
+ * @returns {object} The matching score band { min, max, name, description }
+ */
+function getScoreBand(normalizedScore) {
+  for (const band of SCORE_BANDS) {
+    if (normalizedScore >= band.min && normalizedScore <= band.max) {
+      return band;
+    }
+  }
+  // Fallback to first band if score is somehow out of range
+  return SCORE_BANDS[0];
+}
+
+// =============================================================================
+// COMPANY MODIFIER FUNCTIONS (v1.1)
+// =============================================================================
+
+/**
+ * Apply company type modifier to role weights
+ * @param {object} roleWeights - Base role weights { study, copy, output, research, ethical }
+ * @param {string} companyType - Company type (Startup, Enterprise, Aspirational) or null
+ * @returns {object} Modified weights (renormalized to sum to 1.0)
+ */
+function applyCompanyModifier(roleWeights, companyType) {
+  if (!companyType || !weightsConfig?.companyModifiers?.[companyType]) {
+    return roleWeights;
+  }
+
+  const modifiers = weightsConfig.companyModifiers[companyType].modifiers;
+
+  // Apply multipliers
+  const modified = {};
+  let total = 0;
+
+  for (const dim of Object.keys(roleWeights)) {
+    modified[dim] = roleWeights[dim] * (modifiers[dim] || 1.0);
+    total += modified[dim];
+  }
+
+  // Renormalize to sum to 1.0
+  for (const dim of Object.keys(modified)) {
+    modified[dim] = modified[dim] / total;
+  }
+
+  return modified;
+}
+
+/**
+ * Get weights for a specific score type and role
+ * @param {string} scoreType - 'personal', 'corporate', or 'combined'
+ * @param {string} role - Role name
+ * @param {string} companyType - Company type or null
+ * @returns {object} Weights object { study, copy, output, research, ethical }
+ */
+function getWeightsForScoreType(scoreType, role, companyType) {
+  let baseWeights;
+
+  if (weightsConfig?.scoreTypes?.[scoreType]?.roles?.[role]) {
+    baseWeights = { ...weightsConfig.scoreTypes[scoreType].roles[role] };
+  } else {
+    // Fallback to combined weights
+    baseWeights = { ...(ROLE_WEIGHTS[role] || ROLE_WEIGHTS['General']) };
+  }
+
+  return applyCompanyModifier(baseWeights, companyType);
+}
+
+// =============================================================================
+// DUAL SCORING FUNCTIONS (v1.1)
+// =============================================================================
+
+/**
+ * Calculate a single score (personal, corporate, or combined)
+ * @param {object} levels - Object with dimension levels { study: 3, copy: 2, ... }
+ * @param {object} weights - Weights for each dimension
+ * @param {number} evidenceMultiplier - Evidence multiplier (0.6, 0.8, or 1.0)
+ * @returns {object} Score details { rawTotal, normalizedScore, scoreBand }
+ */
+function calculateSingleScore(levels, weights, evidenceMultiplier) {
+  let rawWeightedTotal = 0;
+  let maxPossible = 0;
+
+  for (const [dimKey, dimLevel] of Object.entries(levels)) {
+    const rawPoints = getPointsForLevel(dimKey, dimLevel);
+    const weight = weights[dimKey] || 0;
+    rawWeightedTotal += rawPoints * weight;
+    maxPossible += getMaxPointsForDimension(dimKey) * weight;
+  }
+
+  // Apply evidence multiplier
+  const finalWeightedScore = rawWeightedTotal * evidenceMultiplier;
+
+  // Normalize to 0-100
+  const normalizedScore = maxPossible > 0
+    ? Math.round((finalWeightedScore / maxPossible) * 100)
+    : 0;
+
+  const scoreBand = getScoreBand(normalizedScore);
+
+  return {
+    rawTotal: Math.round(rawWeightedTotal * 100) / 100,
+    normalizedScore,
+    scoreBand: scoreBand.name
+  };
+}
+
+/**
+ * Get gap interpretation based on personal - corporate gap
+ * @param {number} gap - personalScore - corporateScore
+ * @returns {object} { meaning, action }
+ */
+function getGapInterpretation(gap) {
+  if (weightsConfig?.gapInterpretation) {
+    const gi = weightsConfig.gapInterpretation;
+
+    if (gap > gi.highPositive.threshold) {
+      return { meaning: gi.highPositive.meaning, action: gi.highPositive.action };
+    } else if (gap >= gi.moderatePositive.minThreshold) {
+      return { meaning: gi.moderatePositive.meaning, action: gi.moderatePositive.action };
+    } else if (gap >= gi.balanced.minThreshold) {
+      return { meaning: gi.balanced.meaning, action: gi.balanced.action };
+    } else {
+      return { meaning: gi.negative.meaning, action: gi.negative.action };
+    }
+  }
+
+  // Fallback defaults
+  if (gap > 30) {
+    return { meaning: 'High individual readiness, low org enablement', action: 'Advocate for AI pilot projects' };
+  } else if (gap >= 10) {
+    return { meaning: 'Moderate gap', action: 'Seek deployment opportunities' };
+  } else if (gap >= -10) {
+    return { meaning: 'Balanced', action: 'Continue current trajectory' };
+  } else {
+    return { meaning: 'Org ahead of individual', action: 'Invest in learning/upskilling' };
+  }
+}
+
+/**
+ * Calculate dual scores (Personal Readiness + Corporate Impact + Combined)
+ * @param {object} levels - Object with dimension levels { study: 3, copy: 2, ... }
+ * @param {string} role - The role name
+ * @param {string} companyType - Company type or null
+ * @param {number} assessmentLevel - The assessment level (1, 2, or 3)
+ * @returns {object} Complete dual score breakdown
+ */
+function calculateDualScores(levels, role, companyType, assessmentLevel) {
+  const evidenceData = EVIDENCE_MULTIPLIERS[assessmentLevel] || EVIDENCE_MULTIPLIERS[1];
+  const evidenceMultiplier = evidenceData.multiplier;
+  const confidence = evidenceData.confidence;
+
+  // Get weights for each score type
+  const personalWeights = getWeightsForScoreType('personal', role, companyType);
+  const corporateWeights = getWeightsForScoreType('corporate', role, companyType);
+  const combinedWeights = getWeightsForScoreType('combined', role, companyType);
+
+  // Calculate each score
+  const personalScore = calculateSingleScore(levels, personalWeights, evidenceMultiplier);
+  const corporateScore = calculateSingleScore(levels, corporateWeights, evidenceMultiplier);
+  const combinedScore = calculateSingleScore(levels, combinedWeights, evidenceMultiplier);
+
+  // Calculate gap
+  const gap = personalScore.normalizedScore - corporateScore.normalizedScore;
+  const gapInterpretation = getGapInterpretation(gap);
+
+  // Build dimension details (using combined weights for the dimensions breakdown)
+  const dimensions = {};
+  for (const [dimKey, dimLevel] of Object.entries(levels)) {
+    const rawPoints = getPointsForLevel(dimKey, dimLevel);
+    const weight = combinedWeights[dimKey];
+    dimensions[dimKey] = {
+      level: dimLevel,
+      rawPoints,
+      weight,
+      weightedScore: rawPoints * weight,
+      levelDescription: DIMENSIONS[dimKey].levels.find(l => l.level === dimLevel)?.description || ''
+    };
+  }
+
+  return {
+    personalScore,
+    corporateScore,
+    combinedScore,
+    gap,
+    gapInterpretation,
+    evidenceMultiplier,
+    confidence,
+    dimensions,
+    // Legacy fields for compatibility
+    rawWeightedTotal: combinedScore.rawTotal,
+    finalWeightedScore: combinedScore.rawTotal * evidenceMultiplier,
+    normalizedScore: combinedScore.normalizedScore,
+    scoreBand: getScoreBand(combinedScore.normalizedScore)
+  };
+}
+
+/**
+ * Calculate weighted score for a single dimension (legacy support)
  * @param {string} dimension - The dimension key
  * @param {number} level - The level (0-5)
  * @param {string} role - The role name
@@ -209,7 +485,7 @@ function calculateDimensionScore(dimension, level, role) {
 }
 
 /**
- * Calculate the maximum possible weighted score for a role
+ * Calculate the maximum possible weighted score for a role (legacy support)
  * @param {string} role - The role name
  * @returns {number} Maximum weighted score
  */
@@ -226,7 +502,7 @@ function getMaxWeightedScore(role) {
 }
 
 /**
- * Normalize raw weighted score to 0-100 scale
+ * Normalize raw weighted score to 0-100 scale (legacy support)
  * @param {number} rawWeightedTotal - The raw weighted total
  * @param {string} role - The role name (needed to calculate max possible)
  * @returns {number} Normalized score (0-100)
@@ -238,69 +514,15 @@ function normalizeScore(rawWeightedTotal, role) {
 }
 
 /**
- * Get score band from normalized score
- * @param {number} normalizedScore - Score from 0-100
- * @returns {object} The matching score band { min, max, name, description }
- */
-function getScoreBand(normalizedScore) {
-  for (const band of SCORE_BANDS) {
-    if (normalizedScore >= band.min && normalizedScore <= band.max) {
-      return band;
-    }
-  }
-  // Fallback to first band if score is somehow out of range
-  return SCORE_BANDS[0];
-}
-
-/**
- * Calculate total AIQ score
+ * Calculate total AIQ score (legacy function - now uses dual scoring internally)
  * @param {object} levels - Object with dimension levels { study: 3, copy: 2, output: 4, research: 1, ethical: 3 }
  * @param {string} role - The role name
  * @param {number} assessmentLevel - The assessment level (1, 2, or 3)
- * @returns {object} Complete score breakdown
+ * @param {string} companyType - Optional company type
+ * @returns {object} Complete score breakdown (v1.1 format with dual scores)
  */
-function calculateAIQScore(levels, role, assessmentLevel) {
-  const dimensions = {};
-  let rawWeightedTotal = 0;
-
-  // Calculate each dimension
-  for (const [dimKey, dimLevel] of Object.entries(levels)) {
-    const dimScore = calculateDimensionScore(dimKey, dimLevel, role);
-    dimensions[dimKey] = {
-      level: dimLevel,
-      rawPoints: dimScore.rawPoints,
-      weight: dimScore.weight,
-      weightedScore: dimScore.weightedScore,
-      levelDescription: DIMENSIONS[dimKey].levels.find(l => l.level === dimLevel)?.description || ''
-    };
-    rawWeightedTotal += dimScore.weightedScore;
-  }
-
-  // Get evidence multiplier
-  const evidenceData = EVIDENCE_MULTIPLIERS[assessmentLevel] || EVIDENCE_MULTIPLIERS[1];
-  const evidenceMultiplier = evidenceData.multiplier;
-  const confidence = evidenceData.confidence;
-
-  // Apply evidence multiplier to get final weighted score
-  const finalWeightedScore = rawWeightedTotal * evidenceMultiplier;
-
-  // Normalize to 0-100
-  // We apply the multiplier before normalization so it affects the final percentage
-  const maxPossible = getMaxWeightedScore(role);
-  const normalizedScore = Math.round((finalWeightedScore / maxPossible) * 100);
-
-  // Get score band
-  const scoreBand = getScoreBand(normalizedScore);
-
-  return {
-    rawWeightedTotal: Math.round(rawWeightedTotal * 100) / 100,
-    evidenceMultiplier,
-    finalWeightedScore: Math.round(finalWeightedScore * 100) / 100,
-    normalizedScore,
-    scoreBand,
-    confidence,
-    dimensions
-  };
+function calculateAIQScore(levels, role, assessmentLevel, companyType = null) {
+  return calculateDualScores(levels, role, companyType, assessmentLevel);
 }
 
 /**
@@ -394,6 +616,16 @@ function setUrlParam(name, value) {
 }
 
 /**
+ * Remove URL parameter without page reload
+ * @param {string} name - Parameter name
+ */
+function removeUrlParam(name) {
+  const url = new URL(window.location);
+  url.searchParams.delete(name);
+  window.history.replaceState({}, '', url);
+}
+
+/**
  * Populate a select element with role options
  * @param {HTMLSelectElement} selectElement - The select element to populate
  * @param {string} selectedRole - Optional role to pre-select
@@ -412,12 +644,63 @@ function populateRoleSelect(selectElement, selectedRole = 'General') {
 }
 
 /**
+ * Populate a select element with company type options
+ * @param {HTMLSelectElement} selectElement - The select element to populate
+ * @param {string} selectedType - Optional type to pre-select
+ * @param {boolean} includeNone - Whether to include a "None" option
+ */
+function populateCompanyTypeSelect(selectElement, selectedType = '', includeNone = true) {
+  selectElement.innerHTML = '';
+
+  if (includeNone) {
+    const noneOption = document.createElement('option');
+    noneOption.value = '';
+    noneOption.textContent = '-- None (standard weights) --';
+    if (!selectedType) {
+      noneOption.selected = true;
+    }
+    selectElement.appendChild(noneOption);
+  }
+
+  for (const type of COMPANY_TYPES) {
+    const option = document.createElement('option');
+    option.value = type;
+    option.textContent = type;
+    if (type === selectedType) {
+      option.selected = true;
+    }
+    selectElement.appendChild(option);
+  }
+}
+
+/**
  * Get level description for a dimension and level
+ * Uses role-specific descriptions for output, research, ethical if available
  * @param {string} dimension - Dimension key
  * @param {number} level - Level number (0-5)
+ * @param {string} role - Optional role for role-specific descriptions
  * @returns {string} Level description
  */
-function getLevelDescription(dimension, level) {
+function getLevelDescription(dimension, level, role = null) {
+  // Check for role-specific description in loaded config
+  if (levelDescriptions && role) {
+    const roleSpecific = levelDescriptions.roleSpecific?.[dimension]?.[role];
+    if (roleSpecific) {
+      const levelData = roleSpecific.find(l => l.level === level);
+      if (levelData) return levelData.description;
+    }
+  }
+
+  // Check for universal description in loaded config
+  if (levelDescriptions) {
+    const universal = levelDescriptions.universal?.[dimension];
+    if (universal) {
+      const levelData = universal.find(l => l.level === level);
+      if (levelData) return levelData.description;
+    }
+  }
+
+  // Fallback to DIMENSIONS constant
   const dim = DIMENSIONS[dimension];
   if (!dim) return '';
   const levelData = dim.levels.find(l => l.level === level);
@@ -425,7 +708,7 @@ function getLevelDescription(dimension, level) {
 }
 
 /**
- * Create a basic AIQ report object structure
+ * Create a basic AIQ report object structure (v1.1 format)
  * @param {object} params - Report parameters
  * @returns {object} Report object matching schema
  */
@@ -434,6 +717,7 @@ function createReportObject(params) {
     assesseeName = '',
     assesseeEmail = '',
     role = 'General',
+    companyType = null,
     levels = {},
     assessmentLevel = 1,
     validatorName = '',
@@ -441,42 +725,63 @@ function createReportObject(params) {
     notes = ''
   } = params;
 
-  const score = calculateAIQScore(levels, role, assessmentLevel);
+  const score = calculateDualScores(levels, role, companyType, assessmentLevel);
 
-  return {
-    schemaVersion: '1.0',
+  const report = {
+    schemaVersion: '1.1',
+    reportType: assessmentLevel === 1 ? 'self-assessment' : (assessmentLevel === 2 ? 'peer-validation' : 'full-verification'),
     reportId: generateReportId(),
     generatedAt: formatISOTimestamp(),
     assessmentLevel,
     assessee: {
       name: assesseeName,
-      email: assesseeEmail,
+      email: assesseeEmail || '',
       role
     },
-    validator: assessmentLevel >= 2 ? {
-      name: validatorName,
-      email: validatorEmail
-    } : undefined,
-    scores: {
-      dimensions: Object.fromEntries(
-        Object.entries(score.dimensions).map(([key, val]) => [
-          key,
-          {
-            level: val.level,
-            points: val.rawPoints,
-            weight: val.weight,
-            weightedScore: val.weightedScore
-          }
-        ])
-      ),
-      rawTotal: score.rawWeightedTotal,
+    dimensions: Object.fromEntries(
+      Object.entries(score.dimensions).map(([key, val]) => [
+        key,
+        {
+          level: val.level,
+          points: val.rawPoints,
+          weight: val.weight,
+          weightedScore: val.weightedScore
+        }
+      ])
+    ),
+    calculation: {
+      personalScore: {
+        rawTotal: score.personalScore.rawTotal,
+        normalizedScore: score.personalScore.normalizedScore,
+        scoreBand: score.personalScore.scoreBand
+      },
+      corporateScore: {
+        rawTotal: score.corporateScore.rawTotal,
+        normalizedScore: score.corporateScore.normalizedScore,
+        scoreBand: score.corporateScore.scoreBand
+      },
+      gap: score.gap,
+      combinedScore: {
+        rawTotal: score.combinedScore.rawTotal,
+        normalizedScore: score.combinedScore.normalizedScore,
+        scoreBand: score.combinedScore.scoreBand
+      },
       evidenceMultiplier: score.evidenceMultiplier,
-      confidence: score.confidence,
-      finalScore: score.normalizedScore,
-      band: score.scoreBand.name
-    },
-    notes: notes || undefined
+      confidence: score.confidence
+    }
   };
+
+  // Add companyType if provided
+  if (companyType) {
+    report.assessee.companyType = companyType;
+  }
+
+  // Add notes if provided
+  if (notes) {
+    report.notes = notes;
+  }
+
+  return report;
 }
 
 // =============================================================================
@@ -681,23 +986,54 @@ function escapeHtmlForValidation(text) {
 }
 
 // =============================================================================
+// INITIALIZATION
+// =============================================================================
+
+/**
+ * Initialize shared module - load configs
+ */
+async function initShared() {
+  await Promise.all([
+    loadWeightsConfig(),
+    loadLevelDescriptions()
+  ]);
+}
+
+// Auto-initialize when DOM is ready
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initShared);
+  } else {
+    initShared();
+  }
+}
+
+// =============================================================================
 // EXPORT TO GLOBAL SCOPE
 // =============================================================================
 
 // Make everything available globally for non-module usage
 window.ROLE_WEIGHTS = ROLE_WEIGHTS;
 window.ROLES = ROLES;
+window.COMPANY_TYPES = COMPANY_TYPES;
 window.DIMENSIONS = DIMENSIONS;
 window.SCORE_BANDS = SCORE_BANDS;
 window.EVIDENCE_MULTIPLIERS = EVIDENCE_MULTIPLIERS;
 window.AI_TOOLS = AI_TOOLS;
 
+window.loadWeightsConfig = loadWeightsConfig;
+window.loadLevelDescriptions = loadLevelDescriptions;
 window.getPointsForLevel = getPointsForLevel;
 window.getMaxPointsForDimension = getMaxPointsForDimension;
 window.calculateDimensionScore = calculateDimensionScore;
 window.getMaxWeightedScore = getMaxWeightedScore;
 window.normalizeScore = normalizeScore;
 window.getScoreBand = getScoreBand;
+window.applyCompanyModifier = applyCompanyModifier;
+window.getWeightsForScoreType = getWeightsForScoreType;
+window.calculateSingleScore = calculateSingleScore;
+window.calculateDualScores = calculateDualScores;
+window.getGapInterpretation = getGapInterpretation;
 window.calculateAIQScore = calculateAIQScore;
 window.formatISODate = formatISODate;
 window.formatISOTimestamp = formatISOTimestamp;
@@ -706,9 +1042,12 @@ window.encodeState = encodeState;
 window.decodeState = decodeState;
 window.getUrlParam = getUrlParam;
 window.setUrlParam = setUrlParam;
+window.removeUrlParam = removeUrlParam;
 window.populateRoleSelect = populateRoleSelect;
+window.populateCompanyTypeSelect = populateCompanyTypeSelect;
 window.getLevelDescription = getLevelDescription;
 window.createReportObject = createReportObject;
 window.validateReportSchema = validateReportSchema;
 window.displayValidationErrors = displayValidationErrors;
 window.clearValidationErrors = clearValidationErrors;
+window.initShared = initShared;

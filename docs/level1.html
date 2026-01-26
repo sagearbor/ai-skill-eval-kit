@@ -7,6 +7,106 @@
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv.bundle.min.js"></script>
+  <style>
+    /* Dual Score Display Styles */
+    .dual-score-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+
+    @media (max-width: 768px) {
+      .dual-score-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .score-card {
+      background: var(--color-bg-alt);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      text-align: center;
+    }
+
+    .score-card-title {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-2);
+    }
+
+    .score-card-value {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--color-text);
+      line-height: 1;
+      margin-bottom: var(--space-2);
+    }
+
+    .score-card-band {
+      display: inline-block;
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      margin-bottom: var(--space-3);
+    }
+
+    .score-card-desc {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
+
+    .gap-display {
+      background: var(--color-bg-alt);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      text-align: center;
+      margin-bottom: var(--space-6);
+    }
+
+    .gap-value {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+    }
+
+    .gap-positive { color: var(--color-success); }
+    .gap-negative { color: var(--color-warning); }
+    .gap-balanced { color: var(--color-accent); }
+
+    .gap-interpretation {
+      font-size: var(--font-size-base);
+      margin-bottom: var(--space-1);
+    }
+
+    .gap-action {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    .legacy-score-toggle {
+      margin-top: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--color-border);
+    }
+
+    .legacy-score-section {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      margin-top: var(--space-4);
+    }
+
+    .legacy-score-section .score-display {
+      margin-bottom: 0;
+    }
+  </style>
 </head>
 <body>
   <!-- Header -->
@@ -45,12 +145,19 @@
             <input type="email" id="assessee-email" class="form-input" placeholder="Enter your email">
             <p class="form-hint">Used for organizational tracking if submitting to your company.</p>
           </div>
-          <div class="form-group mb-0">
+          <div class="form-group">
             <label for="role-select" class="form-label form-label-required">Primary Role</label>
             <select id="role-select" class="form-select" required>
               <!-- Populated by JavaScript -->
             </select>
             <p class="form-hint">Your role determines how each dimension is weighted in your final score.</p>
+          </div>
+          <div class="form-group mb-0">
+            <label for="company-type-select" class="form-label">Company Type (optional)</label>
+            <select id="company-type-select" class="form-select">
+              <!-- Populated by JavaScript -->
+            </select>
+            <p class="form-hint">Company type adjusts how dimensions are weighted. Leave blank for standard role weights.</p>
           </div>
         </div>
       </div>
@@ -91,22 +198,62 @@
           </div>
         </div>
 
-        <!-- Score Display -->
+        <!-- Dual Score Display (v1.1) -->
         <div class="results-container">
-          <div class="score-display">
-            <div class="score-value" id="score-value">0</div>
-            <div class="score-label">Your AIQ Score</div>
-            <div id="score-band" class="score-band">--</div>
-            <div class="mt-4">
-              <span id="confidence-badge" class="badge badge-low">Confidence: LOW (0.6x)</span>
+          <h2 class="text-center mb-6">Your AIQ Results</h2>
+
+          <!-- Dual Score Cards -->
+          <div class="dual-score-container" id="dual-score-display">
+            <div class="score-card">
+              <div class="score-card-title">Personal Readiness</div>
+              <div class="score-card-value" id="personal-score-value">0</div>
+              <div class="score-card-band band-unaware" id="personal-score-band">--</div>
+              <div class="score-card-desc">"Am I ready to deliver AI value?"</div>
+            </div>
+            <div class="score-card">
+              <div class="score-card-title">Corporate Impact</div>
+              <div class="score-card-value" id="corporate-score-value">0</div>
+              <div class="score-card-band band-unaware" id="corporate-score-band">--</div>
+              <div class="score-card-desc">"Has my org enabled AI delivery?"</div>
+            </div>
+          </div>
+
+          <!-- Gap Display -->
+          <div class="gap-display" id="gap-display">
+            <div class="gap-value" id="gap-value">Gap: 0 points</div>
+            <div class="gap-interpretation" id="gap-interpretation">--</div>
+            <div class="gap-action" id="gap-action">--</div>
+          </div>
+
+          <!-- Confidence Badge -->
+          <div class="text-center mb-6">
+            <span id="confidence-badge" class="badge badge-low">Confidence: LOW (0.6x)</span>
+          </div>
+
+          <!-- Legacy Score Toggle -->
+          <div class="legacy-score-toggle">
+            <label class="form-check">
+              <input type="checkbox" class="form-check-input" id="show-combined-score" onchange="toggleCombinedScore()">
+              <span class="form-check-label">Show combined score (legacy single-number view)</span>
+            </label>
+
+            <div id="combined-score-section" class="legacy-score-section hidden">
+              <div class="score-display">
+                <div class="score-value" id="score-value">0</div>
+                <div class="score-label">Combined AIQ Score</div>
+                <div id="score-band" class="score-band">--</div>
+              </div>
             </div>
           </div>
 
           <!-- Dimension Breakdown -->
-          <div class="card">
+          <div class="card mt-6">
             <div class="card-header">
               <h3 class="card-title mb-0">Dimension Breakdown</h3>
-              <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">Role: <span id="result-role">General</span></p>
+              <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">
+                Role: <span id="result-role">General</span>
+                <span id="result-company-type"></span>
+              </p>
             </div>
             <div class="card-body">
               <table class="breakdown-table">

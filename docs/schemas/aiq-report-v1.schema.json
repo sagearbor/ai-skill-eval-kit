@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://sagearbor.github.io/ai-skill-eval-kit/schemas/aiq-report-v1.schema.json",
   "title": "AIQ Report Schema",
-  "description": "JSON Schema for Universal AIQ Framework assessment reports. Validates output from all three assessment levels (L1 Self, L2 Peer, L3 Auto/Audit).",
+  "description": "JSON Schema for Universal AIQ Framework assessment reports. Validates output from all three assessment levels (L1 Self, L2 Peer, L3 Auto/Audit). Version 1.1 adds dual scoring (Personal/Corporate) and company type modifiers.",
   "type": "object",
   "required": [
     "schemaVersion",
@@ -17,8 +17,8 @@
   "properties": {
     "schemaVersion": {
       "type": "string",
-      "const": "1.0",
-      "description": "Schema version for forwards compatibility. Must be '1.0' for this schema version."
+      "enum": ["1.0", "1.1"],
+      "description": "Schema version for forwards compatibility. 1.1 adds companyType, role enum, and dual scoring."
     },
     "reportType": {
       "type": "string",
@@ -49,11 +49,16 @@
         "role": {
           "type": "string",
           "minLength": 1,
-          "description": "Job role used for weight selection (e.g., 'Software Engineer', 'Product Manager')."
+          "description": "Job role category that determines base dimension weights. v1.1 uses enum: General, Developer, Researcher, Support, Leader."
         },
         "email": {
           "type": "string",
           "description": "Email address. Empty string if not provided (enables aggregation without nulls)."
+        },
+        "companyType": {
+          "type": "string",
+          "enum": ["Startup", "Enterprise", "Aspirational"],
+          "description": "Company culture profile that modifies role weights. Optional - if not provided, no modifier is applied."
         }
       }
     },
@@ -87,21 +92,92 @@
     },
     "calculation": {
       "type": "object",
-      "description": "Final score calculation details.",
+      "description": "Final score calculation details. v1.1 adds personalScore, corporateScore, and gap for dual scoring.",
       "required": [
-        "rawTotal",
         "evidenceMultiplier",
-        "finalScore",
-        "normalizedScore",
-        "scoreBand",
         "confidence"
       ],
       "additionalProperties": false,
       "properties": {
+        "personalScore": {
+          "type": "object",
+          "description": "Personal Readiness score - measures individual knowledge, skills, productivity. v1.1+",
+          "required": ["rawTotal", "normalizedScore", "scoreBand"],
+          "additionalProperties": false,
+          "properties": {
+            "rawTotal": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Sum of weighted dimension scores for personal readiness."
+            },
+            "normalizedScore": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Personal score normalized to 0-100 scale."
+            },
+            "scoreBand": {
+              "type": "string",
+              "enum": ["Unaware", "User", "Practitioner", "Builder", "Architect", "Pioneer"],
+              "description": "Human-readable proficiency band for personal readiness."
+            }
+          }
+        },
+        "corporateScore": {
+          "type": "object",
+          "description": "Corporate Impact score - measures deployed systems, business outcomes, governance. v1.1+",
+          "required": ["rawTotal", "normalizedScore", "scoreBand"],
+          "additionalProperties": false,
+          "properties": {
+            "rawTotal": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Sum of weighted dimension scores for corporate impact."
+            },
+            "normalizedScore": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Corporate score normalized to 0-100 scale."
+            },
+            "scoreBand": {
+              "type": "string",
+              "enum": ["Unaware", "User", "Practitioner", "Builder", "Architect", "Pioneer"],
+              "description": "Human-readable proficiency band for corporate impact."
+            }
+          }
+        },
+        "gap": {
+          "type": "integer",
+          "description": "personalScore.normalizedScore - corporateScore.normalizedScore. Positive = ready for more responsibility. v1.1+"
+        },
+        "combinedScore": {
+          "type": "object",
+          "description": "Legacy single score for v1.0 compatibility or when scoreType=combined is used.",
+          "additionalProperties": false,
+          "properties": {
+            "rawTotal": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Sum of weighted dimension scores using combined weights."
+            },
+            "normalizedScore": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Combined score normalized to 0-100 scale."
+            },
+            "scoreBand": {
+              "type": "string",
+              "enum": ["Unaware", "User", "Practitioner", "Builder", "Architect", "Pioneer"],
+              "description": "Human-readable proficiency band."
+            }
+          }
+        },
         "rawTotal": {
           "type": "number",
           "minimum": 0,
-          "description": "Sum of all weighted dimension scores before evidence multiplier."
+          "description": "Sum of all weighted dimension scores before evidence multiplier. For v1.0 compat."
         },
         "evidenceMultiplier": {
           "type": "number",
@@ -111,18 +187,18 @@
         "finalScore": {
           "type": "number",
           "minimum": 0,
-          "description": "rawTotal * evidenceMultiplier. The actual AIQ score used for reporting."
+          "description": "rawTotal * evidenceMultiplier. For v1.0 compat - use personalScore/corporateScore in v1.1."
         },
         "normalizedScore": {
           "type": "integer",
           "minimum": 0,
           "maximum": 100,
-          "description": "Final score normalized to 0-100 scale for easy interpretation."
+          "description": "Final score normalized to 0-100 scale. For v1.0 compat."
         },
         "scoreBand": {
           "type": "string",
           "enum": ["Unaware", "User", "Practitioner", "Builder", "Architect", "Pioneer"],
-          "description": "Human-readable proficiency band based on normalizedScore: Unaware (0-20), User (21-40), Practitioner (41-60), Builder (61-80), Architect (81-95), Pioneer (96-100)."
+          "description": "Human-readable proficiency band. For v1.0 compat."
         },
         "confidence": {
           "type": "string",

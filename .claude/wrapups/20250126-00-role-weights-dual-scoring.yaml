@@ -1,0 +1,66 @@
+session:
+  date: 2025-01-26
+  duration: ~2 hours
+  type: interview/spec-writing
+
+summary: |
+  Interviewed user about colleague feedback on AIQ scoring framework. Colleague
+  concerned about low scores (33%) and complexity of role/company weight matrix.
+  Designed and documented v1.1 spec with reduced roles, company modifiers, and
+  new dual scoring system (Personal vs Corporate).
+
+changes:
+  created:
+    - /home/scb2/role-company-weights-v1.1-updated.md  # needs to be moved to docs/specs/
+
+decisions_made:
+  roles:
+    - Reduced from 8 to 5 roles
+    - "General, Developer, Researcher, Support, Leader"
+    - Researcher combines Data/ML + Research Scientist
+    - Support combines PM + Ops + Legal
+
+  company_modifiers:
+    - Three profiles: Startup, Enterprise, Aspirational
+    - Uses multipliers (not additive deltas) to avoid negative weights
+    - "Startup: Output 1.4x, Copy 0.7x, Ethical 0.7x"
+    - "Enterprise: Copy 1.2x, Output 0.8x"
+    - "Aspirational: Study 0.8x, Research 1.2x, Ethical 1.2x"
+
+  dual_scoring:
+    - Personal Readiness: knowledge/skills focused (Study/Copy heavy)
+    - Corporate Impact: deployment/governance focused (Output/Ethical heavy)
+    - Gap indicator shows readiness vs opportunity mismatch
+    - Solves "devs penalized for slow orgs" problem
+
+  config:
+    - Weights moved to external JSON (docs/config/weights-config.json)
+    - Schema bumped to v1.1 with backward compat for v1.0
+    - Role-specific level descriptions for Output, Research, Ethical (102 total)
+
+  ui:
+    - Dual score display as default
+    - "Show all company profiles" toggle (checkbox + URL param)
+    - "Show combined score" toggle for legacy view
+    - Company Type dropdown on L1/L2 forms
+
+discoveries:
+  - Original 8 roles had significant overlap (PM vs Ops, Data/ML vs Research)
+  - Additive weight deltas can push dimensions to 0% - multipliers avoid this
+  - Colleague's YouTube team wants "startup mindset" despite being enterprise
+  - Low scores (33%) primarily from L1 evidence multiplier (0.6x) + low Output level
+
+open_questions:
+  - Default company type: None vs required selection?
+  - HR reporting: which score is primary for performance reviews?
+  - Gap thresholds: are 30/10/-10 point cutoffs correct?
+
+next_steps:
+  - Move spec file to docs/specs/role-company-weights-v1.1.md
+  - Fix file ownership (sudo chown -R sandboxuser:sandboxuser)
+  - Implement spec overnight (prompt provided to user)
+  - Test with colleague's team at YouTube
+
+files_to_move:
+  - from: /home/scb2/role-company-weights-v1.1-updated.md
+    to: docs/specs/role-company-weights-v1.1.md

@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "1.1",
+  "universal": {
+    "study": [
+      { "level": 0, "description": "No AI awareness. Avoids or fears the technology." },
+      { "level": 1, "description": "Mainstream news only. Passive consumption of hype/fear cycles." },
+      { "level": 2, "description": "LinkedIn influencers, YouTube \"Top 10 Tools\" content." },
+      { "level": 3, "description": "Developer blogs, release notes, AI-focused newsletters." },
+      { "level": 4, "description": "Technical reports, GitHub repos. Can explain why models fail." },
+      { "level": 5, "description": "ArXiv papers, model weights, source code. Predicts capability shifts." }
+    ],
+    "copy": [
+      { "level": 0, "description": "No validation. Blind trust: \"It looks right to me.\"" },
+      { "level": 1, "description": "\"Vibes check.\" Runs prompt once, manually reviews." },
+      { "level": 2, "description": "Maintains test cases. Systematic manual Pass/Fail grading." },
+      { "level": 3, "description": "A/B tests models. Comparative benchmarks. Uses eval tools." },
+      { "level": 4, "description": "Automated evals. LLM-as-Judge. Quantified metrics (precision, recall)." },
+      { "level": 5, "description": "Statistical confidence intervals. CI/CD for prompts. Regression testing." }
+    ]
+  },
+  "roleSpecific": {
+    "output": {
+      "General": [
+        { "level": 0, "description": "No AI usage in any workflow." },
+        { "level": 1, "description": "Occasional ChatGPT/Copilot use for personal tasks." },
+        { "level": 2, "description": "Regular AI assistance in daily work. Basic integrations." },
+        { "level": 3, "description": "AI tools embedded in team workflows. Measurable efficiency gains." },
+        { "level": 4, "description": "AI-powered processes producing business outcomes." },
+        { "level": 5, "description": "AI-first approach across multiple workflows. Quantified value." }
+      ],
+      "Developer": [
+        { "level": 0, "description": "Chat interface only. No deployment or workflow integration." },
+        { "level": 1, "description": "Personal productivity (Copilot, ChatGPT Plus). Time savings only." },
+        { "level": 2, "description": "Simple wrapper apps. Basic API integration. ROI not yet quantified." },
+        { "level": 3, "description": "Internal tools used by team. RAG pipelines. $10k+ verified savings." },
+        { "level": 4, "description": "Production agentic systems. Revenue-generating. External users." },
+        { "level": 5, "description": "Vertical AI platform. Fine-tuned models. $100k+ verified value." }
+      ],
+      "Researcher": [
+        { "level": 0, "description": "No practical AI tool usage." },
+        { "level": 1, "description": "Uses AI for literature review and summarization." },
+        { "level": 2, "description": "AI-assisted data analysis and experiment design." },
+        { "level": 3, "description": "Custom pipelines for research workflows. Reproducible results." },
+        { "level": 4, "description": "Novel AI methods deployed in production research systems." },
+        { "level": 5, "description": "Research infrastructure used by others. Published benchmarks." }
+      ],
+      "Support": [
+        { "level": 0, "description": "No AI tools in support workflows." },
+        { "level": 1, "description": "Uses AI chatbots for personal research and drafting." },
+        { "level": 2, "description": "AI-assisted documentation, ticketing, or process automation." },
+        { "level": 3, "description": "AI tools deployed for team-wide support operations. Metrics tracked." },
+        { "level": 4, "description": "AI-powered support systems serving customers. Measured satisfaction gains." },
+        { "level": 5, "description": "AI-first support organization. Industry-recognized efficiency." }
+      ],
+      "Leader": [
+        { "level": 0, "description": "No awareness of AI's business applications." },
+        { "level": 1, "description": "Understands AI use cases. Encourages team exploration." },
+        { "level": 2, "description": "Approved AI tool budgets. Pilot projects underway." },
+        { "level": 3, "description": "Sponsored AI initiative with measurable outcomes. $10k+ value." },
+        { "level": 4, "description": "Championed production AI program. $100k+ organizational value." },
+        { "level": 5, "description": "AI-first organizational strategy. $1M+ documented impact." }
+      ]
+    },
+    "research": {
+      "General": [
+        { "level": 0, "description": "Treats AI as magic. No understanding of mechanisms." },
+        { "level": 1, "description": "Conceptual understanding: tokens, temperature, context windows." },
+        { "level": 2, "description": "Knows model architectures. Can explain transformer basics." },
+        { "level": 3, "description": "Follows AI research developments. Understands recent papers." },
+        { "level": 4, "description": "Applies research findings to practical problems." },
+        { "level": 5, "description": "Contributes to AI knowledge sharing within organization." }
+      ],
+      "Developer": [
+        { "level": 0, "description": "Treats AI as magic. No understanding of mechanisms." },
+        { "level": 1, "description": "Conceptual understanding: tokens, temperature, context windows." },
+        { "level": 2, "description": "Architectural knowledge. Understands Transformers. Implements papers." },
+        { "level": 3, "description": "Contributes: fine-tunes models, publishes weights, shares methods." },
+        { "level": 4, "description": "Researches: novel architectures, publishes at conferences." },
+        { "level": 5, "description": "Invents: paradigm-shifting discoveries. Industry-recognized impact." }
+      ],
+      "Researcher": [
+        { "level": 0, "description": "No AI/ML research background." },
+        { "level": 1, "description": "Familiar with foundational papers (Attention Is All You Need, etc.)." },
+        { "level": 2, "description": "Replicates published results. Understands methodological nuances." },
+        { "level": 3, "description": "Publishes incremental improvements. Active in research community." },
+        { "level": 4, "description": "Novel contributions accepted at top venues (NeurIPS, ICML, etc.)." },
+        { "level": 5, "description": "Field-defining work. H-index impact. Cited by thousands." }
+      ],
+      "Support": [
+        { "level": 0, "description": "No understanding of how AI works." },
+        { "level": 1, "description": "Basic concepts: what AI can and cannot do reliably." },
+        { "level": 2, "description": "Understands limitations relevant to support context." },
+        { "level": 3, "description": "Can evaluate AI tool capabilities for support use cases." },
+        { "level": 4, "description": "Contributes to best practices documentation for AI in support." },
+        { "level": 5, "description": "Recognized expert in AI-augmented support methodologies." }
+      ],
+      "Leader": [
+        { "level": 0, "description": "No understanding of AI capabilities or limitations." },
+        { "level": 1, "description": "General awareness of AI trends and business implications." },
+        { "level": 2, "description": "Can evaluate vendor AI claims. Understands hype vs. reality." },
+        { "level": 3, "description": "Funded internal AI research or innovation programs." },
+        { "level": 4, "description": "Organization contributes to AI research (papers, open source, data)." },
+        { "level": 5, "description": "Shapes industry AI research direction. Advisory board positions." }
+      ]
+    },
+    "ethical": {
+      "General": [
+        { "level": 0, "description": "Dangerous. Pastes PII into public models. Ignores bias." },
+        { "level": 1, "description": "Compliant. Follows rules. Uses only sanctioned tools." },
+        { "level": 2, "description": "Cautious. Fact-checks outputs. Human-in-the-loop for decisions." },
+        { "level": 3, "description": "Proactive. Tests for hallucinations. Documents failure modes." },
+        { "level": 4, "description": "Guardian. Catches risks in others' work. Designs safety protocols." },
+        { "level": 5, "description": "Leader. Shapes org policies. Trains others on safe practices." }
+      ],
+      "Developer": [
+        { "level": 0, "description": "Ships AI code without safety considerations. Ignores edge cases." },
+        { "level": 1, "description": "Basic input validation. Follows team security guidelines." },
+        { "level": 2, "description": "Implements content filtering. Logs AI decisions for audit." },
+        { "level": 3, "description": "Designs for failure. Graceful degradation. Bias testing in CI." },
+        { "level": 4, "description": "Security-first AI architecture. Red team exercises. Incident response." },
+        { "level": 5, "description": "Publishes AI safety tooling. Contributes to industry standards." }
+      ],
+      "Researcher": [
+        { "level": 0, "description": "Ignores ethical implications of research. No IRB awareness." },
+        { "level": 1, "description": "Follows institutional ethics guidelines for AI research." },
+        { "level": 2, "description": "Documents model limitations. Considers dual-use implications." },
+        { "level": 3, "description": "Proactive bias analysis. Mechanistic interpretability investigations." },
+        { "level": 4, "description": "Publishes safety-focused research. Responsible disclosure practices." },
+        { "level": 5, "description": "Shapes AI safety research agenda. Policy advisory roles." }
+      ],
+      "Support": [
+        { "level": 0, "description": "Shares customer data with AI tools without consent." },
+        { "level": 1, "description": "Uses only approved AI tools. Follows data handling policies." },
+        { "level": 2, "description": "Verifies AI responses before sharing with customers." },
+        { "level": 3, "description": "Escalates AI failures appropriately. Documents edge cases." },
+        { "level": 4, "description": "Designs support workflows with AI guardrails. Trains team." },
+        { "level": 5, "description": "Recognized for AI ethics in customer-facing operations." }
+      ],
+      "Leader": [
+        { "level": 0, "description": "Deploys AI without governance. Ignores regulatory requirements." },
+        { "level": 1, "description": "Aware of AI risks. Delegates compliance to legal/IT." },
+        { "level": 2, "description": "Established basic AI usage policies for organization." },
+        { "level": 3, "description": "Comprehensive AI governance framework. Regular audits. Training programs." },
+        { "level": 4, "description": "Organization-wide responsible AI culture. Board-level reporting." },
+        { "level": 5, "description": "Industry leader in AI governance. Shapes regulatory frameworks." }
+      ]
+    }
+  }
+}

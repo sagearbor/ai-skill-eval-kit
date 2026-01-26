@@ -7,6 +7,82 @@
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv.bundle.min.js"></script>
+    <style>
+        /* Dual Score Display Styles (v1.1) */
+        .dual-score-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+
+        @media (max-width: 768px) {
+            .dual-score-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .score-card {
+            background: var(--color-bg-alt);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            text-align: center;
+        }
+
+        .score-card-title {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-2);
+        }
+
+        .score-card-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--color-text);
+            line-height: 1;
+            margin-bottom: var(--space-2);
+        }
+
+        .score-card-band {
+            display: inline-block;
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            margin-bottom: var(--space-3);
+        }
+
+        .gap-display {
+            background: var(--color-bg-alt);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            text-align: center;
+            margin-bottom: var(--space-6);
+        }
+
+        .gap-value {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            margin-bottom: var(--space-2);
+        }
+
+        .gap-positive { color: var(--color-success); }
+        .gap-negative { color: var(--color-warning); }
+        .gap-balanced { color: var(--color-accent); }
+
+        .gap-interpretation {
+            font-size: var(--font-size-base);
+            margin-bottom: var(--space-1);
+        }
+
+        .gap-action {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-muted);
+        }
+    </style>
 </head>
 <body>
     <div class="page-header">
@@ -56,6 +132,10 @@
                             <div>
                                 <p class="text-muted mb-0">Role</p>
                                 <p class="font-semibold" id="displayAssesseeRole">-</p>
+                            </div>
+                            <div class="hidden">
+                                <p class="text-muted mb-0">Company Type</p>
+                                <p class="font-semibold" id="displayAssesseeCompanyType">-</p>
                             </div>
                             <div>
                                 <p class="text-muted mb-0">Submitted</p>
@@ -120,7 +200,7 @@
                 <div class="card-header">
                     <h3 class="card-title">Validation Complete</h3>
                 </div>
-                <div class="card-body">
+                <div class="card-body results-container">
                     <!-- Score Display -->
                     <div class="score-display">
                         <div class="score-value" id="finalScoreValue">--</div>

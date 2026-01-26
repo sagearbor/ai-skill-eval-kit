@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.1",
+  "scoreTypes": {
+    "personal": {
+      "description": "Individual readiness to deliver AI value",
+      "roles": {
+        "General": { "study": 0.30, "copy": 0.30, "output": 0.20, "research": 0.10, "ethical": 0.10 },
+        "Developer": { "study": 0.25, "copy": 0.35, "output": 0.25, "research": 0.10, "ethical": 0.05 },
+        "Researcher": { "study": 0.20, "copy": 0.30, "output": 0.15, "research": 0.30, "ethical": 0.05 },
+        "Support": { "study": 0.35, "copy": 0.25, "output": 0.25, "research": 0.05, "ethical": 0.10 },
+        "Leader": { "study": 0.40, "copy": 0.20, "output": 0.15, "research": 0.10, "ethical": 0.15 }
+      }
+    },
+    "corporate": {
+      "description": "Organizational AI deployment and governance",
+      "roles": {
+        "General": { "study": 0.10, "copy": 0.15, "output": 0.45, "research": 0.05, "ethical": 0.25 },
+        "Developer": { "study": 0.05, "copy": 0.15, "output": 0.55, "research": 0.10, "ethical": 0.15 },
+        "Researcher": { "study": 0.10, "copy": 0.20, "output": 0.35, "research": 0.20, "ethical": 0.15 },
+        "Support": { "study": 0.10, "copy": 0.15, "output": 0.45, "research": 0.05, "ethical": 0.25 },
+        "Leader": { "study": 0.15, "copy": 0.10, "output": 0.30, "research": 0.05, "ethical": 0.40 }
+      }
+    },
+    "combined": {
+      "description": "Legacy single score (v1.0 compatible)",
+      "roles": {
+        "General": { "study": 0.20, "copy": 0.30, "output": 0.30, "research": 0.05, "ethical": 0.15 },
+        "Developer": { "study": 0.10, "copy": 0.25, "output": 0.40, "research": 0.15, "ethical": 0.10 },
+        "Researcher": { "study": 0.15, "copy": 0.25, "output": 0.25, "research": 0.25, "ethical": 0.10 },
+        "Support": { "study": 0.25, "copy": 0.20, "output": 0.30, "research": 0.10, "ethical": 0.15 },
+        "Leader": { "study": 0.30, "copy": 0.15, "output": 0.20, "research": 0.10, "ethical": 0.25 }
+      }
+    }
+  },
+  "companyModifiers": {
+    "Startup": {
+      "description": "Ship it, learn, iterate",
+      "modifiers": { "study": 1.0, "copy": 0.7, "output": 1.4, "research": 1.2, "ethical": 0.7 }
+    },
+    "Enterprise": {
+      "description": "Reliable, scalable, governed",
+      "modifiers": { "study": 1.0, "copy": 1.2, "output": 0.8, "research": 1.0, "ethical": 1.0 }
+    },
+    "Aspirational": {
+      "description": "Build AI the right way",
+      "modifiers": { "study": 0.8, "copy": 0.8, "output": 1.0, "research": 1.2, "ethical": 1.2 }
+    }
+  },
+  "gapInterpretation": {
+    "highPositive": {
+      "threshold": 30,
+      "meaning": "High individual readiness, low org enablement",
+      "action": "Advocate for AI pilot projects"
+    },
+    "moderatePositive": {
+      "minThreshold": 10,
+      "maxThreshold": 30,
+      "meaning": "Moderate gap",
+      "action": "Seek deployment opportunities"
+    },
+    "balanced": {
+      "minThreshold": -10,
+      "maxThreshold": 10,
+      "meaning": "Balanced",
+      "action": "Continue current trajectory"
+    },
+    "negative": {
+      "threshold": -10,
+      "meaning": "Org ahead of individual",
+      "action": "Invest in learning/upskilling"
+    }
+  }
+}
