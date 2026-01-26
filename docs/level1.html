@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AIQ Self-Assessment | Level 1</title>
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/nav.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv.bundle.min.js"></script>
   <style>
@@ -123,7 +124,7 @@
         <span style="opacity: 0.8;">Copy</span> <span style="opacity: 0.5;">|</span>
         <span style="opacity: 0.8;">Output</span> <span style="opacity: 0.5;">|</span>
         <span style="opacity: 0.8;">Research</span> <span style="opacity: 0.5;">|</span>
-        <span style="opacity: 0.8;">Ethical</span>
+        <span style="opacity: 0.8;">Ethical security</span>
       </p>
     </div>
   </header>
@@ -166,6 +167,38 @@
           </div>
         </div>
       </div>
+
+      <!-- Advanced Options (collapsed by default) -->
+      <details class="card mb-8" id="advanced-options">
+        <summary class="card-header" style="cursor: pointer; user-select: none; list-style: none;">
+          <h2 class="card-title" style="margin-bottom: 0;">Advanced Options</h2>
+        </summary>
+        <div class="card-body">
+          <div class="form-group mb-0">
+            <label for="point-distribution-select" class="form-label">Point Distribution Curve</label>
+            <select id="point-distribution-select" class="form-select" onchange="handleDistributionChange(this.value)">
+              <!-- Populated by JavaScript -->
+            </select>
+            <p class="form-hint" id="distribution-description">How points are distributed across levels 0-5.</p>
+            <div id="distribution-preview" style="margin-top: var(--space-3); padding: var(--space-3); background: var(--color-bg-alt); border-radius: var(--radius-md); font-family: monospace; font-size: var(--font-size-xs);">
+              <!-- Populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </details>
+      <style>
+        #advanced-options summary::-webkit-details-marker { display: none; }
+        #advanced-options summary::marker { display: none; }
+        #advanced-options summary { position: relative; padding-left: var(--space-6); }
+        #advanced-options summary::before {
+          content: '▶';
+          position: absolute;
+          left: var(--space-4);
+          font-size: 0.7em;
+          transition: transform 0.2s;
+        }
+        #advanced-options[open] summary::before { transform: rotate(90deg); }
+      </style>
 
       <!-- Assessment Form -->
       <form id="assessment-form">
@@ -319,5 +352,6 @@
 
   <script src="js/shared.js"></script>
   <script src="js/assessment.js"></script>
+  <script src="js/nav.js"></script>
 </body>
 </html>

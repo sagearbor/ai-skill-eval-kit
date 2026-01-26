@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reference Guide | AIQ Framework</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <style>
+        .reference-hero {
+            background: linear-gradient(135deg, var(--color-bg-alt) 0%, #e0e7ff 100%);
+            padding: var(--space-8) 0;
+            margin-bottom: var(--space-8);
+        }
+        .reference-hero h1 {
+            margin-bottom: var(--space-2);
+        }
+        .reference-nav {
+            display: flex;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+            margin-bottom: var(--space-8);
+            padding: var(--space-4);
+            background: var(--color-bg-alt);
+            border-radius: var(--radius-md);
+        }
+        .reference-nav a {
+            padding: var(--space-2) var(--space-4);
+            background: var(--color-bg);
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            color: var(--color-text);
+            font-weight: 500;
+            border: 1px solid var(--color-border);
+            transition: all 0.2s;
+        }
+        .reference-nav a:hover {
+            background: var(--color-accent);
+            color: white;
+            border-color: var(--color-accent);
+        }
+        .section-card {
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+        .section-card h2 {
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-3);
+            border-bottom: 2px solid var(--color-accent);
+        }
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--font-size-sm);
+        }
+        .matrix-table th, .matrix-table td {
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--color-border);
+            text-align: left;
+        }
+        .matrix-table th {
+            background: var(--color-bg-alt);
+            font-weight: 600;
+        }
+        .matrix-table tr:hover {
+            background: rgba(79, 70, 229, 0.03);
+        }
+        .dimension-card {
+            background: var(--color-bg-alt);
+            border-radius: var(--radius-md);
+            padding: var(--space-5);
+            margin-bottom: var(--space-4);
+        }
+        .dimension-card h3 {
+            color: var(--color-accent);
+            margin-bottom: var(--space-2);
+        }
+        .dimension-card .question {
+            font-style: italic;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-4);
+        }
+        .level-grid {
+            display: grid;
+            gap: var(--space-2);
+        }
+        .level-row {
+            display: grid;
+            grid-template-columns: 50px 1fr;
+            gap: var(--space-3);
+            padding: var(--space-2);
+            border-radius: var(--radius-sm);
+            background: var(--color-bg);
+        }
+        .level-row:hover {
+            background: rgba(79, 70, 229, 0.05);
+        }
+        .level-num {
+            font-weight: 700;
+            color: var(--color-accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="reference-hero">
+        <div class="container">
+            <h1>AIQ Framework Reference</h1>
+            <p>Complete documentation for the SCOREs dimensions, scoring weights, and validation matrix.</p>
+        </div>
+    </div>
+
+    <main class="container">
+        <!-- Quick Navigation -->
+        <nav class="reference-nav">
+            <a href="#overview">Framework Overview</a>
+            <a href="#weights">Weight Tables</a>
+            <a href="#matrix">Validation Matrix</a>
+            <a href="#rubrics">Full Rubrics</a>
+        </nav>
+
+        <!-- Framework Overview -->
+        <section class="section-card" id="overview">
+            <h2>Framework Overview</h2>
+            <p class="mb-4">The <strong>Universal AIQ Framework</strong> provides a standardized 0-100 score for individual AI competency, built on five dimensions that form the <strong>SCOREs</strong> acronym:</p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-6);">
+                <div style="padding: var(--space-3); background: var(--color-bg-alt); border-radius: var(--radius-md); border-left: 4px solid var(--color-accent);">
+                    <strong style="color: var(--color-accent);">S</strong> - Study<br>
+                    <span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">Information<br>& Fluency</span>
+                </div>
+                <div style="padding: var(--space-3); background: var(--color-bg-alt); border-radius: var(--radius-md); border-left: 4px solid var(--color-accent);">
+                    <strong style="color: var(--color-accent);">C</strong> - Copy<br>
+                    <span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">Evaluation<br>& Rigor</span>
+                </div>
+                <div style="padding: var(--space-3); background: var(--color-bg-alt); border-radius: var(--radius-md); border-left: 4px solid var(--color-accent);">
+                    <strong style="color: var(--color-accent);">O</strong> - Output<br>
+                    <span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">Deployment<br>& Impact</span>
+                </div>
+                <div style="padding: var(--space-3); background: var(--color-bg-alt); border-radius: var(--radius-md); border-left: 4px solid var(--color-accent);">
+                    <strong style="color: var(--color-accent);">R</strong> - Research<br>
+                    <span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">Innovation<br>& Contribution</span>
+                </div>
+                <div style="padding: var(--space-3); background: var(--color-bg-alt); border-radius: var(--radius-md); border-left: 4px solid var(--color-accent);">
+                    <strong style="color: var(--color-accent);">Es</strong> - Ethical security<br>
+                    <span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">Safety<br>& Responsibility</span>
+                </div>
+            </div>
+
+            <h3>Score Bands</h3>
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Score</th>
+                        <th>Level</th>
+                        <th>What It Means</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>0-20</strong></td><td>Unaware</td><td>No meaningful AI adoption. At risk of displacement.</td></tr>
+                    <tr><td><strong>21-40</strong></td><td>User</td><td>Basic AI usage. Follows instructions. Needs supervision.</td></tr>
+                    <tr><td><strong>41-60</strong></td><td>Practitioner</td><td>Daily productive use. Can evaluate quality. ~25% efficiency gain.</td></tr>
+                    <tr><td><strong>61-80</strong></td><td>Builder</td><td>Deploys reliable systems. Creates measurable business value.</td></tr>
+                    <tr><td><strong>81-95</strong></td><td>Architect</td><td>Advances practices. Mentors others. Trusted for critical work.</td></tr>
+                    <tr><td><strong>96-100</strong></td><td>Pioneer</td><td>Industry-recognized contribution. Shapes how AI is used.</td></tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin-top: var(--space-6);">Evidence Levels</h3>
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Level</th>
+                        <th>Multiplier</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Level 1: Self</strong></td><td>0.6x</td><td>Self-report only. No validation.</td></tr>
+                    <tr><td><strong>Level 2: Peer</strong></td><td>0.8x</td><td>Peer or manager confirmed the work.</td></tr>
+                    <tr><td><strong>Level 3: Verified</strong></td><td>1.0x</td><td>Automated logs or full audit with evidence.</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Weight Tables -->
+        <section class="section-card" id="weights">
+            <h2>Scoring Weight Tables</h2>
+            <p class="mb-4">Your final score is calculated by weighting each dimension based on your role. Different roles emphasize different skills.</p>
+
+            <h3>Role Weights (Combined Score)</h3>
+            <p class="text-muted mb-2" style="font-size: var(--font-size-xs);">
+                <span style="background: rgba(16, 185, 129, 0.15); padding: 1px 4px; border-radius: 2px;">green</span> = higher than General,
+                <span style="background: rgba(244, 63, 94, 0.12); padding: 1px 4px; border-radius: 2px;">red</span> = lower
+            </p>
+            <table class="matrix-table mb-6">
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Study</th>
+                        <th>Copy</th>
+                        <th>Output</th>
+                        <th>Research</th>
+                        <th>Ethical</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>General</strong></td>
+                        <td>20%</td>
+                        <td>30%</td>
+                        <td>30%</td>
+                        <td>5%</td>
+                        <td>15%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Developer</strong></td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">10%</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">25%</td>
+                        <td style="background: rgba(16, 185, 129, 0.15);">40%</td>
+                        <td style="background: rgba(16, 185, 129, 0.15);">15%</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">10%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Researcher</strong></td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">15%</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">25%</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">25%</td>
+                        <td style="background: rgba(16, 185, 129, 0.15);">25%</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">10%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Support</strong></td>
+                        <td style="background: rgba(16, 185, 129, 0.15);">25%</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">20%</td>
+                        <td>30%</td>
+                        <td style="background: rgba(16, 185, 129, 0.15);">10%</td>
+                        <td>15%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Leader</strong></td>
+                        <td style="background: rgba(16, 185, 129, 0.15);">30%</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">15%</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">20%</td>
+                        <td style="background: rgba(16, 185, 129, 0.15);">10%</td>
+                        <td style="background: rgba(16, 185, 129, 0.15);">25%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Company Type Modifiers</h3>
+            <p class="text-muted mb-2" style="font-size: var(--font-size-xs);">Multipliers applied to role weights, then renormalized to 100%.</p>
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Study</th>
+                        <th>Copy</th>
+                        <th>Output</th>
+                        <th>Research</th>
+                        <th>Ethical</th>
+                        <th>Philosophy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Startup</strong></td>
+                        <td>1.0x</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">0.7x</td>
+                        <td style="background: rgba(16, 185, 129, 0.15);">1.4x</td>
+                        <td style="background: rgba(16, 185, 129, 0.15);">1.2x</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">0.7x</td>
+                        <td><em>Ship it, learn, iterate</em></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Enterprise</strong></td>
+                        <td>1.0x</td>
+                        <td style="background: rgba(16, 185, 129, 0.15);">1.2x</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">0.8x</td>
+                        <td>1.0x</td>
+                        <td>1.0x</td>
+                        <td><em>Reliable, scalable, governed</em></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Aspirational</strong></td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">0.8x</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">0.8x</td>
+                        <td>1.0x</td>
+                        <td style="background: rgba(16, 185, 129, 0.15);">1.2x</td>
+                        <td style="background: rgba(16, 185, 129, 0.15);">1.2x</td>
+                        <td><em>Build AI the right way</em></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Validation Matrix -->
+        <section class="section-card" id="matrix">
+            <h2>Validation Matrix</h2>
+            <p class="mb-4">What evidence validates each dimension at each assessment level.</p>
+
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Dimension</th>
+                        <th>Level 1 (Self)</th>
+                        <th>Level 2 (Peer)</th>
+                        <th>Level 3 (Verified)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>S - Study</strong></td>
+                        <td>Self-reported sources</td>
+                        <td>Peer confirms knowledge</td>
+                        <td>Newsletter subs, course certs, reading logs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>C - Copy</strong></td>
+                        <td>Self-reported methods</td>
+                        <td>Peer reviews test cases</td>
+                        <td>Eval scripts, benchmark results, CI logs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>O - Output</strong></td>
+                        <td>Self-reported projects</td>
+                        <td>Peer confirms usage</td>
+                        <td>Git commits, deploy logs, usage metrics</td>
+                    </tr>
+                    <tr>
+                        <td><strong>R - Research</strong></td>
+                        <td>Self-reported contributions</td>
+                        <td>Peer confirms novelty</td>
+                        <td>Publications, patents, model weights</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Es - Ethical security</strong></td>
+                        <td>Self-reported practices</td>
+                        <td>Peer confirms safety</td>
+                        <td>Audit logs, compliance records, training certs</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Full Rubrics -->
+        <section class="section-card" id="rubrics">
+            <h2>Full SCOREs Rubrics</h2>
+            <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;">
+                <span>Detailed level descriptions for each dimension (Levels 0-5).</span>
+                <label style="display: flex; align-items: center; gap: var(--space-2);">
+                    <span style="font-weight: 500;">View for role:</span>
+                    <select id="rubricRoleSelect" style="padding: 0.375rem 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: var(--font-size-sm);">
+                        <option value="General">General</option>
+                        <option value="Developer" selected>Developer</option>
+                        <option value="Researcher">Researcher</option>
+                        <option value="Support">Support</option>
+                        <option value="Leader">Leader</option>
+                    </select>
+                </label>
+            </div>
+
+            <!-- Study (universal - same for all roles) -->
+            <div class="dimension-card">
+                <h3>S - Study (Information & Fluency)</h3>
+                <p class="question">Where do you learn about AI? Can you explain why things work or fail?</p>
+                <div class="level-grid" id="rubric-study">
+                    <div class="level-row"><span class="level-num">L0</span><span class="level-desc">No AI awareness. Avoids or fears the technology.</span></div>
+                    <div class="level-row"><span class="level-num">L1</span><span class="level-desc">Mainstream news only. Passive consumption of hype/fear cycles.</span></div>
+                    <div class="level-row"><span class="level-num">L2</span><span class="level-desc">LinkedIn influencers, YouTube "Top 10 Tools" content.</span></div>
+                    <div class="level-row"><span class="level-num">L3</span><span class="level-desc">Developer blogs, release notes, AI-focused newsletters.</span></div>
+                    <div class="level-row"><span class="level-num">L4</span><span class="level-desc">Technical reports, GitHub repos. Can explain why models fail.</span></div>
+                    <div class="level-row"><span class="level-num">L5</span><span class="level-desc">ArXiv papers, model weights, source code. Predicts capability shifts.</span></div>
+                </div>
+            </div>
+
+            <!-- Copy (universal - same for all roles) -->
+            <div class="dimension-card">
+                <h3>C - Copy (Evaluation & Rigor)</h3>
+                <p class="question">How do you know if AI output is good? Can you prove it?</p>
+                <div class="level-grid" id="rubric-copy">
+                    <div class="level-row"><span class="level-num">L0</span><span class="level-desc">No validation. Blind trust: "It looks right to me."</span></div>
+                    <div class="level-row"><span class="level-num">L1</span><span class="level-desc">"Vibes check." Runs prompt once, manually reviews.</span></div>
+                    <div class="level-row"><span class="level-num">L2</span><span class="level-desc">Maintains test cases. Systematic manual Pass/Fail grading.</span></div>
+                    <div class="level-row"><span class="level-num">L3</span><span class="level-desc">A/B tests models. Comparative benchmarks. Uses eval tools.</span></div>
+                    <div class="level-row"><span class="level-num">L4</span><span class="level-desc">Automated evals. LLM-as-Judge. Quantified metrics (precision, recall).</span></div>
+                    <div class="level-row"><span class="level-num">L5</span><span class="level-desc">Statistical confidence intervals. CI/CD for prompts. Regression testing.</span></div>
+                </div>
+            </div>
+
+            <!-- Output (role-specific) -->
+            <div class="dimension-card">
+                <h3>O - Output (Deployment & Impact)</h3>
+                <p class="question">What have you built that others actually use? What value did it create?</p>
+                <div class="level-grid" id="rubric-output">
+                    <div class="level-row"><span class="level-num">L0</span><span class="level-desc">Chat interface only. No deployment or workflow integration.</span></div>
+                    <div class="level-row"><span class="level-num">L1</span><span class="level-desc">Personal productivity (Copilot, ChatGPT Plus). Time savings only.</span></div>
+                    <div class="level-row"><span class="level-num">L2</span><span class="level-desc">Simple wrapper apps. Basic API integration. ROI not yet quantified.</span></div>
+                    <div class="level-row"><span class="level-num">L3</span><span class="level-desc">Internal tools used by team. RAG pipelines. $10k+ verified savings.</span></div>
+                    <div class="level-row"><span class="level-num">L4</span><span class="level-desc">Production agentic systems. Revenue-generating. External users.</span></div>
+                    <div class="level-row"><span class="level-num">L5</span><span class="level-desc">Vertical AI platform. Fine-tuned models. $100k+ verified value.</span></div>
+                </div>
+            </div>
+
+            <!-- Research (role-specific) -->
+            <div class="dimension-card">
+                <h3>R - Research (Innovation & Contribution)</h3>
+                <p class="question">Do you advance the field or just consume it?</p>
+                <div class="level-grid" id="rubric-research">
+                    <div class="level-row"><span class="level-num">L0</span><span class="level-desc">Treats AI as magic. No understanding of mechanisms.</span></div>
+                    <div class="level-row"><span class="level-num">L1</span><span class="level-desc">Conceptual understanding: tokens, temperature, context windows.</span></div>
+                    <div class="level-row"><span class="level-num">L2</span><span class="level-desc">Architectural knowledge. Understands Transformers. Implements papers.</span></div>
+                    <div class="level-row"><span class="level-num">L3</span><span class="level-desc">Contributes: fine-tunes models, publishes weights, shares methods.</span></div>
+                    <div class="level-row"><span class="level-num">L4</span><span class="level-desc">Researches: novel architectures, publishes at conferences.</span></div>
+                    <div class="level-row"><span class="level-num">L5</span><span class="level-desc">Invents: paradigm-shifting discoveries. Industry-recognized impact.</span></div>
+                </div>
+            </div>
+
+            <!-- Ethical security (role-specific) -->
+            <div class="dimension-card">
+                <h3>Es - Ethical security (Safety & Responsibility)</h3>
+                <p class="question">Can you be trusted with AI? Do you use it safely?</p>
+                <div class="level-grid" id="rubric-ethical">
+                    <div class="level-row"><span class="level-num">L0</span><span class="level-desc">Dangerous. Pastes PII into public models. Ignores bias.</span></div>
+                    <div class="level-row"><span class="level-num">L1</span><span class="level-desc">Compliant. Follows rules. Uses only sanctioned tools.</span></div>
+                    <div class="level-row"><span class="level-num">L2</span><span class="level-desc">Cautious. Fact-checks outputs. Human-in-the-loop for decisions.</span></div>
+                    <div class="level-row"><span class="level-num">L3</span><span class="level-desc">Proactive. Tests for hallucinations. Documents failure modes.</span></div>
+                    <div class="level-row"><span class="level-num">L4</span><span class="level-desc">Guardian. Catches risks in others' work. Designs safety protocols.</span></div>
+                    <div class="level-row"><span class="level-num">L5</span><span class="level-desc">Leader. Shapes org policies. Trains others on safe practices.</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Back to Assessment -->
+        <div class="text-center" style="padding: var(--space-8) 0;">
+            <a href="level1.html" class="btn btn-primary btn-large">Take the Assessment →</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>Universal AIQ Framework - Reference Documentation</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/nav.js"></script>
+    <script>
+    // Dynamic rubric descriptions based on role selection
+    (function() {
+        let levelDescriptions = null;
+
+        // Load level descriptions JSON
+        fetch('config/level-descriptions.json')
+            .then(response => response.json())
+            .then(data => {
+                levelDescriptions = data;
+                // Initialize with default role (Developer)
+                updateRubrics('Developer');
+            })
+            .catch(err => console.error('Failed to load level descriptions:', err));
+
+        // Handle role selection change
+        const roleSelect = document.getElementById('rubricRoleSelect');
+        if (roleSelect) {
+            roleSelect.addEventListener('change', function() {
+                updateRubrics(this.value);
+            });
+        }
+
+        function updateRubrics(role) {
+            if (!levelDescriptions) return;
+
+            // Role-specific dimensions: output, research, ethical
+            const roleSpecificDims = ['output', 'research', 'ethical'];
+
+            roleSpecificDims.forEach(dim => {
+                const grid = document.getElementById('rubric-' + dim);
+                if (!grid) return;
+
+                const descriptions = levelDescriptions.roleSpecific[dim][role];
+                if (!descriptions) return;
+
+                const rows = grid.querySelectorAll('.level-row');
+                rows.forEach((row, index) => {
+                    const descSpan = row.querySelector('.level-desc');
+                    if (descSpan && descriptions[index]) {
+                        descSpan.textContent = descriptions[index].description;
+                    }
+                });
+            });
+        }
+    })();
+    </script>
+</body>
+</html>
