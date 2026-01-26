@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AIQ Self-Assessment | Level 1</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/nav.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv.bundle.min.js" defer></script>
   <style>
     /* Dual Score Display Styles */
     .dual-score-container {
@@ -90,22 +91,86 @@
       color: var(--color-text-muted);
     }
 
-    .legacy-score-toggle {
-      margin-top: var(--space-4);
-      padding-top: var(--space-4);
-      border-top: 1px solid var(--color-border);
+    /* Info Tooltip Styles - Click-based for mobile support */
+    .info-tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      vertical-align: middle;
+      margin-left: var(--space-2);
     }
 
-    .legacy-score-section {
+    .info-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--color-border);
+      color: var(--color-text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .info-tooltip:hover .info-icon,
+    .info-tooltip.active .info-icon {
+      background: var(--color-accent);
+      color: white;
+    }
+
+    .info-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: var(--space-2);
+      padding: var(--space-4);
       background: var(--color-bg);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-lg);
-      padding: var(--space-5);
-      margin-top: var(--space-4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      width: 280px;
+      font-size: var(--font-size-sm);
+      font-weight: normal;
+      text-align: left;
+      z-index: 100;
+      line-height: 1.5;
     }
 
-    .legacy-score-section .score-display {
-      margin-bottom: 0;
+    /* Show on click (via .active class) */
+    .info-tooltip.active .info-content {
+      display: block;
+    }
+
+    .info-content strong {
+      color: var(--color-text);
+    }
+
+    /* Close button for tooltip */
+    .info-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      padding: 0;
+      line-height: 1;
+    }
+
+    .info-close:hover {
+      color: var(--color-text);
+    }
+
+    .info-content em {
+      color: var(--color-accent);
+      font-style: normal;
+      font-weight: 500;
     }
   </style>
 </head>
@@ -198,7 +263,56 @@
           transition: transform 0.2s;
         }
         #advanced-options[open] summary::before { transform: rotate(90deg); }
+
+        /* Share Settings Button */
+        .share-settings-container {
+          display: flex;
+          justify-content: flex-end;
+          margin-bottom: var(--space-6);
+        }
+        .btn-share {
+          display: inline-flex;
+          align-items: center;
+          gap: var(--space-2);
+          padding: var(--space-2) var(--space-4);
+          background: var(--color-bg);
+          border: 1px solid var(--color-border);
+          border-radius: var(--radius-md);
+          color: var(--color-text-muted);
+          font-size: var(--font-size-sm);
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .btn-share:hover {
+          background: var(--color-bg-alt);
+          border-color: var(--color-accent);
+          color: var(--color-accent);
+        }
+        .btn-share.btn-success {
+          background: var(--color-success);
+          border-color: var(--color-success);
+          color: white;
+        }
+        .btn-share.btn-error {
+          background: var(--color-error);
+          border-color: var(--color-error);
+          color: white;
+        }
+        .btn-share svg {
+          width: 16px;
+          height: 16px;
+        }
       </style>
+
+      <!-- Share Settings Button -->
+      <div class="share-settings-container">
+        <button type="button" id="share-settings-btn" class="btn-share" onclick="shareSettings()" title="Copy a link with your current role, company type, and distribution settings">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          </svg>
+          Share Settings
+        </button>
+      </div>
 
       <!-- Assessment Form -->
       <form id="assessment-form">
@@ -232,25 +346,42 @@
           <span class="alert-icon">!</span>
           <div class="alert-content">
             <div class="alert-title">Consider Peer Validation</div>
-            <div>Scores this high are rare (top 5% of AI practitioners). Consider getting peer validation to increase your confidence multiplier from 0.6x to 0.8x.</div>
+            <div>Scores this high are rare (top 5% of AI practitioners). Consider getting peer validation to increase your confidence multiplier from 0.70x to 0.85x.</div>
           </div>
         </div>
 
         <!-- Dual Score Display (v1.1) -->
         <div class="results-container">
-          <h2 class="text-center mb-6">Your AIQ Results</h2>
+          <h2 class="text-center mb-6">
+            Your AIQ Results
+            <span class="info-tooltip" id="dual-score-info" onclick="toggleTooltip(this, event)">
+              <span class="info-icon">?</span>
+              <span class="info-content" id="dual-score-tooltip-content">
+                <button class="info-close" onclick="closeTooltip(event)">&times;</button>
+                <strong>Why two scores?</strong><br><br>
+                <strong>Personal Readiness</strong> measures your individual AI knowledge.<br>
+                <em id="personal-emphasis">Emphasizes Study + Copy</em><br><br>
+                <strong>Corporate Impact</strong> measures deployment in practice.<br>
+                <em id="corporate-emphasis">Emphasizes Output + Ethical</em><br><br>
+                A gap shows when skills don't match deployment opportunities.<br><br>
+                <a href="reference.html#dual-weights" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent);">View weight tables →</a>
+              </span>
+            </span>
+          </h2>
 
           <!-- Dual Score Cards -->
           <div class="dual-score-container" id="dual-score-display">
             <div class="score-card">
               <div class="score-card-title">Personal Readiness</div>
               <div class="score-card-value" id="personal-score-value">0</div>
+              <div class="score-card-range" id="personal-score-range" style="font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: var(--space-2);">(0 - 0)</div>
               <div class="score-card-band band-unaware" id="personal-score-band">--</div>
               <div class="score-card-desc">"Am I ready to deliver AI value?"</div>
             </div>
             <div class="score-card">
               <div class="score-card-title">Corporate Impact</div>
               <div class="score-card-value" id="corporate-score-value">0</div>
+              <div class="score-card-range" id="corporate-score-range" style="font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: var(--space-2);">(0 - 0)</div>
               <div class="score-card-band band-unaware" id="corporate-score-band">--</div>
               <div class="score-card-desc">"Has my org enabled AI delivery?"</div>
             </div>
@@ -263,25 +394,29 @@
             <div class="gap-action" id="gap-action">--</div>
           </div>
 
-          <!-- Confidence Badge -->
-          <div class="text-center mb-6">
-            <span id="confidence-badge" class="badge badge-low">Confidence: LOW (0.6x)</span>
+          <!-- Bell Curve Visualization -->
+          <div class="bell-curve-container" style="margin: var(--space-6) 0;">
+            <h4 class="text-center mb-4">Score Confidence Distribution</h4>
+            <canvas id="confidence-chart" height="200" style="width: 100%; max-height: 200px;"></canvas>
+            <div class="text-center mt-2" style="font-size: var(--font-size-xs); color: var(--color-text-muted);">
+              <span style="display: inline-block; margin-right: var(--space-4);">
+                <span style="display: inline-block; width: 12px; height: 12px; background: rgba(59, 130, 246, 0.6); border-radius: 2px; vertical-align: middle; margin-right: 4px;"></span>
+                L1 Self-Report (widest)
+              </span>
+              <span style="display: inline-block; margin-right: var(--space-4);">
+                <span style="display: inline-block; width: 12px; height: 12px; background: rgba(34, 197, 94, 0.6); border-radius: 2px; vertical-align: middle; margin-right: 4px;"></span>
+                L2 Peer Validated
+              </span>
+              <span style="display: inline-block;">
+                <span style="display: inline-block; width: 12px; height: 12px; background: rgba(139, 92, 246, 0.6); border-radius: 2px; vertical-align: middle; margin-right: 4px;"></span>
+                L3 Evidence Verified (narrowest)
+              </span>
+            </div>
           </div>
 
-          <!-- Legacy Score Toggle -->
-          <div class="legacy-score-toggle">
-            <label class="form-check">
-              <input type="checkbox" class="form-check-input" id="show-combined-score" onchange="toggleCombinedScore()">
-              <span class="form-check-label">Show combined score (legacy single-number view)</span>
-            </label>
-
-            <div id="combined-score-section" class="legacy-score-section hidden">
-              <div class="score-display">
-                <div class="score-value" id="score-value">0</div>
-                <div class="score-label">Combined AIQ Score</div>
-                <div id="score-band" class="score-band">--</div>
-              </div>
-            </div>
+          <!-- Confidence Badge -->
+          <div class="text-center mb-6">
+            <span id="confidence-badge" class="badge badge-low">Confidence: LOW (0.70x)</span>
           </div>
 
           <!-- Dimension Breakdown -->
@@ -333,7 +468,7 @@
             <div class="download-card" onclick="goToPeerReview()">
               <div class="download-icon">L2</div>
               <div class="download-label">Get Peer Validation</div>
-              <div class="download-desc">Increase confidence to 0.8x</div>
+              <div class="download-desc">Increase confidence to 0.85x</div>
             </div>
           </div>
         </div>

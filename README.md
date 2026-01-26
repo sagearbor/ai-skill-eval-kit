@@ -14,7 +14,7 @@ A single 0-100 score that answers: *"Can this person actually use AI well, safel
 - **Five SCOREs Dimensions:** Study, Copy, Output, Research, Ethical Security (S-C-O-R-Es)
 - **Time-Decay Modeling:** Skills depreciate as AI evolves (tool-specific: 1yr half-life → foundational: 10yr)
 - **Role-Based Weighting:** Engineers, PMs, Executives, etc. have different skill priorities
-- **Evidence Multipliers:** Self-report (0.6x) → Peer-validated (0.8x) → Auto/Audit verified (1.0x)
+- **Evidence Multipliers:** Self-report (0.70x) → Peer-validated (0.85x) → Auto/Audit verified (1.0x)
 
 ## Interactive Assessment Tools
 

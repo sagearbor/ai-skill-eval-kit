@@ -142,6 +142,30 @@ The AIQ framework now supports dual scoring to separate individual skills from o
 | **−10 to +10** | Balanced | Continue current trajectory |
 | **< −10** | Org ahead of individual | Invest in learning/upskilling |
 
+#### Personal Readiness Weights
+
+| Role | Study | Copy | Output | Research | Ethical |
+| --- | --- | --- | --- | --- | --- |
+| **General** | 40% | 35% | 10% | 10% | 5% |
+| **Developer** | 30% | 40% | 15% | 10% | 5% |
+| **Researcher** | 30% | 25% | 10% | 30% | 5% |
+| **Support** | 45% | 30% | 10% | 10% | 5% |
+| **Leader** | 40% | 30% | 10% | 10% | 10% |
+
+*Personal Readiness emphasizes knowledge acquisition (Study + Copy = 75% for General role).*
+
+#### Corporate Impact Weights
+
+| Role | Study | Copy | Output | Research | Ethical |
+| --- | --- | --- | --- | --- | --- |
+| **General** | 5% | 10% | 50% | 5% | 30% |
+| **Developer** | 5% | 10% | 55% | 5% | 25% |
+| **Researcher** | 5% | 15% | 45% | 10% | 25% |
+| **Support** | 5% | 10% | 50% | 5% | 30% |
+| **Leader** | 5% | 5% | 40% | 5% | 45% |
+
+*Corporate Impact emphasizes deployment and governance (Output + Ethical = 80% for General role).*
+
 ### **Company Type Modifiers**
 
 Organizations have different AI priorities. Company type modifiers adjust dimension weights to reflect strategic focus:
@@ -160,11 +184,28 @@ Claims without proof are discounted. Evidence modulates confidence, not capabili
 
 | Evidence Level | Multiplier | Description |
 | --- | --- | --- |
-| **Self-report only** | 0.6x | No artifacts. No validation. "Trust me." |
-| **Peer/manager validated** | 0.8x | Someone else confirmed the work and quality. |
+| **Self-report only** | 0.70x | No artifacts. No validation. "Trust me." |
+| **Peer/manager validated** | 0.85x | Someone else confirmed the work and quality. |
 | **Auto/Audit verified** | 1.0x | Automated verification OR full manual audit with quantified impact. |
 
 *Note: Automated verification and manual audit are equivalent—both achieve 1.0x. The choice depends on what's practical for the skill being assessed, not a hierarchy of rigor.*
+
+### **Confidence Ranges**
+
+Each assessment level produces a score with a confidence range representing the uncertainty in self-reported vs. validated data:
+
+| Level | Score Formula | Range | Interpretation |
+| --- | --- | --- | --- |
+| **Self (L1)** | Raw × 0.70 | Score−10 to Raw+2 | Wide range; unvalidated claims |
+| **Peer (L2)** | Raw × 0.85 | Score−5 to Raw+2 | Narrower; peer confirmation |
+| **Auto/Audit (L3)** | Raw × 1.0 | Score±2 | Tight range; verified evidence |
+
+Example: A raw score of 72 displays as:
+- **L1:** 50 (range 40–74)
+- **L2:** 61 (range 56–74)
+- **L3:** 72 (range 70–74)
+
+The range upper bound represents potential score with full verification. The lower bound accounts for possible over-reporting.
 
 ### **Confidence Rating**
 
@@ -229,7 +270,7 @@ AIQ explicitly rejects "more usage \= better." The framework includes safeguards
 | Red Flag | Consequence |
 | --- | --- |
 | **Garbage output** | AI work rejected by users or requires heavy rework → **zero Output credit** |
-| **Unverifiable claims** | "Saved $100k" without documentation → **automatic audit, 0.6x multiplier** |
+| **Unverifiable claims** | "Saved $100k" without documentation → **automatic audit, 0.70x multiplier** |
 | **Credit theft** | Two people claim 80%+ of same project → **both audited, split enforced** |
 | **Deployed but unused** | System with zero real users or adoption → **minimal Output credit** |
 | **Credit burning** | High API costs without corresponding value → **Output score capped** |
@@ -252,8 +293,8 @@ When multiple people work on a project, impact is split by contribution:
 
 | Level | Time | Method | Multiplier |
 | --- | --- | --- | --- |
-| **1\. Self** | 5 min | Self-assessment only | 0.6x |
-| **2\. Peer** | 30 min | Peer/manager validation | 0.8x |
+| **1\. Self** | 5 min | Self-assessment only | 0.70x |
+| **2\. Peer** | 30 min | Peer/manager validation | 0.85x |
 | **3\. Auto/Audit** | 1+ hr | Automated verification OR full audit | 1.0x |
 
 *Note: Both automated verification and manual audit achieve the same 1.0x multiplier. Good automation is not inferior to manual audit—both provide equivalent confidence when properly implemented.*
@@ -295,6 +336,6 @@ A high AIQ score should mean one thing:
 2. **Step 2:** Apply time decay based on when skills were learned.
 3. **Step 3:** Apply production bonus (1.5x) for live project learning.
 4. **Step 4:** Multiply by role weights.
-5. **Step 5:** Apply evidence multiplier (0.6x to 1.0x).
+5. **Step 5:** Apply evidence multiplier (0.70x to 1.0x).
 6. **Step 6:** Sum dimensions → Final AIQ (0-100).
 7. **Step 7:** Report with confidence rating (Low/Medium/High).

@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Validate AI Skills Assessment - AIQ Assessment</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/nav.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv.bundle.min.js" defer></script>
     <style>
         /* Dual Score Display Styles (v1.1) */
         .dual-score-container {
@@ -208,7 +209,7 @@
                         <div class="score-label">AIQ Score (Level 2: Peer Validated)</div>
                         <div id="scoreBandBadge" class="score-band">--</div>
                         <p class="text-muted mt-4">
-                            <span class="badge badge-medium">0.8x Evidence Multiplier</span>
+                            <span class="badge badge-medium" data-multiplier-level="2">0.85x Evidence Multiplier</span>
                         </p>
                     </div>
 

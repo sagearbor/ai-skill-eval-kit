@@ -14,7 +14,7 @@ flowchart TD
     %% ===== LEVEL 1: SELF (Easiest) =====
     subgraph L1["LEVEL 1: SELF"]
         direction LR
-        SA["Self-Assessment<br/>------------------<br/>Time: 5 minutes<br/>Evidence: 0.6x multiplier"]
+        SA["Self-Assessment<br/>------------------<br/>Time: 5 minutes<br/>Evidence: 0.70x multiplier"]
         SA_E["Evidence Needed:<br/>- Honest self-rating<br/>- Mental inventory of skills<br/>- No artifacts required"]
     end
 
@@ -25,7 +25,7 @@ flowchart TD
     %% ===== LEVEL 2: PEER (Standard) =====
     subgraph L2["LEVEL 2: PEER"]
         direction LR
-        MC["Peer/Manager Validation<br/>------------------<br/>Time: 30 minutes<br/>Evidence: 0.8x multiplier"]
+        MC["Peer/Manager Validation<br/>------------------<br/>Time: 30 minutes<br/>Evidence: 0.85x multiplier"]
         MC_E["Evidence Needed:<br/>- Work samples (GitHub, docs)<br/>- Peer feedback<br/>- Manager validation<br/>- Basic artifacts"]
     end
 
@@ -74,8 +74,8 @@ flowchart TD
 ## How to Read
 
 1. **Start at top** - Identify your assessment purpose
-2. **Green (Level 1: Self)** - Quick self-assessment (0.6x), sufficient for personal development
-3. **Yellow (Level 2: Peer)** - Peer/manager validation (0.8x), standard rigor for performance reviews
+2. **Green (Level 1: Self)** - Quick self-assessment (0.70x), sufficient for personal development
+3. **Yellow (Level 2: Peer)** - Peer/manager validation (0.85x), standard rigor for performance reviews
 4. **Red (Level 3: Auto/Audit)** - Automated verification or full audit (1.0x), maximum rigor for high-stakes decisions
 
 ## Rendering

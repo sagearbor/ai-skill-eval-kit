@@ -27,21 +27,21 @@
     "personal": {
       "description": "Individual readiness to deliver AI value",
       "roles": {
-        "General": { "study": 0.30, "copy": 0.30, "output": 0.20, "research": 0.10, "ethical": 0.10 },
-        "Developer": { "study": 0.25, "copy": 0.35, "output": 0.25, "research": 0.10, "ethical": 0.05 },
-        "Researcher": { "study": 0.20, "copy": 0.30, "output": 0.15, "research": 0.30, "ethical": 0.05 },
-        "Support": { "study": 0.35, "copy": 0.25, "output": 0.25, "research": 0.05, "ethical": 0.10 },
-        "Leader": { "study": 0.40, "copy": 0.20, "output": 0.15, "research": 0.10, "ethical": 0.15 }
+        "General": { "study": 0.40, "copy": 0.35, "output": 0.10, "research": 0.10, "ethical": 0.05 },
+        "Developer": { "study": 0.30, "copy": 0.40, "output": 0.15, "research": 0.10, "ethical": 0.05 },
+        "Researcher": { "study": 0.30, "copy": 0.25, "output": 0.10, "research": 0.30, "ethical": 0.05 },
+        "Support": { "study": 0.45, "copy": 0.30, "output": 0.10, "research": 0.10, "ethical": 0.05 },
+        "Leader": { "study": 0.40, "copy": 0.30, "output": 0.10, "research": 0.10, "ethical": 0.10 }
       }
     },
     "corporate": {
       "description": "Organizational AI deployment and governance",
       "roles": {
-        "General": { "study": 0.10, "copy": 0.15, "output": 0.45, "research": 0.05, "ethical": 0.25 },
-        "Developer": { "study": 0.05, "copy": 0.15, "output": 0.55, "research": 0.10, "ethical": 0.15 },
-        "Researcher": { "study": 0.10, "copy": 0.20, "output": 0.35, "research": 0.20, "ethical": 0.15 },
-        "Support": { "study": 0.10, "copy": 0.15, "output": 0.45, "research": 0.05, "ethical": 0.25 },
-        "Leader": { "study": 0.15, "copy": 0.10, "output": 0.30, "research": 0.05, "ethical": 0.40 }
+        "General": { "study": 0.05, "copy": 0.10, "output": 0.50, "research": 0.05, "ethical": 0.30 },
+        "Developer": { "study": 0.05, "copy": 0.10, "output": 0.55, "research": 0.05, "ethical": 0.25 },
+        "Researcher": { "study": 0.05, "copy": 0.15, "output": 0.45, "research": 0.10, "ethical": 0.25 },
+        "Support": { "study": 0.05, "copy": 0.10, "output": 0.50, "research": 0.05, "ethical": 0.30 },
+        "Leader": { "study": 0.05, "copy": 0.05, "output": 0.40, "research": 0.05, "ethical": 0.45 }
       }
     },
     "combined": {

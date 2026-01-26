@@ -136,10 +136,38 @@ const SCORE_BANDS = [
 // =============================================================================
 
 const EVIDENCE_MULTIPLIERS = {
-  1: { multiplier: 0.6, confidence: 'LOW', description: 'Self-report only' },
-  2: { multiplier: 0.8, confidence: 'MEDIUM', description: 'Peer/manager validated' },
+  1: { multiplier: 0.70, confidence: 'LOW', description: 'Self-report only' },
+  2: { multiplier: 0.85, confidence: 'MEDIUM', description: 'Peer/manager validated' },
   3: { multiplier: 1.0, confidence: 'HIGH', description: 'Auto/Audit verified' }
 };
+
+/**
+ * Calculate confidence range for a score based on assessment level
+ * L1 (0.70x): range = score-10 to rawScore+2 (widest uncertainty)
+ * L2 (0.85x): range = score-5 to rawScore+2 (medium uncertainty)
+ * L3 (1.0x): range = score-2 to score+2 (narrowest uncertainty)
+ * @param {number} rawScore - The raw normalized score (0-100) before multiplier
+ * @param {number} assessmentLevel - The assessment level (1, 2, or 3)
+ * @returns {object} { score, lower, upper, rawScore }
+ */
+function calculateConfidenceRange(rawScore, assessmentLevel) {
+  const multiplier = EVIDENCE_MULTIPLIERS[assessmentLevel].multiplier;
+  const score = Math.round(rawScore * multiplier);
+
+  let lower, upper;
+  if (assessmentLevel === 1) {
+    lower = Math.max(0, score - 10);
+    upper = Math.min(100, rawScore + 2);
+  } else if (assessmentLevel === 2) {
+    lower = Math.max(0, score - 5);
+    upper = Math.min(100, rawScore + 2);
+  } else {
+    lower = Math.max(0, score - 2);
+    upper = Math.min(100, score + 2);
+  }
+
+  return { score, lower, upper, rawScore };
+}
 
 // =============================================================================
 // AI TOOLS LIST (for Level 3)
@@ -492,12 +520,39 @@ function calculateDualScores(levels, role, companyType, assessmentLevel) {
   const corporateWeights = getWeightsForScoreType('corporate', role, companyType);
   const combinedWeights = getWeightsForScoreType('combined', role, companyType);
 
-  // Calculate each score
-  const personalScore = calculateSingleScore(levels, personalWeights, evidenceMultiplier);
-  const corporateScore = calculateSingleScore(levels, corporateWeights, evidenceMultiplier);
-  const combinedScore = calculateSingleScore(levels, combinedWeights, evidenceMultiplier);
+  // Calculate each score (using multiplier of 1.0 to get raw scores first)
+  const personalScoreRaw = calculateSingleScore(levels, personalWeights, 1.0);
+  const corporateScoreRaw = calculateSingleScore(levels, corporateWeights, 1.0);
+  const combinedScoreRaw = calculateSingleScore(levels, combinedWeights, 1.0);
 
-  // Calculate gap
+  // Calculate confidence ranges for each score type
+  const personalRange = calculateConfidenceRange(personalScoreRaw.normalizedScore, assessmentLevel);
+  const corporateRange = calculateConfidenceRange(corporateScoreRaw.normalizedScore, assessmentLevel);
+  const combinedRange = calculateConfidenceRange(combinedScoreRaw.normalizedScore, assessmentLevel);
+
+  // Build score objects with ranges
+  const personalScore = {
+    rawTotal: personalScoreRaw.rawTotal,
+    normalizedScore: personalRange.score,
+    scoreBand: getScoreBand(personalRange.score).name,
+    range: { lower: personalRange.lower, upper: personalRange.upper, rawScore: personalRange.rawScore }
+  };
+
+  const corporateScore = {
+    rawTotal: corporateScoreRaw.rawTotal,
+    normalizedScore: corporateRange.score,
+    scoreBand: getScoreBand(corporateRange.score).name,
+    range: { lower: corporateRange.lower, upper: corporateRange.upper, rawScore: corporateRange.rawScore }
+  };
+
+  const combinedScore = {
+    rawTotal: combinedScoreRaw.rawTotal,
+    normalizedScore: combinedRange.score,
+    scoreBand: getScoreBand(combinedRange.score).name,
+    range: { lower: combinedRange.lower, upper: combinedRange.upper, rawScore: combinedRange.rawScore }
+  };
+
+  // Calculate gap (using the multiplied scores)
   const gap = personalScore.normalizedScore - corporateScore.normalizedScore;
   const gapInterpretation = getGapInterpretation(gap);
 
@@ -523,6 +578,7 @@ function calculateDualScores(levels, role, companyType, assessmentLevel) {
     gapInterpretation,
     evidenceMultiplier,
     confidence,
+    assessmentLevel,
     dimensions,
     // Legacy fields for compatibility
     rawWeightedTotal: combinedScore.rawTotal,
@@ -1054,6 +1110,24 @@ function escapeHtmlForValidation(text) {
 }
 
 // =============================================================================
+// DYNAMIC MULTIPLIER LABELS
+// =============================================================================
+
+/**
+ * Populate evidence multiplier values in HTML elements
+ * Elements with data-multiplier-level="1|2|3" will have their text content
+ * replaced with the corresponding multiplier value
+ */
+function populateMultiplierLabels() {
+  document.querySelectorAll('[data-multiplier-level]').forEach(el => {
+    const level = parseInt(el.dataset.multiplierLevel, 10);
+    if (EVIDENCE_MULTIPLIERS[level]) {
+      el.textContent = EVIDENCE_MULTIPLIERS[level].multiplier + 'x';
+    }
+  });
+}
+
+// =============================================================================
 // INITIALIZATION
 // =============================================================================
 
@@ -1065,6 +1139,9 @@ async function initShared() {
     loadWeightsConfig(),
     loadLevelDescriptions()
   ]);
+
+  // Populate multiplier labels after configs are loaded
+  populateMultiplierLabels();
 }
 
 // Auto-initialize when DOM is ready
@@ -1101,6 +1178,7 @@ window.calculateDimensionScore = calculateDimensionScore;
 window.getMaxWeightedScore = getMaxWeightedScore;
 window.normalizeScore = normalizeScore;
 window.getScoreBand = getScoreBand;
+window.calculateConfidenceRange = calculateConfidenceRange;
 window.applyCompanyModifier = applyCompanyModifier;
 window.getWeightsForScoreType = getWeightsForScoreType;
 window.calculateSingleScore = calculateSingleScore;
@@ -1122,4 +1200,5 @@ window.createReportObject = createReportObject;
 window.validateReportSchema = validateReportSchema;
 window.displayValidationErrors = displayValidationErrors;
 window.clearValidationErrors = clearValidationErrors;
+window.populateMultiplierLabels = populateMultiplierLabels;
 window.initShared = initShared;

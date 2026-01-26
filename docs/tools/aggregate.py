@@ -266,8 +266,9 @@ def calculate_stats(reports: List[Tuple[Dict[str, Any], str]]) -> Dict[str, Any]
             stats["byCompanyType"][company_type] = stats["byCompanyType"].get(company_type, 0) + 1
 
         # Score distribution - handle both v1.0 and v1.1
+        # v1.1 uses personalScore as primary (individual readiness)
         if schema_version == "1.1":
-            final_score = safe_get(report, "calculation", "combinedScore", "normalizedScore", default=None)
+            final_score = safe_get(report, "calculation", "personalScore", "normalizedScore", default=None)
             gap = safe_get(report, "calculation", "gap", default=None)
             if gap is not None and isinstance(gap, (int, float)):
                 gaps.append(int(gap))
@@ -400,9 +401,14 @@ def main() -> int:
     print(f"\nStats:")
 
     # Calculate overall average score
+    # v1.1 uses personalScore, v1.0 uses scores.finalScore
     all_scores = []
     for report, _ in reports_with_periods:
-        score = safe_get(report, "scores", "finalScore", default=None)
+        schema_version = report.get("schemaVersion", "1.0")
+        if schema_version == "1.1":
+            score = safe_get(report, "calculation", "personalScore", "normalizedScore", default=None)
+        else:
+            score = safe_get(report, "scores", "finalScore", default=None)
         if score is not None and isinstance(score, (int, float)):
             all_scores.append(int(score))
 

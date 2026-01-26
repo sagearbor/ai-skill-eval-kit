@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reference Guide | AIQ Framework</title>
     <link rel="stylesheet" href="css/styles.css">
@@ -102,6 +103,12 @@
             font-weight: 700;
             color: var(--color-accent);
         }
+        /* Responsive dual weights tables */
+        @media (max-width: 900px) {
+            #dual-weights > div[style*="grid-template-columns: 1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -116,9 +123,11 @@
         <!-- Quick Navigation -->
         <nav class="reference-nav">
             <a href="#overview">Framework Overview</a>
+            <a href="#dual-weights">Dual Scoring (v1.1)</a>
             <a href="#weights">Weight Tables</a>
             <a href="#matrix">Validation Matrix</a>
             <a href="#rubrics">Full Rubrics</a>
+            <a href="#administrators">For Administrators</a>
         </nav>
 
         <!-- Framework Overview -->
@@ -178,9 +187,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td><strong>Level 1: Self</strong></td><td>0.6x</td><td>Self-report only. No validation.</td></tr>
-                    <tr><td><strong>Level 2: Peer</strong></td><td>0.8x</td><td>Peer or manager confirmed the work.</td></tr>
-                    <tr><td><strong>Level 3: Verified</strong></td><td>1.0x</td><td>Automated logs or full audit with evidence.</td></tr>
+                    <tr><td><strong>Level 1: Self</strong></td><td data-multiplier-level="1">0.70x</td><td>Self-report only. No validation.</td></tr>
+                    <tr><td><strong>Level 2: Peer</strong></td><td data-multiplier-level="2">0.85x</td><td>Peer or manager confirmed the work.</td></tr>
+                    <tr><td><strong>Level 3: Verified</strong></td><td data-multiplier-level="3">1.0x</td><td>Automated logs or full audit with evidence.</td></tr>
                 </tbody>
             </table>
         </section>
@@ -188,67 +197,86 @@
         <!-- Weight Tables -->
         <section class="section-card" id="weights">
             <h2>Scoring Weight Tables</h2>
-            <p class="mb-4">Your final score is calculated by weighting each dimension based on your role. Different roles emphasize different skills.</p>
+            <p class="mb-2">Your final score is calculated by weighting each SCOREs dimension based on three factors:</p>
+            <ol style="margin: 0 0 var(--space-4) var(--space-6); padding: 0;">
+                <li><strong>Role</strong> — which skills matter most for your job function</li>
+                <li><strong>Company Type</strong> — organizational priorities that modify role weights</li>
+                <li><strong>Assessment Level</strong> — evidence confidence (you control this by getting peer validation or verified evidence)</li>
+            </ol>
 
-            <h3>Role Weights (Combined Score)</h3>
-            <p class="text-muted mb-2" style="font-size: var(--font-size-xs);">
-                <span style="background: rgba(16, 185, 129, 0.15); padding: 1px 4px; border-radius: 2px;">green</span> = higher than General,
-                <span style="background: rgba(244, 63, 94, 0.12); padding: 1px 4px; border-radius: 2px;">red</span> = lower
-            </p>
-            <table class="matrix-table mb-6">
-                <thead>
-                    <tr>
-                        <th>Role</th>
-                        <th>Study</th>
-                        <th>Copy</th>
-                        <th>Output</th>
-                        <th>Research</th>
-                        <th>Ethical</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>General</strong></td>
-                        <td>20%</td>
-                        <td>30%</td>
-                        <td>30%</td>
-                        <td>5%</td>
-                        <td>15%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Developer</strong></td>
-                        <td style="background: rgba(244, 63, 94, 0.12);">10%</td>
-                        <td style="background: rgba(244, 63, 94, 0.12);">25%</td>
-                        <td style="background: rgba(16, 185, 129, 0.15);">40%</td>
-                        <td style="background: rgba(16, 185, 129, 0.15);">15%</td>
-                        <td style="background: rgba(244, 63, 94, 0.12);">10%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Researcher</strong></td>
-                        <td style="background: rgba(244, 63, 94, 0.12);">15%</td>
-                        <td style="background: rgba(244, 63, 94, 0.12);">25%</td>
-                        <td style="background: rgba(244, 63, 94, 0.12);">25%</td>
-                        <td style="background: rgba(16, 185, 129, 0.15);">25%</td>
-                        <td style="background: rgba(244, 63, 94, 0.12);">10%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Support</strong></td>
-                        <td style="background: rgba(16, 185, 129, 0.15);">25%</td>
-                        <td style="background: rgba(244, 63, 94, 0.12);">20%</td>
-                        <td>30%</td>
-                        <td style="background: rgba(16, 185, 129, 0.15);">10%</td>
-                        <td>15%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Leader</strong></td>
-                        <td style="background: rgba(16, 185, 129, 0.15);">30%</td>
-                        <td style="background: rgba(244, 63, 94, 0.12);">15%</td>
-                        <td style="background: rgba(244, 63, 94, 0.12);">20%</td>
-                        <td style="background: rgba(16, 185, 129, 0.15);">10%</td>
-                        <td style="background: rgba(16, 185, 129, 0.15);">25%</td>
-                    </tr>
-                </tbody>
-            </table>
+            <!-- Dual Scoring Weights (v1.1) -->
+            <div id="dual-weights" style="scroll-margin-top: 20px;">
+                <h3>Dual Scoring Weights</h3>
+                <p class="text-muted mb-4" style="font-size: var(--font-size-sm);">
+                    The framework uses <strong>two separate scores</strong> to distinguish what <em>you</em> know from what <em>your organization</em> has enabled:
+                </p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-6);">
+                    <div style="padding: var(--space-4); background: rgba(59, 130, 246, 0.08); border-radius: var(--radius-md); border-left: 4px solid #3b82f6;">
+                        <strong style="color: #3b82f6;">Personal Readiness</strong>
+                        <span style="font-size: var(--font-size-xs); background: #3b82f6; color: white; padding: 1px 6px; border-radius: 3px; margin-left: 6px;">PRIMARY</span><br>
+                        <span style="font-size: var(--font-size-sm); color: var(--color-text-muted);">"Am I ready to deliver AI value?"</span><br>
+                        <span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">Emphasizes <strong>Study + Copy</strong> (knowledge & evaluation skills)</span><br>
+                        <span style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 4px; display: block;">Used for individual dashboards and comparisons.</span>
+                    </div>
+                    <div style="padding: var(--space-4); background: rgba(16, 185, 129, 0.08); border-radius: var(--radius-md); border-left: 4px solid #10b981;">
+                        <strong style="color: #10b981;">Corporate Impact</strong><br>
+                        <span style="font-size: var(--font-size-sm); color: var(--color-text-muted);">"Has my org enabled AI delivery?"</span><br>
+                        <span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">Emphasizes <strong>Output + Ethical</strong> (deployment & governance)</span><br>
+                        <span style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 4px; display: block;">Reveals organizational enablement gaps.</span>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); margin-bottom: var(--space-6);">
+                    <!-- Personal Readiness Table -->
+                    <div>
+                        <h4 style="color: #3b82f6; margin-bottom: var(--space-2);">Personal Readiness Weights</h4>
+                        <table class="matrix-table" id="personal-weights-table">
+                            <thead>
+                                <tr>
+                                    <th>Role</th>
+                                    <th>Study</th>
+                                    <th>Copy</th>
+                                    <th>Output</th>
+                                    <th>Research</th>
+                                    <th>Ethical</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Corporate Impact Table -->
+                    <div>
+                        <h4 style="color: #10b981; margin-bottom: var(--space-2);">Corporate Impact Weights</h4>
+                        <table class="matrix-table" id="corporate-weights-table">
+                            <thead>
+                                <tr>
+                                    <th>Role</th>
+                                    <th>Study</th>
+                                    <th>Copy</th>
+                                    <th>Output</th>
+                                    <th>Research</th>
+                                    <th>Ethical</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="background: var(--color-bg-alt); padding: var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-6);">
+                    <strong style="font-size: var(--font-size-sm);">Gap Analysis (Personal − Corporate):</strong>
+                    <ul style="margin: var(--space-2) 0 0 var(--space-4); padding: 0; font-size: var(--font-size-xs); color: var(--color-text-muted);">
+                        <li><strong style="color: var(--color-success);">Positive gap</strong> (Personal &gt; Corporate): You have skills your org isn't utilizing → advocate for AI projects</li>
+                        <li><strong style="color: var(--color-warning);">Negative gap</strong> (Corporate &gt; Personal): Org is deploying faster than you're learning → invest in upskilling</li>
+                        <li><strong style="color: var(--color-accent);">Balanced</strong> (within ±10): Skills match opportunities → continue current trajectory</li>
+                    </ul>
+                </div>
+            </div>
 
             <h3>Company Type Modifiers</h3>
             <p class="text-muted mb-2" style="font-size: var(--font-size-xs);">Multipliers applied to role weights, then renormalized to 100%.</p>
@@ -278,15 +306,15 @@
                         <td><strong>Enterprise</strong></td>
                         <td>1.0x</td>
                         <td style="background: rgba(16, 185, 129, 0.15);">1.2x</td>
-                        <td style="background: rgba(244, 63, 94, 0.12);">0.8x</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">0.85x</td>
                         <td>1.0x</td>
                         <td>1.0x</td>
                         <td><em>Reliable, scalable, governed</em></td>
                     </tr>
                     <tr>
                         <td><strong>Aspirational</strong></td>
-                        <td style="background: rgba(244, 63, 94, 0.12);">0.8x</td>
-                        <td style="background: rgba(244, 63, 94, 0.12);">0.8x</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">0.85x</td>
+                        <td style="background: rgba(244, 63, 94, 0.12);">0.85x</td>
                         <td>1.0x</td>
                         <td style="background: rgba(16, 185, 129, 0.15);">1.2x</td>
                         <td style="background: rgba(16, 185, 129, 0.15);">1.2x</td>
@@ -433,6 +461,81 @@
             </div>
         </section>
 
+        <!-- For Administrators -->
+        <section class="section-card" id="administrators">
+            <h2>For Administrators</h2>
+            <p class="mb-4">Share pre-configured assessment links with your team to ensure everyone uses the same role and company settings.</p>
+
+            <h3>Pre-configured Assessment Links</h3>
+            <p class="mb-4">You can generate assessment URLs with settings pre-filled. When users open these links, their role, company type, and scoring distribution will be automatically selected.</p>
+
+            <h4 style="margin-top: var(--space-4);">Available URL Parameters</h4>
+            <table class="matrix-table mb-6">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Values</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>role</code></td>
+                        <td><code>General</code>, <code>Developer</code>, <code>Researcher</code>, <code>Support</code>, <code>Leader</code></td>
+                        <td><code>General</code></td>
+                        <td>Sets the primary role for dimension weighting</td>
+                    </tr>
+                    <tr>
+                        <td><code>companyType</code></td>
+                        <td><code>Startup</code>, <code>Enterprise</code>, <code>Aspirational</code></td>
+                        <td><em>(none)</em></td>
+                        <td>Applies company-specific weight modifiers</td>
+                    </tr>
+                    <tr>
+                        <td><code>distribution</code></td>
+                        <td><code>bellCurve</code>, <code>linear</code>, <code>progressive</code>, <code>sigmoid</code></td>
+                        <td><code>bellCurve</code></td>
+                        <td>Point distribution curve (Advanced Options)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Example URLs</h4>
+            <div style="background: var(--color-bg-alt); padding: var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-4);">
+                <p style="font-size: var(--font-size-sm); margin-bottom: var(--space-2);"><strong>Developer at a Startup:</strong></p>
+                <code style="word-break: break-all; font-size: var(--font-size-xs); display: block; padding: var(--space-2); background: var(--color-bg); border-radius: var(--radius-sm);">https://sagearbor.github.io/ai-skill-eval-kit/level1.html?role=Developer&companyType=Startup</code>
+            </div>
+            <div style="background: var(--color-bg-alt); padding: var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-4);">
+                <p style="font-size: var(--font-size-sm); margin-bottom: var(--space-2);"><strong>Leader at an Enterprise company:</strong></p>
+                <code style="word-break: break-all; font-size: var(--font-size-xs); display: block; padding: var(--space-2); background: var(--color-bg); border-radius: var(--radius-sm);">https://sagearbor.github.io/ai-skill-eval-kit/level1.html?role=Leader&companyType=Enterprise</code>
+            </div>
+            <div style="background: var(--color-bg-alt); padding: var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-4);">
+                <p style="font-size: var(--font-size-sm); margin-bottom: var(--space-2);"><strong>Researcher with progressive point distribution:</strong></p>
+                <code style="word-break: break-all; font-size: var(--font-size-xs); display: block; padding: var(--space-2); background: var(--color-bg); border-radius: var(--radius-sm);">https://sagearbor.github.io/ai-skill-eval-kit/level1.html?role=Researcher&distribution=progressive</code>
+            </div>
+
+            <h4 style="margin-top: var(--space-6);">Using the Share Settings Button</h4>
+            <p>On the assessment page, after selecting your desired settings:</p>
+            <ol style="margin-left: var(--space-6); margin-bottom: var(--space-4);">
+                <li>Configure the role, company type, and distribution as needed</li>
+                <li>Click the <strong>"Share Settings"</strong> button (located above the assessment form)</li>
+                <li>The URL with your current settings is copied to your clipboard</li>
+                <li>Share this link with your team via email, Slack, or any messaging platform</li>
+            </ol>
+            <p class="text-muted" style="font-size: var(--font-size-sm);">
+                <strong>Tip:</strong> Only non-default values are included in the URL to keep it clean. If you select "General" role with no company type and "bellCurve" distribution, the URL will be the plain assessment page.
+            </p>
+
+            <h4 style="margin-top: var(--space-6);">Use Cases</h4>
+            <ul style="margin-left: var(--space-6);">
+                <li><strong>Team-wide assessments:</strong> Send a single link to all developers with <code>?role=Developer&companyType=Startup</code></li>
+                <li><strong>Role-specific campaigns:</strong> Create separate links for different job functions</li>
+                <li><strong>Standardized scoring:</strong> Ensure consistent point distribution across your organization</li>
+                <li><strong>Onboarding:</strong> Include the assessment link in new hire materials with appropriate defaults</li>
+            </ul>
+        </section>
+
         <!-- Back to Assessment -->
         <div class="text-center" style="padding: var(--space-8) 0;">
             <a href="level1.html" class="btn btn-primary btn-large">Take the Assessment →</a>
@@ -449,19 +552,22 @@
 
     <script src="js/nav.js"></script>
     <script>
-    // Dynamic rubric descriptions based on role selection
+    // Dynamic weight tables and rubric descriptions
     (function() {
         let levelDescriptions = null;
+        let weightsConfig = null;
 
-        // Load level descriptions JSON
-        fetch('config/level-descriptions.json')
-            .then(response => response.json())
-            .then(data => {
-                levelDescriptions = data;
-                // Initialize with default role (Developer)
-                updateRubrics('Developer');
-            })
-            .catch(err => console.error('Failed to load level descriptions:', err));
+        // Load both config files
+        Promise.all([
+            fetch('config/level-descriptions.json').then(r => r.json()),
+            fetch('config/weights-config.json').then(r => r.json())
+        ]).then(([descriptions, weights]) => {
+            levelDescriptions = descriptions;
+            weightsConfig = weights;
+            // Initialize
+            updateRubrics('Developer');
+            populateDualWeightsTables();
+        }).catch(err => console.error('Failed to load config:', err));
 
         // Handle role selection change
         const roleSelect = document.getElementById('rubricRoleSelect');
@@ -492,6 +598,51 @@
                     }
                 });
             });
+        }
+
+        function populateDualWeightsTables() {
+            if (!weightsConfig?.scoreTypes) return;
+
+            const roles = ['General', 'Developer', 'Researcher', 'Support', 'Leader'];
+            const dims = ['study', 'copy', 'output', 'research', 'ethical'];
+
+            // Personal Readiness table
+            const personalTbody = document.querySelector('#personal-weights-table tbody');
+            if (personalTbody && weightsConfig.scoreTypes.personal) {
+                personalTbody.innerHTML = roles.map(role => {
+                    const weights = weightsConfig.scoreTypes.personal.roles[role];
+                    return `<tr>
+                        <td><strong>${role}</strong></td>
+                        ${dims.map(d => {
+                            const w = weights[d];
+                            const pct = Math.round(w * 100);
+                            // Highlight high values (Study/Copy emphasis)
+                            const isHigh = (d === 'study' || d === 'copy') && w >= 0.30;
+                            const style = isHigh ? 'background: rgba(59, 130, 246, 0.15);' : '';
+                            return `<td style="${style}">${pct}%</td>`;
+                        }).join('')}
+                    </tr>`;
+                }).join('');
+            }
+
+            // Corporate Impact table
+            const corporateTbody = document.querySelector('#corporate-weights-table tbody');
+            if (corporateTbody && weightsConfig.scoreTypes.corporate) {
+                corporateTbody.innerHTML = roles.map(role => {
+                    const weights = weightsConfig.scoreTypes.corporate.roles[role];
+                    return `<tr>
+                        <td><strong>${role}</strong></td>
+                        ${dims.map(d => {
+                            const w = weights[d];
+                            const pct = Math.round(w * 100);
+                            // Highlight high values (Output/Ethical emphasis)
+                            const isHigh = (d === 'output' || d === 'ethical') && w >= 0.25;
+                            const style = isHigh ? 'background: rgba(16, 185, 129, 0.15);' : '';
+                            return `<td style="${style}">${pct}%</td>`;
+                        }).join('')}
+                    </tr>`;
+                }).join('');
+            }
         }
     })();
     </script>
