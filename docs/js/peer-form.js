@@ -724,7 +724,7 @@ function generateValidatedReport(validatorName, validatorRelationship, validatio
     finalLevels[dimKey] = val.finalLevel;
   }
 
-  // Calculate dual scores (assessment level 2 = 0.8x multiplier)
+  // Calculate dual scores (assessment level 2 = 0.85x multiplier)
   const score = calculateDualScores(finalLevels, assesseeData.role, assesseeData.companyType || null, 2);
 
   // Build the report object (v1.1 format)

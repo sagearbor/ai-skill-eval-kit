@@ -119,7 +119,7 @@ docs/
 
   "calculation": {
     "rawTotal": 49.2,
-    "evidenceMultiplier": 0.6,
+    "evidenceMultiplier": 0.70,
     "finalScore": 29.5,
     "normalizedScore": 52,          // 0-100 scale
     "scoreBand": "Practitioner",
@@ -242,14 +242,14 @@ At bottom of page, before footer, add collapsible assessment flow diagram:
       Q -->|"Hiring/Promotion"| HP[Verified Path]
 
       subgraph L1["LEVEL 1: SELF"]
-        SA["Self-Assessment<br/>5 min · 0.6x"]
+        SA["Self-Assessment<br/>5 min · 0.70x"]
       end
       PD --> L1
       PR --> L1
       HP --> L1
 
       subgraph L2["LEVEL 2: PEER"]
-        MC["Peer Validation<br/>30 min · 0.8x"]
+        MC["Peer Validation<br/>30 min · 0.85x"]
       end
       L1 -->|"Personal Dev STOPS"| DONE1((Done))
       L1 -->|"Continue"| L2
@@ -372,14 +372,14 @@ For each of the 5 dimensions (S, C, O, R, Es):
 
 ### Gaming Prevention
 If user selects Level 4 or 5 on ALL dimensions, show warning:
-> "Scores this high are rare (top 5% of AI practitioners). Consider getting peer validation to increase your confidence multiplier from 0.6x to 0.8x."
+> "Scores this high are rare (top 5% of AI practitioners). Consider getting peer validation to increase your confidence multiplier from 0.70x to 0.85x."
 
 Not blocking - just informational.
 
 ### Score Calculation
 1. Apply point values based on selected levels (use midpoint of range)
 2. Apply role-based weights
-3. Apply 0.6x evidence multiplier (self-report)
+3. Apply 0.70x evidence multiplier (self-report)
 4. Calculate final AIQ (0-100)
 5. Determine score band (Unaware/User/Practitioner/Builder/Architect/Pioneer)
 6. Set confidence to "LOW"
@@ -390,7 +390,7 @@ Not blocking - just informational.
 │                    Your AIQ Score                        │
 │                        52                                │
 │                   PRACTITIONER                           │
-│              Confidence: LOW (0.6x)                      │
+│              Confidence: LOW (0.70x)                     │
 ├─────────────────────────────────────────────────────────┤
 │  Dimension Breakdown            Role: Software Engineer  │
 │  ─────────────────────────────────────────────────────  │
@@ -400,7 +400,7 @@ Not blocking - just informational.
 │  Research: 5 pts  (×15%)  →  0.75                       │
 │  Ethical:  9 pts  (×10%)  →  0.9                        │
 │  ─────────────────────────────────────────────────────  │
-│  Raw Total: 10.85 × 0.6 = 6.51 (normalized to 52/100)   │
+│  Raw Total: 10.85 × 0.70 = 7.60 (normalized to 52/100)  │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -523,7 +523,7 @@ Level 2 uses **URL-encoded state** to pass data between assessee and validator w
 
 **Output:**
 - Validated JSON report (assessmentLevel: 2, validation: {...})
-- Recalculated score with 0.8x multiplier
+- Recalculated score with 0.85x multiplier
 - Download buttons: JSON (primary) + PDF (human-readable)
 - Option to copy a "completed validation" URL to share back with assessee
 
@@ -751,7 +751,7 @@ python aggregate.py ./2025-Q1/ --output ./reports/
 | ethical_level | int | |
 | ethical_points | float | |
 | raw_total | float | |
-| evidence_multiplier | float | 0.6, 0.8, or 1.0 |
+| evidence_multiplier | float | 0.70, 0.85, or 1.0 |
 | final_score | float | |
 | normalized_score | int | 0-100 |
 | score_band | string | |
@@ -968,7 +968,7 @@ To ensure reliable html2pdf conversion:
 - [ ] L1 PDF downloads work (all 3 types)
 - [ ] L2 URL encoding works (generates valid shareable link)
 - [ ] L2 validator page decodes URL correctly
-- [ ] L2 validation produces JSON with 0.8x multiplier
+- [ ] L2 validation produces JSON with 0.85x multiplier
 - [ ] L3 role tabs work, show correct content
 - [ ] L3 form captures tool metrics
 - [ ] L3 JSON includes all evidence fields

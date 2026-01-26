@@ -28,7 +28,7 @@
     "assessmentLevel": {
       "type": "integer",
       "enum": [1, 2, 3],
-      "description": "Assessment rigor level: 1=Self (0.6x), 2=Peer (0.8x), 3=Auto/Audit (1.0x)."
+      "description": "Assessment rigor level: 1=Self (0.70x), 2=Peer (0.85x), 3=Auto/Audit (1.0x)."
     },
     "generatedAt": {
       "type": "string",

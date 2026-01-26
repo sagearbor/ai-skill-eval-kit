@@ -32,6 +32,13 @@ async function initAssessment() {
       // Update dimension descriptions for new role
       updateDimensionDescriptions(currentRole);
     });
+
+    // Check for URL param
+    const urlRole = getUrlParam('role');
+    if (urlRole && ROLES.includes(urlRole)) {
+      roleSelect.value = urlRole;
+      currentRole = urlRole;
+    }
   }
 
   // Populate company type dropdown
@@ -109,9 +116,9 @@ function renderDimensionForm(dimensionKey, dimensionData, role = 'General') {
 
   let radioCardsHtml = '';
   for (const levelData of dimensionData.levels) {
-    const pointsText = levelData.level === 0
-      ? '0 pts'
-      : `${levelData.minPoints}-${levelData.maxPoints} pts`;
+    // Use getPointsForLevel() to get actual points for current distribution
+    const actualPoints = getPointsForLevel(dimensionKey, levelData.level);
+    const pointsText = `${actualPoints} pts`;
 
     // Get description from level-descriptions.json based on role
     const description = getLevelDescription(dimensionKey, levelData.level, role);
@@ -121,7 +128,7 @@ function renderDimensionForm(dimensionKey, dimensionData, role = 'General') {
         <input type="radio" name="${dimensionKey}" value="${levelData.level}">
         <div class="radio-card-indicator"></div>
         <div class="radio-card-content">
-          <div class="radio-card-label">Level ${levelData.level} (${pointsText})</div>
+          <div class="radio-card-label">Level ${levelData.level} (<span class="points-value">${pointsText}</span>)</div>
           <div class="radio-card-desc">${escapeHtml(description)}</div>
         </div>
       </label>
@@ -289,6 +296,198 @@ function validateForm() {
 }
 
 // =============================================================================
+// BELL CURVE VISUALIZATION
+// =============================================================================
+
+/**
+ * Draw a normal distribution (bell) curve on a canvas
+ * @param {CanvasRenderingContext2D} ctx - Canvas context
+ * @param {number} mean - Center of the curve (0-100 scale)
+ * @param {number} stdDev - Standard deviation (controls width)
+ * @param {string} color - Fill color (rgba format)
+ * @param {string} strokeColor - Stroke color
+ * @param {number} canvasWidth - Canvas width in pixels
+ * @param {number} canvasHeight - Canvas height in pixels
+ * @param {boolean} isCurrentLevel - Whether this is the current assessment level (more opaque)
+ */
+function drawBellCurve(ctx, mean, stdDev, color, strokeColor, canvasWidth, canvasHeight, isCurrentLevel) {
+  const padding = 40;
+  const drawWidth = canvasWidth - (padding * 2);
+  const drawHeight = canvasHeight - 60;
+
+  // Calculate curve points
+  const points = [];
+  for (let x = 0; x <= 100; x += 0.5) {
+    const canvasX = padding + (x / 100) * drawWidth;
+    // Gaussian function: y = e^(-(x-mean)^2 / (2*stdDev^2))
+    const z = (x - mean) / stdDev;
+    const y = Math.exp(-0.5 * z * z);
+    const canvasY = (canvasHeight - 30) - (y * drawHeight * 0.9);
+    points.push({ x: canvasX, y: canvasY });
+  }
+
+  // Draw filled area
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, canvasHeight - 30);
+  ctx.lineTo(points[0].x, points[0].y);
+
+  for (let i = 1; i < points.length; i++) {
+    ctx.lineTo(points[i].x, points[i].y);
+  }
+
+  ctx.lineTo(points[points.length - 1].x, canvasHeight - 30);
+  ctx.closePath();
+
+  // Fill with appropriate opacity
+  ctx.fillStyle = color;
+  ctx.fill();
+
+  // Stroke the curve
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = isCurrentLevel ? 2 : 1;
+  ctx.beginPath();
+  for (let i = 0; i < points.length; i++) {
+    if (i === 0) {
+      ctx.moveTo(points[i].x, points[i].y);
+    } else {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
+  }
+  ctx.stroke();
+}
+
+/**
+ * Draw the confidence chart with overlapping bell curves for all assessment levels
+ * @param {object} scoreData - Score data from calculateDualScores
+ */
+function drawConfidenceChart(scoreData) {
+  const canvas = document.getElementById('confidence-chart');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+
+  // Set canvas size for high DPI displays
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = 200 * dpr;
+  ctx.scale(dpr, dpr);
+
+  const width = rect.width;
+  const height = 200;
+
+  // Clear canvas
+  ctx.clearRect(0, 0, width, height);
+
+  // Get the combined score's raw score (before multiplier)
+  const rawScore = scoreData.combinedScore.range.rawScore;
+  const currentLevel = scoreData.assessmentLevel || 1;
+
+  // Calculate scores and ranges for each level
+  const levels = [
+    {
+      level: 1,
+      range: calculateConfidenceRange(rawScore, 1),
+      color: 'rgba(59, 130, 246, 0.2)', // Blue
+      strokeColor: 'rgba(59, 130, 246, 0.6)',
+      activeColor: 'rgba(59, 130, 246, 0.4)',
+      activeStroke: 'rgba(59, 130, 246, 1)'
+    },
+    {
+      level: 2,
+      range: calculateConfidenceRange(rawScore, 2),
+      color: 'rgba(34, 197, 94, 0.2)', // Green
+      strokeColor: 'rgba(34, 197, 94, 0.6)',
+      activeColor: 'rgba(34, 197, 94, 0.4)',
+      activeStroke: 'rgba(34, 197, 94, 1)'
+    },
+    {
+      level: 3,
+      range: calculateConfidenceRange(rawScore, 3),
+      color: 'rgba(139, 92, 246, 0.2)', // Purple
+      strokeColor: 'rgba(139, 92, 246, 0.6)',
+      activeColor: 'rgba(139, 92, 246, 0.4)',
+      activeStroke: 'rgba(139, 92, 246, 1)'
+    }
+  ];
+
+  // Draw x-axis
+  const padding = 40;
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padding, height - 30);
+  ctx.lineTo(width - padding, height - 30);
+  ctx.stroke();
+
+  // Draw x-axis labels
+  ctx.fillStyle = '#64748b';
+  ctx.font = '11px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  for (let x = 0; x <= 100; x += 20) {
+    const canvasX = padding + (x / 100) * (width - padding * 2);
+    ctx.fillText(x.toString(), canvasX, height - 10);
+
+    // Tick mark
+    ctx.beginPath();
+    ctx.moveTo(canvasX, height - 30);
+    ctx.lineTo(canvasX, height - 25);
+    ctx.stroke();
+  }
+
+  // Draw curves from widest (L1) to narrowest (L3) - but current level on top
+  // First draw non-current levels
+  for (const levelData of levels) {
+    if (levelData.level === currentLevel) continue;
+
+    const rangeWidth = levelData.range.upper - levelData.range.lower;
+    // Standard deviation roughly corresponds to range/4 for ~95% of curve
+    const stdDev = Math.max(rangeWidth / 4, 2);
+
+    drawBellCurve(
+      ctx,
+      levelData.range.score,
+      stdDev,
+      levelData.color,
+      levelData.strokeColor,
+      width,
+      height,
+      false
+    );
+  }
+
+  // Draw current level on top with more opacity
+  const currentLevelData = levels.find(l => l.level === currentLevel);
+  if (currentLevelData) {
+    const rangeWidth = currentLevelData.range.upper - currentLevelData.range.lower;
+    const stdDev = Math.max(rangeWidth / 4, 2);
+
+    drawBellCurve(
+      ctx,
+      currentLevelData.range.score,
+      stdDev,
+      currentLevelData.activeColor,
+      currentLevelData.activeStroke,
+      width,
+      height,
+      true
+    );
+
+    // Draw score marker for current level
+    const scoreX = padding + (currentLevelData.range.score / 100) * (width - padding * 2);
+    ctx.beginPath();
+    ctx.arc(scoreX, height - 30, 6, 0, Math.PI * 2);
+    ctx.fillStyle = currentLevelData.activeStroke;
+    ctx.fill();
+
+    // Draw score label
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 12px system-ui, sans-serif';
+    ctx.fillText(currentLevelData.range.score.toString(), scoreX, height - 42);
+  }
+}
+
+// =============================================================================
 // SCORE CALCULATION & DISPLAY
 // =============================================================================
 
@@ -360,10 +559,15 @@ function calculateAndShowResults() {
  * @param {string} companyType - Selected company type
  */
 function renderResults(scoreData, role, companyType) {
-  // Personal score
+  // Personal score with range
   const personalValueEl = document.getElementById('personal-score-value');
   if (personalValueEl) {
     personalValueEl.textContent = scoreData.personalScore.normalizedScore;
+  }
+
+  const personalRangeEl = document.getElementById('personal-score-range');
+  if (personalRangeEl && scoreData.personalScore.range) {
+    personalRangeEl.textContent = `(${scoreData.personalScore.range.lower} - ${scoreData.personalScore.range.upper})`;
   }
 
   const personalBandEl = document.getElementById('personal-score-band');
@@ -372,10 +576,15 @@ function renderResults(scoreData, role, companyType) {
     personalBandEl.className = `score-card-band band-${scoreData.personalScore.scoreBand.toLowerCase()}`;
   }
 
-  // Corporate score
+  // Corporate score with range
   const corporateValueEl = document.getElementById('corporate-score-value');
   if (corporateValueEl) {
     corporateValueEl.textContent = scoreData.corporateScore.normalizedScore;
+  }
+
+  const corporateRangeEl = document.getElementById('corporate-score-range');
+  if (corporateRangeEl && scoreData.corporateScore.range) {
+    corporateRangeEl.textContent = `(${scoreData.corporateScore.range.lower} - ${scoreData.corporateScore.range.upper})`;
   }
 
   const corporateBandEl = document.getElementById('corporate-score-band');
@@ -383,6 +592,9 @@ function renderResults(scoreData, role, companyType) {
     corporateBandEl.textContent = scoreData.corporateScore.scoreBand;
     corporateBandEl.className = `score-card-band band-${scoreData.corporateScore.scoreBand.toLowerCase()}`;
   }
+
+  // Draw bell curve visualization
+  drawConfidenceChart(scoreData);
 
   // Gap display
   const gapValueEl = document.getElementById('gap-value');
@@ -711,6 +923,109 @@ function goToPeerReview() {
 }
 
 // =============================================================================
+// SHARE SETTINGS FUNCTION
+// =============================================================================
+
+/**
+ * Generate a shareable URL with current assessment settings and copy to clipboard
+ * Only includes non-default values in the URL
+ */
+function shareSettings() {
+  const params = new URLSearchParams();
+
+  // Get current values
+  const roleSelect = document.getElementById('role-select');
+  const companyTypeSelect = document.getElementById('company-type-select');
+  const distributionSelect = document.getElementById('point-distribution-select');
+
+  const role = roleSelect ? roleSelect.value : 'General';
+  const companyType = companyTypeSelect ? companyTypeSelect.value : '';
+  const distribution = distributionSelect ? distributionSelect.value : 'bellCurve';
+
+  // Only add non-default values
+  if (role && role !== 'General') {
+    params.set('role', role);
+  }
+  if (companyType && companyType !== '') {
+    params.set('companyType', companyType);
+  }
+  if (distribution && distribution !== 'bellCurve') {
+    params.set('distribution', distribution);
+  }
+
+  // Build the full URL
+  const baseUrl = window.location.origin + window.location.pathname;
+  const queryString = params.toString();
+  const shareUrl = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+
+  // Copy to clipboard with fallback
+  copyToClipboard(shareUrl).then(success => {
+    showShareFeedback(success);
+  });
+}
+
+/**
+ * Copy text to clipboard with fallback for older browsers
+ * @param {string} text - Text to copy
+ * @returns {Promise<boolean>} Success status
+ */
+async function copyToClipboard(text) {
+  // Modern clipboard API
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (err) {
+      console.warn('Clipboard API failed, trying fallback:', err);
+    }
+  }
+
+  // Fallback for older browsers
+  try {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-9999px';
+    textArea.style.top = '-9999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    const result = document.execCommand('copy');
+    document.body.removeChild(textArea);
+    return result;
+  } catch (err) {
+    console.error('Fallback clipboard copy failed:', err);
+    return false;
+  }
+}
+
+/**
+ * Show brief feedback after share button click
+ * @param {boolean} success - Whether copy succeeded
+ */
+function showShareFeedback(success) {
+  const btn = document.getElementById('share-settings-btn');
+  if (!btn) return;
+
+  const originalText = btn.innerHTML;
+  const originalClass = btn.className;
+
+  if (success) {
+    btn.innerHTML = 'Link copied!';
+    btn.classList.add('btn-success');
+  } else {
+    btn.innerHTML = 'Copy failed';
+    btn.classList.add('btn-error');
+  }
+
+  // Reset after 2 seconds
+  setTimeout(() => {
+    btn.innerHTML = originalText;
+    btn.className = originalClass;
+  }, 2000);
+}
+
+// =============================================================================
 // POINT DISTRIBUTION FUNCTIONS
 // =============================================================================
 
@@ -740,12 +1055,35 @@ function populateDistributionSelect(selectElement) {
 function handleDistributionChange(distributionKey) {
   setPointDistribution(distributionKey);
   updateDistributionPreview();
+  updatePointLabels();
 
   // Update URL param
   if (distributionKey === 'bellCurve') {
     removeUrlParam('distribution');
   } else {
     setUrlParam('distribution', distributionKey);
+  }
+}
+
+/**
+ * Update all point labels in radio cards based on current distribution
+ * Called when distribution dropdown changes
+ */
+function updatePointLabels() {
+  for (const [dimKey, dimData] of Object.entries(DIMENSIONS)) {
+    const section = document.querySelector(`.dimension-section[data-dimension="${dimKey}"]`);
+    if (!section) continue;
+
+    for (const levelData of dimData.levels) {
+      const card = section.querySelector(`.radio-card[data-level="${levelData.level}"]`);
+      if (!card) continue;
+
+      const pointsSpan = card.querySelector('.points-value');
+      if (pointsSpan) {
+        const actualPoints = getPointsForLevel(dimKey, levelData.level);
+        pointsSpan.textContent = `${actualPoints} pts`;
+      }
+    }
   }
 }
 
@@ -799,6 +1137,8 @@ window.toggleCombinedScore = toggleCombinedScore;
 window.handleDistributionChange = handleDistributionChange;
 window.populateDistributionSelect = populateDistributionSelect;
 window.updateDistributionPreview = updateDistributionPreview;
+window.updatePointLabels = updatePointLabels;
+window.shareSettings = shareSettings;
 
 // =============================================================================
 // DOCUMENT READY

@@ -46,8 +46,8 @@
         { id: 'home', label: 'Home', icon: '🏠', href: base + 'index.html' },
       ]},
       { section: 'Assess', items: [
-        { id: 'level1', label: 'Level 1: Self', icon: '①', href: base + 'level1.html', badge: '0.6x' },
-        { id: 'level2', label: 'Level 2: Peer', icon: '②', href: base + 'level2.html', badge: '0.8x' },
+        { id: 'level1', label: 'Level 1: Self', icon: '①', href: base + 'level1.html', badge: '0.70x' },
+        { id: 'level2', label: 'Level 2: Peer', icon: '②', href: base + 'level2.html', badge: '0.85x' },
         { id: 'level3', label: 'Level 3: Verified', icon: '③', href: base + 'level3.html', badge: '1.0x' },
       ]},
       { section: 'Reference', items: [
