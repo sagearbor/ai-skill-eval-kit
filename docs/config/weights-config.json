@@ -1,5 +1,28 @@
 {
   "schemaVersion": "1.1",
+  "pointDistributions": {
+    "linear": {
+      "name": "Linear (Legacy)",
+      "description": "Equal point increments per level",
+      "ratios": [0, 0.125, 0.325, 0.525, 0.725, 0.925]
+    },
+    "bellCurve": {
+      "name": "Bell Curve (Default)",
+      "description": "More granularity where most people score",
+      "default": true,
+      "ratios": [0, 0.10, 0.30, 0.70, 0.90, 1.0]
+    },
+    "progressive": {
+      "name": "Progressive",
+      "description": "Rewards excellence - top levels worth more",
+      "ratios": [0, 0.10, 0.25, 0.50, 0.80, 1.0]
+    },
+    "sigmoid": {
+      "name": "Sigmoid",
+      "description": "Big breakthrough in middle, plateaus at ends",
+      "ratios": [0, 0.05, 0.25, 0.75, 0.95, 1.0]
+    }
+  },
   "scoreTypes": {
     "personal": {
       "description": "Individual readiness to deliver AI value",

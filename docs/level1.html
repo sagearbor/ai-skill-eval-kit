@@ -167,6 +167,33 @@
         </div>
       </div>
 
+      <!-- Advanced Options (collapsed by default) -->
+      <details class="card mb-8" id="advanced-options">
+        <summary class="card-header" style="cursor: pointer; user-select: none;">
+          <h2 class="card-title" style="margin-bottom: 0; display: flex; align-items: center; gap: var(--space-2);">
+            <span style="font-size: var(--font-size-sm); transition: transform 0.2s;">&#9654;</span>
+            Advanced Options
+          </h2>
+        </summary>
+        <div class="card-body">
+          <div class="form-group mb-0">
+            <label for="point-distribution-select" class="form-label">Point Distribution Curve</label>
+            <select id="point-distribution-select" class="form-select" onchange="handleDistributionChange(this.value)">
+              <!-- Populated by JavaScript -->
+            </select>
+            <p class="form-hint" id="distribution-description">How points are distributed across levels 0-5.</p>
+            <div id="distribution-preview" style="margin-top: var(--space-3); padding: var(--space-3); background: var(--color-bg-alt); border-radius: var(--radius-md); font-family: monospace; font-size: var(--font-size-xs);">
+              <!-- Populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </details>
+      <style>
+        #advanced-options[open] summary .card-title span:first-child {
+          transform: rotate(90deg);
+        }
+      </style>
+
       <!-- Assessment Form -->
       <form id="assessment-form">
         <div id="dimensions-container">

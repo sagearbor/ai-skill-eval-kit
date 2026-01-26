@@ -43,6 +43,7 @@ let weightsConfig = null;
 let levelDescriptions = null;
 let configLoadPromise = null;
 let descriptionsLoadPromise = null;
+let currentPointDistribution = 'bellCurve'; // Default distribution
 
 // =============================================================================
 // DIMENSION DATA
@@ -229,11 +230,69 @@ async function loadLevelDescriptions() {
 }
 
 // =============================================================================
+// POINT DISTRIBUTION FUNCTIONS
+// =============================================================================
+
+/**
+ * Get list of available point distributions
+ * @returns {object} Distribution options { key: { name, description, default } }
+ */
+function getPointDistributions() {
+  if (weightsConfig?.pointDistributions) {
+    return weightsConfig.pointDistributions;
+  }
+  // Fallback defaults
+  return {
+    linear: { name: 'Linear (Legacy)', description: 'Equal point increments', ratios: [0, 0.125, 0.325, 0.525, 0.725, 0.925] },
+    bellCurve: { name: 'Bell Curve (Default)', description: 'More granularity in middle', default: true, ratios: [0, 0.10, 0.30, 0.70, 0.90, 1.0] },
+    progressive: { name: 'Progressive', description: 'Top levels worth more', ratios: [0, 0.10, 0.25, 0.50, 0.80, 1.0] },
+    sigmoid: { name: 'Sigmoid', description: 'Breakthrough in middle', ratios: [0, 0.05, 0.25, 0.75, 0.95, 1.0] }
+  };
+}
+
+/**
+ * Get current point distribution key
+ * @returns {string} Current distribution key
+ */
+function getCurrentPointDistribution() {
+  return currentPointDistribution;
+}
+
+/**
+ * Set point distribution
+ * @param {string} distributionKey - Distribution key (linear, bellCurve, progressive, sigmoid)
+ */
+function setPointDistribution(distributionKey) {
+  const distributions = getPointDistributions();
+  if (distributions[distributionKey]) {
+    currentPointDistribution = distributionKey;
+  } else {
+    console.warn(`Unknown distribution: ${distributionKey}, using bellCurve`);
+    currentPointDistribution = 'bellCurve';
+  }
+}
+
+/**
+ * Get the ratio array for current distribution
+ * @returns {number[]} Array of 6 ratios [0, r1, r2, r3, r4, r5] where each is 0-1
+ */
+function getDistributionRatios() {
+  const distributions = getPointDistributions();
+  const dist = distributions[currentPointDistribution];
+  if (dist?.ratios) {
+    return dist.ratios;
+  }
+  // Fallback to bell curve
+  return [0, 0.10, 0.30, 0.70, 0.90, 1.0];
+}
+
+// =============================================================================
 // UTILITY FUNCTIONS
 // =============================================================================
 
 /**
- * Get points for a given level in a dimension (uses midpoint for ranges)
+ * Get points for a given level in a dimension
+ * Uses current point distribution to calculate points as ratio of max
  * @param {string} dimension - The dimension key (study, copy, output, research, ethical)
  * @param {number} level - The level (0-5)
  * @returns {number} The points value for that level
@@ -245,17 +304,25 @@ function getPointsForLevel(dimension, level) {
     return 0;
   }
 
-  const levelData = dim.levels.find(l => l.level === level);
-  if (!levelData) {
-    console.error(`Unknown level ${level} for dimension ${dimension}`);
+  if (level < 0 || level > 5) {
+    console.error(`Invalid level ${level} for dimension ${dimension}`);
     return 0;
   }
 
-  // Level 0 has explicit points, others use midpoint
+  // Level 0 is always 0 points
   if (level === 0) {
-    return levelData.points;
+    return 0;
   }
-  return levelData.midpoint;
+
+  // Get max points for this dimension (level 5 midpoint from original data)
+  const level5Data = dim.levels.find(l => l.level === 5);
+  const maxPoints = level5Data ? level5Data.midpoint : 20;
+
+  // Get distribution ratios and calculate points
+  const ratios = getDistributionRatios();
+  const points = maxPoints * ratios[level];
+
+  return Math.round(points * 10) / 10; // Round to 1 decimal
 }
 
 /**
@@ -1024,6 +1091,10 @@ window.AI_TOOLS = AI_TOOLS;
 
 window.loadWeightsConfig = loadWeightsConfig;
 window.loadLevelDescriptions = loadLevelDescriptions;
+window.getPointDistributions = getPointDistributions;
+window.getCurrentPointDistribution = getCurrentPointDistribution;
+window.setPointDistribution = setPointDistribution;
+window.getDistributionRatios = getDistributionRatios;
 window.getPointsForLevel = getPointsForLevel;
 window.getMaxPointsForDimension = getMaxPointsForDimension;
 window.calculateDimensionScore = calculateDimensionScore;

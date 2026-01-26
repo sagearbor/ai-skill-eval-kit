@@ -56,6 +56,19 @@ async function initAssessment() {
     // Will be handled in results display
   }
 
+  // Populate point distribution dropdown
+  const distributionSelect = document.getElementById('point-distribution-select');
+  if (distributionSelect) {
+    populateDistributionSelect(distributionSelect);
+    // Check for URL param
+    const urlDistribution = getUrlParam('distribution');
+    if (urlDistribution) {
+      setPointDistribution(urlDistribution);
+      distributionSelect.value = urlDistribution;
+    }
+    updateDistributionPreview();
+  }
+
   // Generate dimension forms
   const container = document.getElementById('dimensions-container');
   if (container) {
@@ -698,10 +711,94 @@ function goToPeerReview() {
 }
 
 // =============================================================================
+// POINT DISTRIBUTION FUNCTIONS
+// =============================================================================
+
+/**
+ * Populate the distribution select dropdown
+ * @param {HTMLSelectElement} selectElement - The select element
+ */
+function populateDistributionSelect(selectElement) {
+  const distributions = getPointDistributions();
+  selectElement.innerHTML = '';
+
+  for (const [key, dist] of Object.entries(distributions)) {
+    const option = document.createElement('option');
+    option.value = key;
+    option.textContent = dist.name;
+    if (dist.default) {
+      option.selected = true;
+    }
+    selectElement.appendChild(option);
+  }
+}
+
+/**
+ * Handle distribution change
+ * @param {string} distributionKey - Selected distribution key
+ */
+function handleDistributionChange(distributionKey) {
+  setPointDistribution(distributionKey);
+  updateDistributionPreview();
+
+  // Update URL param
+  if (distributionKey === 'bellCurve') {
+    removeUrlParam('distribution');
+  } else {
+    setUrlParam('distribution', distributionKey);
+  }
+}
+
+/**
+ * Update the distribution preview display
+ */
+function updateDistributionPreview() {
+  const preview = document.getElementById('distribution-preview');
+  const description = document.getElementById('distribution-description');
+  if (!preview) return;
+
+  const distributions = getPointDistributions();
+  const current = getCurrentPointDistribution();
+  const dist = distributions[current];
+
+  if (description && dist) {
+    description.textContent = dist.description;
+  }
+
+  // Show points for a sample dimension (Study, max 18.5)
+  const ratios = dist?.ratios || [0, 0.10, 0.30, 0.70, 0.90, 1.0];
+  const maxPoints = 18.5; // Study dimension max
+
+  const points = ratios.map((r, i) => {
+    const pts = i === 0 ? 0 : Math.round(maxPoints * r * 10) / 10;
+    return pts;
+  });
+
+  // Calculate increments
+  const increments = points.map((p, i) => i === 0 ? 0 : Math.round((p - points[i-1]) * 10) / 10);
+
+  preview.innerHTML = `
+    <div style="margin-bottom: 4px;"><strong>Example (Study dimension, max ${maxPoints} pts):</strong></div>
+    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; text-align: center;">
+      ${points.map((p, i) => `
+        <div>
+          <div style="font-weight: 600;">L${i}</div>
+          <div>${p}</div>
+          ${i > 0 ? `<div style="color: var(--color-success); font-size: 10px;">+${increments[i]}</div>` : '<div style="font-size: 10px;">&nbsp;</div>'}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// =============================================================================
 // EXPORT TO GLOBAL SCOPE
 // =============================================================================
 
 window.toggleCombinedScore = toggleCombinedScore;
+window.handleDistributionChange = handleDistributionChange;
+window.populateDistributionSelect = populateDistributionSelect;
+window.updateDistributionPreview = updateDistributionPreview;
 
 // =============================================================================
 // DOCUMENT READY
