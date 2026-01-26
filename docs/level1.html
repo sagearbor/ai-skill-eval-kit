@@ -123,7 +123,7 @@
         <span style="opacity: 0.8;">Copy</span> <span style="opacity: 0.5;">|</span>
         <span style="opacity: 0.8;">Output</span> <span style="opacity: 0.5;">|</span>
         <span style="opacity: 0.8;">Research</span> <span style="opacity: 0.5;">|</span>
-        <span style="opacity: 0.8;">Ethical</span>
+        <span style="opacity: 0.8;">Ethical Sec</span>
       </p>
     </div>
   </header>
@@ -169,11 +169,8 @@
 
       <!-- Advanced Options (collapsed by default) -->
       <details class="card mb-8" id="advanced-options">
-        <summary class="card-header" style="cursor: pointer; user-select: none;">
-          <h2 class="card-title" style="margin-bottom: 0; display: flex; align-items: center; gap: var(--space-2);">
-            <span style="font-size: var(--font-size-sm); transition: transform 0.2s;">&#9654;</span>
-            Advanced Options
-          </h2>
+        <summary class="card-header" style="cursor: pointer; user-select: none; list-style: none;">
+          <h2 class="card-title" style="margin-bottom: 0;">Advanced Options</h2>
         </summary>
         <div class="card-body">
           <div class="form-group mb-0">
@@ -189,9 +186,17 @@
         </div>
       </details>
       <style>
-        #advanced-options[open] summary .card-title span:first-child {
-          transform: rotate(90deg);
+        #advanced-options summary::-webkit-details-marker { display: none; }
+        #advanced-options summary::marker { display: none; }
+        #advanced-options summary { position: relative; padding-left: var(--space-6); }
+        #advanced-options summary::before {
+          content: '▶';
+          position: absolute;
+          left: var(--space-4);
+          font-size: 0.7em;
+          transition: transform 0.2s;
         }
+        #advanced-options[open] summary::before { transform: rotate(90deg); }
       </style>
 
       <!-- Assessment Form -->
