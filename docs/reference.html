@@ -348,75 +348,87 @@
         <!-- Full Rubrics -->
         <section class="section-card" id="rubrics">
             <h2>Full SCOREs Rubrics</h2>
-            <p class="mb-6">Detailed level descriptions for each dimension (Levels 0-5).</p>
+            <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;">
+                <span>Detailed level descriptions for each dimension (Levels 0-5).</span>
+                <label style="display: flex; align-items: center; gap: var(--space-2);">
+                    <span style="font-weight: 500;">View for role:</span>
+                    <select id="rubricRoleSelect" style="padding: 0.375rem 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: var(--font-size-sm);">
+                        <option value="General">General</option>
+                        <option value="Developer" selected>Developer</option>
+                        <option value="Researcher">Researcher</option>
+                        <option value="Support">Support</option>
+                        <option value="Leader">Leader</option>
+                    </select>
+                </label>
+            </div>
 
-            <!-- Study -->
+            <!-- Study (universal - same for all roles) -->
             <div class="dimension-card">
                 <h3>S - Study (Information & Fluency)</h3>
                 <p class="question">Where do you learn about AI? Can you explain why things work or fail?</p>
-                <div class="level-grid">
-                    <div class="level-row"><span class="level-num">L0</span><span>No AI awareness. Avoids or fears the technology.</span></div>
-                    <div class="level-row"><span class="level-num">L1</span><span>Mainstream news only. Passive consumption of hype/fear cycles.</span></div>
-                    <div class="level-row"><span class="level-num">L2</span><span>LinkedIn influencers, YouTube "Top 10 Tools" content.</span></div>
-                    <div class="level-row"><span class="level-num">L3</span><span>Developer blogs, release notes, AI-focused newsletters.</span></div>
-                    <div class="level-row"><span class="level-num">L4</span><span>Technical reports, GitHub repos. Can explain why models fail.</span></div>
-                    <div class="level-row"><span class="level-num">L5</span><span>ArXiv papers, model weights, source code. Predicts capability shifts.</span></div>
+                <div class="level-grid" id="rubric-study">
+                    <div class="level-row"><span class="level-num">L0</span><span class="level-desc">No AI awareness. Avoids or fears the technology.</span></div>
+                    <div class="level-row"><span class="level-num">L1</span><span class="level-desc">Mainstream news only. Passive consumption of hype/fear cycles.</span></div>
+                    <div class="level-row"><span class="level-num">L2</span><span class="level-desc">LinkedIn influencers, YouTube "Top 10 Tools" content.</span></div>
+                    <div class="level-row"><span class="level-num">L3</span><span class="level-desc">Developer blogs, release notes, AI-focused newsletters.</span></div>
+                    <div class="level-row"><span class="level-num">L4</span><span class="level-desc">Technical reports, GitHub repos. Can explain why models fail.</span></div>
+                    <div class="level-row"><span class="level-num">L5</span><span class="level-desc">ArXiv papers, model weights, source code. Predicts capability shifts.</span></div>
                 </div>
             </div>
 
-            <!-- Copy -->
+            <!-- Copy (universal - same for all roles) -->
             <div class="dimension-card">
                 <h3>C - Copy (Evaluation & Rigor)</h3>
                 <p class="question">How do you know if AI output is good? Can you prove it?</p>
-                <div class="level-grid">
-                    <div class="level-row"><span class="level-num">L0</span><span>No validation. Blind trust: "It looks right to me."</span></div>
-                    <div class="level-row"><span class="level-num">L1</span><span>"Vibes check." Runs prompt once, manually reviews.</span></div>
-                    <div class="level-row"><span class="level-num">L2</span><span>Maintains test cases. Systematic manual Pass/Fail grading.</span></div>
-                    <div class="level-row"><span class="level-num">L3</span><span>A/B tests models. Comparative benchmarks. Uses eval tools.</span></div>
-                    <div class="level-row"><span class="level-num">L4</span><span>Automated evals. LLM-as-Judge. Quantified metrics (precision, recall).</span></div>
-                    <div class="level-row"><span class="level-num">L5</span><span>Statistical confidence intervals. CI/CD for prompts. Regression testing.</span></div>
+                <div class="level-grid" id="rubric-copy">
+                    <div class="level-row"><span class="level-num">L0</span><span class="level-desc">No validation. Blind trust: "It looks right to me."</span></div>
+                    <div class="level-row"><span class="level-num">L1</span><span class="level-desc">"Vibes check." Runs prompt once, manually reviews.</span></div>
+                    <div class="level-row"><span class="level-num">L2</span><span class="level-desc">Maintains test cases. Systematic manual Pass/Fail grading.</span></div>
+                    <div class="level-row"><span class="level-num">L3</span><span class="level-desc">A/B tests models. Comparative benchmarks. Uses eval tools.</span></div>
+                    <div class="level-row"><span class="level-num">L4</span><span class="level-desc">Automated evals. LLM-as-Judge. Quantified metrics (precision, recall).</span></div>
+                    <div class="level-row"><span class="level-num">L5</span><span class="level-desc">Statistical confidence intervals. CI/CD for prompts. Regression testing.</span></div>
                 </div>
             </div>
 
-            <!-- Output -->
+            <!-- Output (role-specific) -->
             <div class="dimension-card">
                 <h3>O - Output (Deployment & Impact)</h3>
                 <p class="question">What have you built that others actually use? What value did it create?</p>
-                <div class="level-grid">
-                    <div class="level-row"><span class="level-num">L0</span><span>Chat interface only. No deployment or workflow integration.</span></div>
-                    <div class="level-row"><span class="level-num">L1</span><span>Personal productivity (Copilot, ChatGPT Plus). Time savings only.</span></div>
-                    <div class="level-row"><span class="level-num">L2</span><span>Simple wrapper apps. Basic API integration. Likely negative ROI.</span></div>
-                    <div class="level-row"><span class="level-num">L3</span><span>Internal tools used by team. RAG pipelines. $10k+ verified savings.</span></div>
-                    <div class="level-row"><span class="level-num">L4</span><span>Production agentic systems. Revenue-generating. External users.</span></div>
-                    <div class="level-row"><span class="level-num">L5</span><span>Vertical AI platform. Fine-tuned models. $100k+ verified value.</span></div>
+                <div class="level-grid" id="rubric-output">
+                    <div class="level-row"><span class="level-num">L0</span><span class="level-desc">Chat interface only. No deployment or workflow integration.</span></div>
+                    <div class="level-row"><span class="level-num">L1</span><span class="level-desc">Personal productivity (Copilot, ChatGPT Plus). Time savings only.</span></div>
+                    <div class="level-row"><span class="level-num">L2</span><span class="level-desc">Simple wrapper apps. Basic API integration. ROI not yet quantified.</span></div>
+                    <div class="level-row"><span class="level-num">L3</span><span class="level-desc">Internal tools used by team. RAG pipelines. $10k+ verified savings.</span></div>
+                    <div class="level-row"><span class="level-num">L4</span><span class="level-desc">Production agentic systems. Revenue-generating. External users.</span></div>
+                    <div class="level-row"><span class="level-num">L5</span><span class="level-desc">Vertical AI platform. Fine-tuned models. $100k+ verified value.</span></div>
                 </div>
             </div>
 
-            <!-- Research -->
+            <!-- Research (role-specific) -->
             <div class="dimension-card">
                 <h3>R - Research (Innovation & Contribution)</h3>
                 <p class="question">Do you advance the field or just consume it?</p>
-                <div class="level-grid">
-                    <div class="level-row"><span class="level-num">L0</span><span>Treats AI as magic. No understanding of mechanisms.</span></div>
-                    <div class="level-row"><span class="level-num">L1</span><span>Conceptual understanding: tokens, temperature, context windows.</span></div>
-                    <div class="level-row"><span class="level-num">L2</span><span>Architectural knowledge. Understands Transformers. Implements papers.</span></div>
-                    <div class="level-row"><span class="level-num">L3</span><span>Contributes: fine-tunes models, publishes weights, shares methods.</span></div>
-                    <div class="level-row"><span class="level-num">L4</span><span>Researches: novel architectures, publishes at conferences.</span></div>
-                    <div class="level-row"><span class="level-num">L5</span><span>Invents: paradigm-shifting discoveries. Industry-recognized impact.</span></div>
+                <div class="level-grid" id="rubric-research">
+                    <div class="level-row"><span class="level-num">L0</span><span class="level-desc">Treats AI as magic. No understanding of mechanisms.</span></div>
+                    <div class="level-row"><span class="level-num">L1</span><span class="level-desc">Conceptual understanding: tokens, temperature, context windows.</span></div>
+                    <div class="level-row"><span class="level-num">L2</span><span class="level-desc">Architectural knowledge. Understands Transformers. Implements papers.</span></div>
+                    <div class="level-row"><span class="level-num">L3</span><span class="level-desc">Contributes: fine-tunes models, publishes weights, shares methods.</span></div>
+                    <div class="level-row"><span class="level-num">L4</span><span class="level-desc">Researches: novel architectures, publishes at conferences.</span></div>
+                    <div class="level-row"><span class="level-num">L5</span><span class="level-desc">Invents: paradigm-shifting discoveries. Industry-recognized impact.</span></div>
                 </div>
             </div>
 
-            <!-- Ethical security -->
+            <!-- Ethical security (role-specific) -->
             <div class="dimension-card">
                 <h3>Es - Ethical security (Safety & Responsibility)</h3>
                 <p class="question">Can you be trusted with AI? Do you use it safely?</p>
-                <div class="level-grid">
-                    <div class="level-row"><span class="level-num">L0</span><span>Dangerous. Pastes PII into public models. Ignores bias.</span></div>
-                    <div class="level-row"><span class="level-num">L1</span><span>Compliant. Follows rules. Uses only sanctioned tools.</span></div>
-                    <div class="level-row"><span class="level-num">L2</span><span>Cautious. Fact-checks outputs. Human-in-the-loop for decisions.</span></div>
-                    <div class="level-row"><span class="level-num">L3</span><span>Proactive. Tests for hallucinations. Documents failure modes.</span></div>
-                    <div class="level-row"><span class="level-num">L4</span><span>Guardian. Catches risks in others' work. Designs safety protocols.</span></div>
-                    <div class="level-row"><span class="level-num">L5</span><span>Leader. Shapes org policies. Trains others on safe practices.</span></div>
+                <div class="level-grid" id="rubric-ethical">
+                    <div class="level-row"><span class="level-num">L0</span><span class="level-desc">Dangerous. Pastes PII into public models. Ignores bias.</span></div>
+                    <div class="level-row"><span class="level-num">L1</span><span class="level-desc">Compliant. Follows rules. Uses only sanctioned tools.</span></div>
+                    <div class="level-row"><span class="level-num">L2</span><span class="level-desc">Cautious. Fact-checks outputs. Human-in-the-loop for decisions.</span></div>
+                    <div class="level-row"><span class="level-num">L3</span><span class="level-desc">Proactive. Tests for hallucinations. Documents failure modes.</span></div>
+                    <div class="level-row"><span class="level-num">L4</span><span class="level-desc">Guardian. Catches risks in others' work. Designs safety protocols.</span></div>
+                    <div class="level-row"><span class="level-num">L5</span><span class="level-desc">Leader. Shapes org policies. Trains others on safe practices.</span></div>
                 </div>
             </div>
         </section>
@@ -436,5 +448,52 @@
     </footer>
 
     <script src="js/nav.js"></script>
+    <script>
+    // Dynamic rubric descriptions based on role selection
+    (function() {
+        let levelDescriptions = null;
+
+        // Load level descriptions JSON
+        fetch('config/level-descriptions.json')
+            .then(response => response.json())
+            .then(data => {
+                levelDescriptions = data;
+                // Initialize with default role (Developer)
+                updateRubrics('Developer');
+            })
+            .catch(err => console.error('Failed to load level descriptions:', err));
+
+        // Handle role selection change
+        const roleSelect = document.getElementById('rubricRoleSelect');
+        if (roleSelect) {
+            roleSelect.addEventListener('change', function() {
+                updateRubrics(this.value);
+            });
+        }
+
+        function updateRubrics(role) {
+            if (!levelDescriptions) return;
+
+            // Role-specific dimensions: output, research, ethical
+            const roleSpecificDims = ['output', 'research', 'ethical'];
+
+            roleSpecificDims.forEach(dim => {
+                const grid = document.getElementById('rubric-' + dim);
+                if (!grid) return;
+
+                const descriptions = levelDescriptions.roleSpecific[dim][role];
+                if (!descriptions) return;
+
+                const rows = grid.querySelectorAll('.level-row');
+                rows.forEach((row, index) => {
+                    const descSpan = row.querySelector('.level-desc');
+                    if (descSpan && descriptions[index]) {
+                        descSpan.textContent = descriptions[index].description;
+                    }
+                });
+            });
+        }
+    })();
+    </script>
 </body>
 </html>
