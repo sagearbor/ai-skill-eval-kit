@@ -12,7 +12,7 @@
 
 ## **The Formula**
 
-$$AIQ \= \\sum (\\text{Dimension Score} \\times \\text{Role Weight}) \\times \\text{Evidence Multiplier}$$  
+$$AIQ = \sum (\text{Dimension Score} \times \text{Role Weight}) \times \text{Evidence Multiplier}$$  
 *All dimension scores are time-adjusted. Result: 0-100 with confidence rating.*
 
 ### **Score Bands**
@@ -234,7 +234,7 @@ Different organizations may prefer different point distributions across levels. 
 
 AI evolves rapidly. Skills learned years ago are worth less today. The framework automatically depreciates knowledge based on how fast that category changes.
 
-$$\\text{Current Value} \= \\text{Original Value} \\times (0.5)^{\\frac{\\text{years}}{\\text{half-life}}}$$
+$$\text{Current Value} = \text{Original Value} \times (0.5)^{\frac{\text{years}}{\text{half-life}}}$$
 
 | Skill Category | Half-Life | Examples |
 | --- | --- | --- |
@@ -247,7 +247,7 @@ $$\\text{Current Value} \= \\text{Original Value} \\times (0.5)^{\\frac{\\text{y
 
 In 2023, Alex mastered prompt engineering (Framework skill, 2-year half-life) and earned 15 points. It's now 2026 (3 years later).
 
-$$\\text{Current value: } 15 \\times (0.5)^{\\frac{3}{2}} \= 15 \\times 0.35 \= 5.3 \\text{ points}$$  
+$$\text{Current value: } 15 \times (0.5)^{\frac{3}{2}} = 15 \times 0.35 = 5.3 \text{ points}$$  
 To maintain their score, Alex must continue learning.
 
 ## **Part V: Production Learning Bonus**
