@@ -201,6 +201,7 @@ Each assessment level produces a score with a confidence range representing the 
 | **Auto/Audit (L3)** | Raw × 1.0 | Score±2 | Tight range; verified evidence |
 
 Example: A raw score of 72 displays as:
+
 - **L1:** 50 (range 40–74)
 - **L2:** 61 (range 56–74)
 - **L3:** 72 (range 70–74)
