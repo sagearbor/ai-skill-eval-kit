@@ -73,8 +73,8 @@ build/                             # Generated outputs (auto-committed)
 ### Run the Site Locally
 ```bash
 # Any static file server works
-cd docs && python -m http.server 8000
-# Visit http://localhost:8000
+cd docs && python -m http.server 8003 --bind localhost
+# Visit http://localhost:8003
 ```
 
 ### Build the DOCX (requires Pandoc)

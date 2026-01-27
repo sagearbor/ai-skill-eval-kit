@@ -74,7 +74,7 @@ build/                             # Generated outputs (DO NOT EDIT)
 
 ### Run Site Locally
 ```bash
-cd docs && python -m http.server 8000
+cd docs && python -m http.server 8000 --bind localhost
 ```
 
 ### Build DOCX (requires Pandoc)
