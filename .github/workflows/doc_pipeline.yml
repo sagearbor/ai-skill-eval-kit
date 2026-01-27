@@ -176,6 +176,7 @@ jobs:
             --user root \
             pandoc/core:latest \
             docs/ai_mastery_eval.md \
+            --from markdown+tex_math_dollars \
             --reference-doc docs/templates/reference.docx \
             -o build/ai_mastery_eval.docx
 
